@@ -289,3 +289,6 @@ export interface MetrikaLive {
   totals?: Record<string, number>
   rows?: { date: string; visits?: number; users?: number; [k: string]: string | number | undefined }[]
 }
+
+export interface UploadResult { file: string; chunks_added: number; error?: string }
+export interface IndexStats { chunks: number; by_source: Record<string, number>; seconds?: number; errors?: string[] }

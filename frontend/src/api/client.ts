@@ -1,6 +1,6 @@
 import type {
   ApplyResult, ChatMessage, ChatResponse, Health, HypothesisRecord, Investigation, KnowledgeHit,
-  Measurement, MetricInfo, MetricRule, MetricSeries, MetrikaLive, Release, Settings, Signal, Task, DataGap,
+  Measurement, MetricInfo, MetricRule, MetricSeries, MetrikaLive, Release, Settings, Signal, Task, DataGap, UploadResult, IndexStats,
 } from './types'
 import { mockRequest } from '../mocks/mockServer'
 
@@ -85,16 +85,17 @@ export const api = {
     request<Measurement>('POST', `/hypotheses/${id}/measure`, { scenario }),
 
   settings: () => request<Settings>('GET', '/settings'),
-  putMetricRule: (id: string, rule: Partial<MetricRule>) => request<Settings>('PUT', `/settings/metrics/${id}`, rule),
+  putMetricRule: (id: string, rule: Partial<MetricRule>) => request<MetricRule>('PUT', `/settings/metrics/${id}`, rule),
+  putSettings: (patch: Partial<Settings>) => request<Settings>('PUT', '/settings', patch),
   resetSettings: () => request<Settings>('POST', '/settings/reset'),
 
   search: (q: string, k = 8, source?: string) => request<KnowledgeHit[]>('GET', `/knowledge/search${qs({ q, k, source })}`),
   upload: (file: File) => {
     const fd = new FormData()
     fd.append('file', file)
-    return request<Record<string, unknown>>('POST', '/knowledge/upload', fd)
+    return request<UploadResult>('POST', '/knowledge/upload', fd)
   },
-  reindex: () => request<Record<string, unknown>>('POST', '/knowledge/reindex'),
+  reindex: () => request<IndexStats>('POST', '/knowledge/reindex'),
 
   chat: (message: string, history: ChatMessage[]) => request<ChatResponse>('POST', '/chat', { message, history }),
   metrikaLive: (date1 = '7daysAgo', date2 = 'today') => request<MetrikaLive>('GET', `/metrika/live${qs({ date1, date2 })}`),

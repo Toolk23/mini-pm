@@ -26,6 +26,7 @@ const state = {
   hypotheses: [] as any[],
   settings: clone(settings) as any,
   investigations: {} as Record<string, any>,
+  uploads: 0,
 }
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
@@ -120,6 +121,11 @@ function route(method: string, path: string, body: any): any {
   if (method === 'GET' && p === '/settings') return state.settings
   if (method === 'PUT' && (r = m(/^\/settings\/metrics\/([^/]+)$/))) {
     state.settings.metrics[r[1]] = { ...state.settings.metrics[r[1]], ...body }
+    return state.settings.metrics[r[1]]
+  }
+  if (method === 'PUT' && p === '/settings') {
+    state.settings = { ...state.settings, ...body, detector: { ...state.settings.detector, ...(body?.detector ?? {}) },
+      metrics: { ...state.settings.metrics, ...(body?.metrics ?? {}) } }
     return state.settings
   }
   if (method === 'POST' && p === '/settings/reset') {
@@ -128,8 +134,8 @@ function route(method: string, path: string, body: any): any {
   }
 
   if (method === 'GET' && p === '/knowledge/search') return search
-  if (method === 'POST' && p === '/knowledge/upload') return { ok: true, file: body?.get?.('file')?.name, chunks: 12 }
-  if (method === 'POST' && p === '/knowledge/reindex') return { ok: true }
+  if (method === 'POST' && p === '/knowledge/upload') { state.uploads += 6; return { file: body?.get?.('file')?.name ?? 'файл', chunks_added: 6 } }
+  if (method === 'POST' && p === '/knowledge/reindex') return { chunks: 1180 + state.uploads, by_source: { interview: 742, competitor: 438, ...(state.uploads ? { upload: state.uploads } : {}) }, seconds: 1.2 }
   if (method === 'POST' && p === '/chat') return chat
   if (method === 'GET' && p === '/metrika/live') return metrikaLive
 
