@@ -5,8 +5,9 @@ import type { MetricInfo, Signal } from '../api/types'
 import MetricChart, { parsePeriod, type ChartWindow } from '../components/MetricChart'
 import MetrikaLivePanel from '../components/MetrikaLivePanel'
 import { CountUp, Radar } from '../components/live'
-import { Card, ErrorBox, Loading, NoData, NoDataBadge, PriorityBadge, useApi } from '../components/ui'
-import { Hl, KIcons, Kicker, Rich, SectionHead } from '../components/highlight'
+import { Card, ErrorBox, Loading, NoData, NoDataBadge, useApi } from '../components/ui'
+import { Hl, KIcons, Kicker, SectionHead } from '../components/highlight'
+import { SignalRow, useMetricNames } from '../components/SignalRow'
 
 type Mode = 'sales' | 'metric' | 'live'
 const PRODUCTS = ['Конфигуратор Kaspersky', 'Конфигуратор Астра', 'ЛК'] as const
@@ -211,21 +212,16 @@ function GapsStrip({ gaps }: { gaps: { id: string; text: string }[] }) {
 
 /* ---------------- лента сигналов ---------------- */
 function SignalFeed({ signals, loading }: { signals: Signal[]; loading: boolean }) {
+  const nav = useNavigate()
+  const names = useMetricNames()
   return (
     <Card className="reveal feed" title={<h2>Лента сигналов</h2>} extra={<span className="row faint"><span className="live-dot" /> {signals.length} активных</span>}>
       {loading && !signals.length && <Loading />}
-      <div className="stack" style={{ gap: 8 }}>
+      <div className="sig-list">
         {signals.map((s, i) => (
-          <Link key={s.id} to={`/investigations?signal=${encodeURIComponent(s.id)}`} className={`signal-item reveal prio-${s.priority.toLowerCase()}`}
-            style={{ ['--i' as string]: i + 2 }}>
-            <div className="row" style={{ justifyContent: 'space-between' }}>
-              <PriorityBadge p={s.priority} />
-              <span className="faint mono">{s.product}</span>
-            </div>
-            <div className="signal-title"><Rich text={s.title} /></div>
-            {s.caveats[0] && <div className="faint">{shortCaveat(s.caveats[0])}</div>}
-            <span className="signal-cta">Расследовать</span>
-          </Link>
+          <SignalRow key={s.id} s={s} names={names} as="a" href={`/investigations?signal=${encodeURIComponent(s.id)}`}
+            onClick={() => nav(`/investigations?signal=${encodeURIComponent(s.id)}`)} style={{ ['--i' as string]: i + 2 }}
+            action={<span className="kbd">↵</span>} />
         ))}
       </div>
     </Card>

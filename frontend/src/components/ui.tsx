@@ -25,19 +25,18 @@ export function useApi<T>(fn: () => Promise<T>, deps: unknown[] = []) {
   return { data, error, loading, reload, setData }
 }
 
-const PRIORITY_CLASS: Record<string, string> = {
-  Critical: 'badge-critical', High: 'badge-high', Medium: 'badge-medium', Low: '',
-}
 const PRIORITY_RU: Record<string, string> = { Critical: 'Критичный', High: 'Высокий', Medium: 'Средний', Low: 'Низкий' }
 
+/** Приоритет — точка + подпись (как статусы в Linear/Raycast), без цветной таблетки. */
 export function PriorityBadge({ p }: { p: string }) {
-  return <span className={`badge ${PRIORITY_CLASS[p] ?? ''}`}>{PRIORITY_RU[p] ?? p}</span>
+  const k = ['Critical', 'High', 'Medium', 'Low'].includes(p) ? p.toLowerCase() : 'none'
+  return <span className={`prio prio-${k}`}><i aria-hidden />{PRIORITY_RU[p] ?? p}</span>
 }
 
 export function AiBadge() {
   return (
     <span className="badge badge-ai" title="Задачу создал агент «мини ПМ»">
-      <SparkIcon /> {AI_TAG}
+      {AI_TAG}
     </span>
   )
 }

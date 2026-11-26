@@ -825,3 +825,61 @@ input[type='range']:disabled { opacity: .4; cursor: not-allowed; }
   .nav-actions { margin-left: auto; }
   .stepper, .mail-list, .inv-aside { top: 120px; }
 }
+
+/* ---------- приоритет: точка + подпись ---------- */
+.prio { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: var(--text-2); white-space: nowrap; }
+.prio i { width: 7px; height: 7px; border-radius: 2px; background: var(--text-3); flex: none; }
+.prio-critical i { background: #ff5f6d; }
+.prio-high i { background: #f5a524; }
+.prio-medium i { background: #8f7dff; }
+.prio-low i, .prio-none i { background: transparent; border: 1px solid var(--text-3); }
+
+/* ---------- строка сигнала в стиле списков Raycast ---------- */
+.sig-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; border: 1px solid transparent;
+  background: none; color: var(--text); font: inherit; text-align: left; width: 100%; transition: background .15s, border-color .15s; }
+.sig-row.clickable { cursor: pointer; }
+.sig-row.clickable:hover { background: rgba(255, 255, 255, .045); border-color: var(--border); text-decoration: none; }
+.sig-row + .sig-row { margin-top: 2px; }
+.sig-icon { width: 36px; height: 36px; flex: none; border-radius: 10px; display: grid; place-items: center; color: var(--text-2);
+  background: rgba(255, 255, 255, .04); border: 1px solid var(--border); }
+.sig-icon svg { width: 18px; height: 18px; }
+.sig-icon.prio-critical { color: #ff8a8a; }
+.sig-icon.prio-high { color: #f5b24a; }
+.sig-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.sig-title { font-weight: 550; font-size: 14.5px; line-height: 1.35; }
+.sig-meta { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-3); flex-wrap: wrap; }
+.sig-dot-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--text-3); }
+.sig-action { flex: none; opacity: 0; transition: opacity .15s; }
+.sig-row:hover .sig-action, .sig-row:focus-visible .sig-action { opacity: 1; }
+.sig-row.is-new { border-color: color-mix(in srgb, var(--success) 35%, transparent); background: var(--success-soft); }
+.sig-list { display: flex; flex-direction: column; }
+:root[data-theme='light'] .sig-row.clickable:hover { background: var(--surface-2); }
+:root[data-theme='light'] .sig-icon { background: #fff; }
+:root[data-theme='light'] .sig-icon.prio-critical { color: var(--danger); }
+:root[data-theme='light'] .sig-icon.prio-high { color: var(--warning); }
+
+/* проценты в тексте — цветом, без свечения */
+.tok-num.neg { color: #ff8a8a; text-shadow: none; }
+
+/* ---------- метки спокойнее: без таблеток-капсул и свечения (как теги Raycast/Linear) ---------- */
+.badge { border-radius: 6px; height: 22px; padding: 0 7px; font-weight: 500; background: rgba(255, 255, 255, .06); border: 0; }
+.badge-critical, .badge-high, .badge-medium, .badge-success { border: 0; }
+.badge-critical { background: rgba(255, 95, 109, .1); color: #ff8f99; }
+.badge-high { background: rgba(245, 165, 36, .1); color: #f5b24a; }
+.badge-success { background: rgba(62, 224, 161, .1); color: #5fdcaa; }
+.badge-ai { border: 0; background: rgba(211, 155, 255, .1); color: #d6aefc; }
+.badge-nodata { border-radius: 6px; }
+.tok-id { box-shadow: none; background: rgba(255, 174, 74, .1); }
+.tok-id.hot { box-shadow: none; text-shadow: none; background: rgba(255, 99, 99, .14); color: #ffb3b3; }
+.inv-id { font: 600 12.5px var(--mono); color: var(--text-3); }
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
+.status i { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+.status-done i { background: #3ee0a1; } .status-running i { background: #f5a524; } .status-error i { background: #ff5f6d; }
+:root[data-theme='light'] .badge { background: var(--surface-2); }
+:root[data-theme='light'] .badge-critical { background: var(--danger-soft); color: var(--danger); }
+:root[data-theme='light'] .badge-high { background: var(--warning-soft); color: var(--warning); }
+:root[data-theme='light'] .badge-success { background: var(--success-soft); color: var(--success); }
+:root[data-theme='light'] .badge-ai { background: var(--ai-soft); color: var(--ai); }
+:root[data-theme='light'] .tok-id.hot { color: #b0182c; }
+.task-card.ai { border-color: color-mix(in srgb, var(--ai) 30%, transparent); box-shadow: none; }
+.task-card.ai::before { display: none; }

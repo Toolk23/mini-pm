@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
-import { ErrorBox, Loading, PriorityBadge, fmtDate, useApi } from '../components/ui'
+import { ErrorBox, Loading, fmtDate, useApi } from '../components/ui'
+import { SignalRow, signalTitle, useMetricNames } from '../components/SignalRow'
 import { Hl, KIcons, Kicker, Rich, SectionHead } from '../components/highlight'
 
 export default function Investigations() {
@@ -35,8 +36,9 @@ export default function Investigations() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preselected])
 
-  const titleOf = (id: string) => signals.data?.find((x) => x.id === id)?.title ?? id
-  const STATUS: Record<string, [string, string]> = { done: ['готово', 'badge-success'], running: ['идёт', 'badge-high'], error: ['ошибка', 'badge-critical'] }
+  const names = useMetricNames()
+  const titleOf = (id: string) => { const x = signals.data?.find((y) => y.id === id); return x ? signalTitle(x, names) : id }
+  const STATUS: Record<string, [string, string]> = { done: ['готово', 'done'], running: ['идёт', 'running'], error: ['ошибка', 'error'] }
 
   return (
     <>
@@ -52,14 +54,10 @@ export default function Investigations() {
         <div className="eyebrow">запустить по сигналу</div>
         {signals.loading && <Loading />}
         {signals.error && <ErrorBox error={signals.error} onRetry={signals.reload} />}
-        <div className="grid grid-3">
+        <div className="card sig-list" style={{ padding: 6 }}>
           {signals.data?.map((s, i) => (
-            <button key={s.id} className={`signal-item reveal prio-${s.priority.toLowerCase()} start-card`} style={{ ['--i' as string]: i + 1 }}
-              disabled={!!starting} onClick={() => start(s.id)}>
-              <div className="row" style={{ justifyContent: 'space-between' }}><PriorityBadge p={s.priority} /><span className="faint mono">{s.product}</span></div>
-              <div className="signal-title"><Rich text={s.title} /></div>
-              <span className="signal-cta" style={{ opacity: starting === s.id ? 1 : undefined }}>{starting === s.id ? <><span className="spinner" /> Запускаю…</> : 'Расследовать'}</span>
-            </button>
+            <SignalRow key={s.id} s={s} names={names} as="button" onClick={() => !starting && start(s.id)} style={{ ['--i' as string]: i + 1 }}
+              action={starting === s.id ? <span className="row faint"><span className="spinner" /> Запускаю…</span> : <span className="btn btn-sm">Расследовать</span>} />
           ))}
         </div>
       </section>
@@ -73,11 +71,11 @@ export default function Investigations() {
             const [label, cls] = STATUS[inv.status] ?? [inv.status, '']
             return (
               <Link key={inv.id} to={`/investigations/${inv.id}`} className="inv-row reveal">
-                <code className="tok-id">{inv.id}</code>
+                <code className="inv-id">{inv.id}</code>
                 <span className="inv-row-title"><Rich text={titleOf(inv.signal_id)} /></span>
-                <span className="row" style={{ gap: 6 }}>
-                  {inv.applied && <span className="badge badge-ai">письмо и задача {inv.applied.task.task_id}</span>}
-                  <span className={`badge ${cls}`}>{label}</span>
+                <span className="row" style={{ gap: 12 }}>
+                  {inv.applied && <span className="faint">письмо и задача {inv.applied.task.task_id}</span>}
+                  <span className={`status status-${cls}`}><i aria-hidden />{label}</span>
                   <span className="faint">{fmtDate(inv.created_at)} {new Date(inv.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
                   <span className="inv-row-arrow">→</span>
                 </span>

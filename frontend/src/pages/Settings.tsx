@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../api/client'
 import type { MetricInfo, MetricRule, Settings, Signal } from '../api/types'
-import { Hl, Kicker, Rich, SectionHead } from '../components/highlight'
+import { Hl, Kicker, SectionHead } from '../components/highlight'
+import { SignalRow, signalTitle, useMetricNames } from '../components/SignalRow'
 import { CountUp } from '../components/live'
-import { ErrorBox, Icons, Loading, PriorityBadge, useApi } from '../components/ui'
+import { ErrorBox, Icons, Loading, useApi } from '../components/ui'
 
 const RULES: Record<string, { label: string; unit: string; min: number; max: number; step: number; hint: (t: number) => string }> = {
   pct_drop: { label: 'Падение', unit: '%', min: 5, max: 80, step: 1, hint: (t) => `сигнал, если метрика упала больше чем на ${t}%` },
@@ -173,6 +174,7 @@ export default function SettingsPage() {
 function LivePreview({ signals, loading, prev }: { signals: Signal[]; loading: boolean; prev: Signal[] }) {
   const ids = signals.map((s) => s.id)
   const prevIds = prev.map((s) => s.id)
+  const names = useMetricNames()
   const gone = prev.filter((s) => !ids.includes(s.id))
   const [pulse, setPulse] = useState(false)
   useEffect(() => { setPulse(true); const t = setTimeout(() => setPulse(false), 700); return () => clearTimeout(t) }, [signals])
@@ -183,14 +185,9 @@ function LivePreview({ signals, loading, prev }: { signals: Signal[]; loading: b
         {loading && <span className="spinner" />}
       </div>
       <div className="live-count"><CountUp value={signals.length} duration={600} /><span>активных</span></div>
-      {gone.length > 0 && <div className="callout callout-warning faint" style={{ marginBottom: 10 }}>Пропал сигнал: {gone.map((g) => g.title).join('; ')}</div>}
-      <div className="stack" style={{ gap: 8 }}>
-        {signals.map((s) => (
-          <div key={s.id} className={`signal-item reveal prio-${s.priority.toLowerCase()}${prevIds.length && !prevIds.includes(s.id) ? ' is-new' : ''}`}>
-            <div className="row" style={{ justifyContent: 'space-between' }}><PriorityBadge p={s.priority} /><span className="faint mono">{s.product}</span></div>
-            <div className="signal-title"><Rich text={s.title} /></div>
-          </div>
-        ))}
+      {gone.length > 0 && <div className="callout callout-warning faint" style={{ marginBottom: 10 }}>Пропал сигнал: {gone.map((g) => signalTitle(g, names)).join('; ')}</div>}
+      <div className="sig-list">
+        {signals.map((s) => <SignalRow key={s.id} s={s} names={names} isNew={prevIds.length > 0 && !prevIds.includes(s.id)} />)}
         {!loading && signals.length === 0 && <div className="board-empty">Ни одного сигнала при текущих порогах</div>}
       </div>
     </section>
