@@ -8,7 +8,7 @@ import uuid
 import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -301,10 +301,16 @@ def tokens():
 
 
 # ------------------------------------------------------------------ фронтенд (один URL стенда)
-if config.FRONTEND_DIST.exists():
+if (config.FRONTEND_DIST / "assets").is_dir():
     app.mount("/assets", StaticFiles(directory=config.FRONTEND_DIST / "assets"), name="assets")
 
+if (config.FRONTEND_DIST / "index.html").is_file():
     @app.get("/{path:path}", include_in_schema=False)
     def spa(path: str):
         f = config.FRONTEND_DIST / path
         return FileResponse(f if path and f.is_file() else config.FRONTEND_DIST / "index.html")
+else:
+    @app.get("/", include_in_schema=False)
+    def placeholder():
+        return HTMLResponse("<h1>мини ПМ</h1><p>API работает. Фронтенд в разработке. "
+                            "<a href='/docs'>Документация API</a> · <a href='/api/signals'>Сигналы</a></p>")
