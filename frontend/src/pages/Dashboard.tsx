@@ -35,31 +35,34 @@ export default function Dashboard() {
 function Hero({ s, all, onInvestigate }: { s: Signal; all: Signal[]; onInvestigate: () => void }) {
   const pct = Math.abs(Math.round(s.change?.change_pct ?? 0))
   const ctrl = s.control
+  // Короткие пометки — в плашки; длинные методические оговорки остаются в подсказке.
+  const chips = s.caveats.filter((c) => /всплеск|неполн/i.test(c))
   return (
-    <section className="card card-glow reveal hero">
-      <div className="hero-text">
-        <div className="row eyebrow"><span className="live-dot red" /> критичный сигнал · {s.change?.post_period}</div>
-        <h1 className="hero-title">
-          Самостоятельные заказы {s.family} <span className="grad-text">упали на {pct}%</span>
-        </h1>
-        <p className="muted hero-sub">
-          Устойчиво — по скользящему среднему, а не по отдельной неделе.
-          {ctrl && <> Контроль {ctrl.name}: {ctrl.change_pct > 0 ? '+' : ''}{ctrl.change_pct}% — {ctrl.stable ? 'падение специфично для ' + s.family : 'контроль тоже изменился'}.</>}
-        </p>
-        <div className="row" style={{ marginTop: 18, gap: 10 }}>
-          <button className="btn btn-primary" onClick={onInvestigate}>Запустить расследование →</button>
-          <Link className="btn" to="/story">Смотреть всю историю</Link>
+    <section className="hero reveal">
+      <div className="hero-orbit" aria-hidden><Radar signals={all} size={640} /></div>
+      <div className="hero-glow" aria-hidden />
+
+      <button className="pill-warm" onClick={onInvestigate}>
+        <span className="live-dot red" /> Критичный сигнал · {s.change?.post_period} <span className="pill-arrow">›</span>
+      </button>
+      <h1 className="hero-title">
+        <span className="grad-silver">Заказы {s.family}</span><br />
+        <span className="grad-warm">упали на {pct}%</span>
+      </h1>
+      <p className="hero-sub">
+        Устойчиво — по скользящему среднему, а не по отдельной неделе.
+        {ctrl && <> Контроль {ctrl.name}: {ctrl.change_pct > 0 ? '+' : ''}{ctrl.change_pct}% — {ctrl.stable ? 'падение специфично для ' + s.family : 'контроль тоже изменился'}.</>}
+      </p>
+      <div className="row hero-actions">
+        <button className="btn btn-primary btn-lg" onClick={onInvestigate}>Запустить расследование</button>
+        <Link className="btn btn-lg" to="/story">Вся история →</Link>
+      </div>
+      {chips.length > 0 && (
+        <div className="row hero-chips">
+          {chips.map((c) => <span key={c} className="chip" title={c}>{shortCaveat(c)}</span>)}
+          <span className="chip" title={s.caveats.filter((c) => !chips.includes(c)).join('\n')}>ещё {s.caveats.length - chips.length} оговорки</span>
         </div>
-        {s.caveats.length > 0 && (
-          <div className="row" style={{ marginTop: 16, gap: 6 }}>
-            {s.caveats.map((c) => <span key={c} className="chip" title={c}>{shortCaveat(c)}</span>)}
-          </div>
-        )}
-      </div>
-      <div className="hero-radar">
-        <Radar signals={all} size={250} />
-        <div className="faint" style={{ textAlign: 'center' }}>{all.length} сигнал(а) на радаре</div>
-      </div>
+      )}
     </section>
   )
 }
