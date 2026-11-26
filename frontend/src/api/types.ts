@@ -265,6 +265,10 @@ export interface Health {
 export interface MetrikaLive {
   ok: boolean
   error?: string
-  source: string
-  [k: string]: unknown
+  status?: number
+  source?: string
+  counter_id?: string
+  request?: { url: string; params: Record<string, string | number> }
+  totals?: Record<string, number>
+  rows?: { date: string; visits?: number; users?: number; [k: string]: string | number | undefined }[]
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { setUseMocks, useMocks, api } from '../api/client'
 import { Icons, useApi } from './ui'
+import { useTheme } from './theme'
 
 const NAV = [
   { section: 'Радар' },
@@ -25,6 +26,7 @@ const TITLES: Record<string, string> = {
 export default function Layout() {
   const loc = useLocation()
   const [mock, setMock] = useState(useMocks)
+  const [theme, setTheme] = useTheme()
   const health = useApi(() => api.health(), [mock])
   const title = TITLES[loc.pathname.split('/')[1] ?? ''] ?? 'мини ПМ'
 
@@ -35,6 +37,11 @@ export default function Layout() {
   }
 
   return (
+    <>
+    <div className="backdrop" aria-hidden>
+      <div className="aurora aurora-1" /><div className="aurora aurora-2" /><div className="aurora aurora-3" />
+      <div className="noise" />
+    </div>
     <div className="app">
       <aside className="sidebar">
         <div className="brand">
@@ -68,15 +75,21 @@ export default function Layout() {
           <span className="topbar-title">{title}</span>
           <span className="topbar-spacer" />
           {health.error && !mock && <span className="badge badge-critical">бэкенд недоступен</span>}
-          <button className={`btn btn-sm ${mock ? '' : 'btn-ghost'} mock-pill`} onClick={toggleMock}
+          <span className="row faint topbar-live"><span className="live-dot" /> агент следит за метриками</span>
+          <button className={`btn btn-sm ${mock ? '' : 'btn-ghost'}`} onClick={toggleMock}
             title="Моки — снятые ответы бэкенда, работают без сервера">
             {mock ? 'Данные: моки' : 'Данные: API'}
           </button>
+          <button className="btn btn-sm btn-ghost" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            title="Тёмная / светлая тема (светлая — для проектора)" aria-label="Сменить тему">
+            {theme === 'dark' ? '☀' : '☾'}
+          </button>
         </header>
-        <main className="content">
+        <main className="content" key={loc.pathname}>
           <Outlet />
         </main>
       </div>
     </div>
+    </>
   )
 }
