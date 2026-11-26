@@ -27,7 +27,8 @@ def _search_index():
 @app.get("/api/health")
 def health():
     return {"ok": True, "data": ingest.warmup(), "llm": {"configured": llm.available(), "provider": config.LLM_PROVIDER,
-                                                          "model": config.LLM_MODEL},
+                                                          "model": config.LLM_MODEL,
+                                                          "models_by_step": {s: config.model_for(s) for s in ("investigation", "chat")}},
             "metrika": {"configured": metrika.configured()}}
 
 

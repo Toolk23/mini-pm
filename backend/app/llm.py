@@ -27,7 +27,8 @@ def chat(messages: list[dict], step: str, *, temperature: float = 0.2, max_token
     headers = {"Authorization": f"Bearer {config.LLM_API_KEY}"}
     if config.LLM_FOLDER_ID:
         headers["OpenAI-Project"] = config.LLM_FOLDER_ID  # YandexGPT: каталог
-    body = {"model": config.LLM_MODEL, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}
+    model = config.model_for(step)
+    body = {"model": model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}
     if json_mode:
         body["response_format"] = {"type": "json_object"}
     url = config.LLM_BASE_URL.rstrip("/") + "/chat/completions"
@@ -42,7 +43,7 @@ def chat(messages: list[dict], step: str, *, temperature: float = 0.2, max_token
         raise LLMError(f"Ошибка LLM: {e} {detail}") from e
     data = r.json()
     usage = data.get("usage") or {}
-    store.log_tokens(step, config.LLM_MODEL, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0), request_id)
+    store.log_tokens(step, model, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0), request_id)
     return data["choices"][0]["message"]["content"] or ""
 
 
