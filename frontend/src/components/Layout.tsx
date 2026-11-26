@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { setUseMocks, useMocks, api } from '../api/client'
 import { Icons, useApi } from './ui'
 import { useTheme } from './theme'
@@ -16,7 +16,20 @@ const NAV = [
 
 export default function Layout() {
   const loc = useLocation()
+  const nav = useNavigate()
   const [mock, setMock] = useState(useMocks)
+
+  // Ctrl+K / ⌘K — чат с любой страницы (как командная строка Raycast).
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K' || e.code === 'KeyK')) {
+        e.preventDefault()
+        nav('/chat')
+      }
+    }
+    window.addEventListener('keydown', on)
+    return () => window.removeEventListener('keydown', on)
+  }, [nav])
   const [theme, setTheme] = useTheme()
   const health = useApi(() => api.health(), [mock])
   const [scrolled, setScrolled] = useState(false)
@@ -84,7 +97,9 @@ export default function Layout() {
               <NavLink to="/settings" className={({ isActive }) => `icon-btn${isActive ? ' on' : ''}`} title="Настройки порогов" aria-label="Настройки">
                 <Icons.settings />
               </NavLink>
-              <NavLink to="/chat" className="btn btn-primary btn-cta">Спросить мини ПМ</NavLink>
+              <NavLink to="/chat" className="btn btn-primary btn-cta" title="Ctrl+K — с любой страницы">
+                Спросить мини ПМ <span className="kbd kbd-on-light">Ctrl K</span>
+              </NavLink>
             </div>
           </div>
         </header>
