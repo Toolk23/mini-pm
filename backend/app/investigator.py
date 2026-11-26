@@ -212,21 +212,75 @@ def investigate(sig: dict, inv_id: str) -> dict:
 
 
 # ------------------------------------------------------------------ чат
-CHAT_SYSTEM = SYSTEM.replace("Верни строго JSON.", "Отвечай обычным текстом, в конце перечисли источники в квадратных скобках [1], [2].")
+CHAT_SYSTEM = SYSTEM.replace("Верни строго JSON.", (
+    "Сначала опирайся на блок «Факты из данных» (продажи, контрольная группа, релизы, итоги расследований) — "
+    "это первичные данные магазина. Интервью и конкуренты — только как подтверждение или контекст, не как причина "
+    "падения, если факты указывают на другое. Если по вопросу есть расследование — пересказывай его вывод. "
+    "Отвечай обычным текстом; ссылайся на сигналы/релизы/расследования по id, на фрагменты базы — [1], [2]."))
+
+
+def _mentioned_families(text: str) -> set[str]:
+    t = text.lower()
+    return {f for f, kws in FAMILY_KEYWORDS.items() if any(k in t for k in kws)}
+
+
+def _signal_facts(sig: dict) -> dict:
+    if sig.get("kind") != "sales_drop":
+        return {k: sig.get(k) for k in ("id", "title", "priority", "facts", "caveats")}
+    ctrl = sig.get("control", {})
+    return {
+        "id": sig["id"], "title": sig["title"], "priority": sig["priority"],
+        "change": sig["change"], "split_week": sig["split_week"], "rolling": sig["rolling"],
+        "control": {k: ctrl.get(k) for k in ("family", "change_pct", "baseline_period", "post_period", "stable", "conclusion")},
+        "releases_ranked": [{k: r.get(k) for k in ("release_id", "date", "type", "description", "score", "why")}
+                            for r in _rank_releases(sig)],
+        "caveats": sig.get("caveats", []),
+    }
+
+
+def _investigation_digest(signal_id: str) -> dict | None:
+    done = [j for j in store.read("investigations", {}).values()
+            if j.get("signal_id") == signal_id and j.get("status") == "done"]
+    if not done:
+        return None
+    j = max(done, key=lambda x: x.get("created_at", ""))
+    r = j.get("report", {})
+    return {"investigation_id": j["id"], "mode": r.get("mode"), "summary": r.get("summary"),
+            "hypotheses": [{k: h.get(k) for k in ("text", "status")} for h in r.get("hypotheses", [])],
+            "recommendation": r.get("recommendation"), "applied": bool(j.get("applied"))}
+
+
+def chat_facts(message: str) -> dict:
+    """Факты из данных для чата: подробно — по упомянутым семействам (или по критичным сигналам), кратко — остальные."""
+    sigs = detector.detect_all()
+    fams = _mentioned_families(message)
+    focus = [s for s in sigs if s.get("family") in fams] if fams else \
+        [s for s in sigs if s.get("priority") == "Critical"][:2]
+    detailed = []
+    for s in focus:
+        f = _signal_facts(s)
+        inv = _investigation_digest(s["id"])
+        if inv:
+            f["investigation"] = inv
+        detailed.append(f)
+    focus_ids = {s["id"] for s in focus}
+    others = [{k: s.get(k) for k in ("id", "title", "priority")} for s in sigs if s["id"] not in focus_ids]
+    return {"signals_detailed": detailed, "other_signals": others}
 
 
 def answer(message: str, history: list[dict]) -> dict:
     hits = _search(message, 6)
-    sigs = [{k: s.get(k) for k in ("id", "title", "priority")} for s in detector.detect_all()]
+    facts = chat_facts(message)
     ctx = "\n".join(f"[{i + 1}] {h['title']} ({h['file']}, лист {h['sheet']}, строка {h['row']}): {h['text']}" for i, h in enumerate(hits))
     if not llm.available():
         return {"answer": ("Режим без LLM. Нашёл в базе:\n" + ctx) if hits else "В базе нет данных по этому вопросу.",
-                "sources": hits, "mode": "search_only"}
+                "sources": hits, "facts": facts, "mode": "search_only"}
     msgs = [{"role": "system", "content": CHAT_SYSTEM},
             *[m for m in history[-6:] if m.get("role") in ("user", "assistant")],
-            {"role": "user", "content": f"Активные сигналы: {json.dumps(sigs, ensure_ascii=False)}\n\nФрагменты базы знаний:\n{ctx or 'ничего не найдено'}\n\nВопрос: {message}"}]
+            {"role": "user", "content": f"Факты из данных:\n{json.dumps(facts, ensure_ascii=False, default=str)}\n\n"
+                                        f"Фрагменты базы знаний (интервью, конкуренты):\n{ctx or 'ничего не найдено'}\n\nВопрос: {message}"}]
     try:
         text = llm.chat(msgs, step="chat", max_tokens=4000)
     except llm.LLMError as e:
-        return {"answer": f"LLM недоступна ({e}). Нашёл в базе:\n{ctx}", "sources": hits, "mode": "search_only"}
-    return {"answer": text, "sources": hits, "mode": "llm"}
+        return {"answer": f"LLM недоступна ({e}). Нашёл в базе:\n{ctx}", "sources": hits, "facts": facts, "mode": "search_only"}
+    return {"answer": text, "sources": hits, "facts": facts, "mode": "llm"}
