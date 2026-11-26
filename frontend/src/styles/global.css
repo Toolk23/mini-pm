@@ -597,3 +597,51 @@ select:focus, input:focus, textarea:focus, .btn:focus-visible { outline: 2px sol
   .story-num { width: 30px; height: 30px; }
 }
 .story-body > .btn { align-self: flex-start; }
+
+/* ---------- шаги расследования: плитки как у Resend ---------- */
+.steps-picker { position: relative; }
+.tiles { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 10px; scrollbar-width: none; scroll-snap-type: x proximity; }
+.tiles::-webkit-scrollbar { display: none; }
+.tile { flex: none; display: flex; flex-direction: column; align-items: center; gap: 10px; background: none; border: 0; padding: 0;
+  font: inherit; cursor: pointer; color: var(--text-2); scroll-snap-align: center; }
+.tile-box { position: relative; width: 76px; height: 76px; border-radius: 18px; display: grid; place-items: center;
+  border: 1px solid var(--border-strong); background: rgba(255, 255, 255, .015); color: var(--text-2);
+  transition: background .2s, border-color .2s, color .2s, box-shadow .25s, transform .2s; }
+.tile-box svg { width: 28px; height: 28px; }
+.tile:hover .tile-box { border-color: rgba(255, 255, 255, .22); color: var(--text); transform: translateY(-2px); }
+.tile-label { font-size: 15px; font-weight: 500; transition: color .2s; }
+.tile.on .tile-box { color: var(--tc); background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .03));
+  border-color: rgba(255, 255, 255, .32); box-shadow: 0 0 0 1px rgba(255, 255, 255, .06) inset, 0 10px 30px -12px var(--tc); }
+.tile.on .tile-box svg { filter: drop-shadow(0 0 8px var(--tc)); }
+.tile.on .tile-label { color: var(--text); font-weight: 650; }
+.tile:focus-visible .tile-box { outline: 2px solid color-mix(in srgb, var(--tc) 70%, transparent); outline-offset: 2px; }
+.tile-n { position: absolute; top: 6px; right: 7px; font: 600 10px var(--mono); color: var(--text-3); }
+.tile.on .tile-n { color: var(--tc); }
+.tile-gap .tile-box { border-style: dashed; }
+.tiles-track { height: 4px; border-radius: 4px; background: var(--surface-3); margin: 6px 2px 22px; overflow: hidden; }
+.tiles-track span { display: block; height: 100%; border-radius: inherit; background: var(--text-3); transition: width .35s cubic-bezier(.2, .7, .2, 1); }
+
+.step-panel { border-radius: 22px; border: 1px solid var(--border-strong); background: color-mix(in srgb, var(--surface-solid) 85%, transparent);
+  overflow: hidden; position: relative; animation: reveal .45s cubic-bezier(.2, .7, .2, 1) both; }
+.step-panel::before { content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--tc), transparent); opacity: .7; }
+.step-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.panel-pill { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px; border-radius: 12px;
+  font-size: 15px; font-weight: 500; color: var(--text-2); border: 1px solid transparent; white-space: nowrap; }
+.panel-pill.on { color: var(--text); background: rgba(255, 255, 255, .05); border-color: var(--border-strong); font-weight: 600;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .06) inset; white-space: normal; }
+.panel-pill-ico { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; flex: none;
+  color: var(--tc); border: 1px solid color-mix(in srgb, var(--tc) 60%, transparent); }
+.panel-pill-ico svg { width: 14px; height: 14px; }
+.panel-src-dot { width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--surface-3); }
+.step-panel-body { padding: 20px 22px 22px; }
+.step-finding { font-size: 16px; line-height: 1.65; color: var(--text-2); }
+:root[data-theme='light'] .tile-box { background: #fff; }
+:root[data-theme='light'] .tile.on .tile-box { background: #fff; border-color: var(--text-3); }
+:root[data-theme='light'] .panel-pill.on { background: var(--surface-2); }
+@media (max-width: 760px) {
+  .tile-box { width: 64px; height: 64px; border-radius: 16px; }
+  .tile-label { font-size: 13px; }
+  .step-panel-body { padding: 16px; }
+}

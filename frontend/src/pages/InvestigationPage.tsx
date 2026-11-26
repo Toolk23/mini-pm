@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api, pollInvestigation } from '../api/client'
 import type { ApplyResult, Investigation, InvestigationReport, InvestigationStep, KnowledgeHit, ReleaseCandidate } from '../api/types'
@@ -103,12 +103,7 @@ function Report({ inv, rep }: { inv: Investigation; rep: InvestigationReport }) 
 
       <div className="grid grid-main-side" style={{ alignItems: 'start' }}>
         <div className="stack" style={{ gap: 16 }}>
-          <Card title={<div className="stack" style={{ gap: 6 }}><Kicker tone="blue" icon={<KIcons.search />}>Следствие</Kicker><h2 style={{ fontSize: 20 }}>Ход расследования · {rep.steps.length} шагов</h2></div>}>
-            <ol className="timeline">
-              {rep.steps.map((s, i) => <Step key={s.n} s={s} rep={rep} i={i} />)}
-            </ol>
-          </Card>
-          <Hypotheses rep={rep} />
+          <StepsPicker rep={rep} />
           <Decision inv={inv} rep={rep} />
         </div>
 
@@ -134,28 +129,125 @@ function Report({ inv, rep }: { inv: Investigation; rep: InvestigationReport }) 
   )
 }
 
-/* ---------- шаг таймлайна + обогащения по типу шага ---------- */
-function Step({ s, rep, i }: { s: InvestigationStep; rep: InvestigationReport; i: number }) {
+/* ---------- шаги расследования: плитки как у Resend + панель шага ---------- */
+type StepKind = 'signal' | 'control' | 'releases' | 'funnel' | 'gap' | 'external' | 'plain' | 'hyp'
+
+function kindOf(s: InvestigationStep): StepKind {
   const t = (s.title ?? '').toLowerCase()
-  const hot = rep.evidence.releases[0] ? [rep.evidence.releases[0].release_id] : []
-  const kind = t.includes('релиз') ? 'releases' : t.includes('теряем') || t.includes('воронк') ? 'funnel'
-    : t.includes('пробел') || t.includes('нет данных') ? 'gap' : t.includes('внешн') || t.includes('интервью') ? 'external' : 'plain'
+  if (t.includes('релиз')) return 'releases'
+  if (t.includes('теряем') || t.includes('воронк')) return 'funnel'
+  if (t.includes('пробел') || t.includes('нет данных')) return 'gap'
+  if (t.includes('внешн') || t.includes('интервью')) return 'external'
+  if (t.includes('контрол')) return 'control'
+  if (t.includes('сигнал')) return 'signal'
+  return 'plain'
+}
+
+const ico = (d: ReactNode) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>{d}</svg>
+const STEP_LOOK: Record<StepKind, { short: string; color: string; icon: ReactNode }> = {
+  signal: { short: 'Сигнал', color: '#ff7b7b', icon: ico(<path d="M3 12h4l3-7 4 14 3-7h4" />) },
+  control: { short: 'Контроль', color: '#4fe0d4', icon: ico(<><path d="M12 3v18M5 7h14" /><path d="M5 7 2 14a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z" /></>) },
+  releases: { short: 'Релизы', color: '#ffb35c', icon: ico(<><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2" /><path d="M9 18 6 15c1-4 4-9 11-11 0 7-5 10-9 11z" /><circle cx="14.5" cy="9.5" r="1.5" /></>) },
+  funnel: { short: 'Воронка', color: '#ab9cff', icon: ico(<path d="M3 4h18l-7 8v6l-4 2v-8z" />) },
+  gap: { short: 'Нет данных', color: '#a0a4c0', icon: ico(<><circle cx="12" cy="12" r="9" /><path d="M5.6 5.6l12.8 12.8" /></>) },
+  external: { short: 'Источники', color: '#6aa8ff', icon: ico(<path d="M7 7h4v4c0 3-2 5-4 5M14 7h4v4c0 3-2 5-4 5" />) },
+  plain: { short: 'Шаг', color: '#c9cbd6', icon: ico(<circle cx="12" cy="12" r="4" />) },
+  hyp: { short: 'Гипотезы', color: '#d39bff', icon: ico(<><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3" /><path d="M7 15h10" /></>) },
+}
+
+function StepsPicker({ rep }: { rep: InvestigationReport }) {
+  const items = useMemo(() => [
+    ...rep.steps.map((s) => ({ key: `s${s.n}`, kind: kindOf(s), title: s.title ?? `Шаг ${s.n}`, step: s as InvestigationStep | null })),
+    { key: 'hyp', kind: 'hyp' as StepKind, title: 'Гипотезы и проверки', step: null as InvestigationStep | null },
+  ], [rep])
+  const [sel, setSel] = useState(0)
+  const [copied, setCopied] = useState(false)
+  const cur = items[Math.min(sel, items.length - 1)]
+  const look = STEP_LOOK[cur.kind]
+  const tilesRef = useRef<HTMLDivElement>(null)
+
+  const go = (i: number) => {
+    const n = (i + items.length) % items.length
+    setSel(n)
+    tilesRef.current?.querySelectorAll<HTMLButtonElement>('.tile')[n]?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' })
+  }
+  // Стрелки: от актуального значения, чтобы быстрые нажатия не терялись.
+  const shift = (d: number) => setSel((p) => {
+    const n = (p + d + items.length) % items.length
+    tilesRef.current?.querySelectorAll<HTMLButtonElement>('.tile')[n]?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' })
+    return n
+  })
+  const copyText = cur.step
+    ? `${cur.title}\n${cur.step.finding}`
+    : rep.hypotheses.map((h, i) => `${i + 1}. ${h.text} — проверка: ${h.check ?? ''}`).join('\n')
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(copyText); setCopied(true); setTimeout(() => setCopied(false), 1400) } catch { /* без буфера */ }
+  }
+
   return (
-    <li className={`tl-item reveal${kind === 'gap' ? ' tl-gap' : ''}`} style={{ ['--i' as string]: i + 1 }}>
-      <span className="tl-node">{s.n}</span>
-      <div className="stack" style={{ gap: 8, minWidth: 0 }}>
-        <div className="row" style={{ justifyContent: 'space-between' }}>
-          <h3>{s.title}</h3>
-          <div className="row" style={{ gap: 4 }}>{s.sources.map((src, k) => <span key={k} className="src-chip">{typeof src === 'string' ? src : src.sheet ?? src.file ?? src.type}</span>)}</div>
+    <section className="steps-picker reveal">
+      <div className="row" style={{ justifyContent: 'space-between', marginBottom: 14 }}>
+        <div className="stack" style={{ gap: 6 }}>
+          <Kicker tone="blue" icon={<KIcons.search />}>Следствие</Kicker>
+          <h2 style={{ fontSize: 22, letterSpacing: '-.02em' }}>Ход расследования · {rep.steps.length} шагов</h2>
         </div>
-        {kind === 'releases' ? <Releases list={rep.evidence.releases} /> : kind === 'gap' ? (
-          <NoData title="Нет данных — не ноль"><Rich text={s.finding} hot={hot} /></NoData>
-        ) : <p className="muted"><Rich text={s.finding} hot={hot} /></p>}
-        {kind === 'funnel' && <Funnel rep={rep} />}
-        {kind === 'gap' && <LinkedTasks rep={rep} />}
-        {kind === 'external' && <Quotes rep={rep} />}
+        <span className="faint">← → переключают шаги</span>
       </div>
-    </li>
+
+      <div className="tiles" ref={tilesRef} role="tablist" aria-label="Шаги расследования"
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowRight') { e.preventDefault(); shift(1) }
+          if (e.key === 'ArrowLeft') { e.preventDefault(); shift(-1) }
+        }}>
+        {items.map((it, i) => {
+          const L = STEP_LOOK[it.kind]
+          return (
+            <button key={it.key} role="tab" aria-selected={i === sel} tabIndex={i === sel ? 0 : -1}
+              className={`tile${i === sel ? ' on' : ''}${it.kind === 'gap' ? ' tile-gap' : ''}`} style={{ ['--tc' as string]: L.color }}
+              onClick={() => go(i)}>
+              <span className="tile-box">{L.icon}{it.step && <span className="tile-n">{it.step.n}</span>}</span>
+              <span className="tile-label">{L.short}</span>
+            </button>
+          )
+        })}
+      </div>
+      <div className="tiles-track"><span style={{ width: `${((sel + 1) / items.length) * 100}%` }} /></div>
+
+      <div className="step-panel" key={cur.key} style={{ ['--tc' as string]: look.color }}>
+        <header className="step-panel-head">
+          <div className="row" style={{ gap: 6, minWidth: 0 }}>
+            <span className="panel-pill on"><span className="panel-pill-ico">{look.icon}</span>{cur.title}</span>
+            {cur.step?.sources.map((src, k) => (
+              <span key={k} className="panel-pill"><span className="panel-src-dot" />{typeof src === 'string' ? src : src.sheet ?? src.file ?? src.type}</span>
+            ))}
+          </div>
+          <div className="row" style={{ gap: 6 }}>
+            <button className="icon-btn" onClick={() => shift(-1)} aria-label="Предыдущий шаг">‹</button>
+            <button className="icon-btn" onClick={() => shift(1)} aria-label="Следующий шаг">›</button>
+            <button className="icon-btn" onClick={copy} title="Скопировать текст шага" aria-label="Скопировать">
+              {copied ? '✓' : ico(<><rect x="8" y="3" width="10" height="14" rx="2" /><path d="M6 7H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-1" /></>)}
+            </button>
+          </div>
+        </header>
+        <div className="step-panel-body">
+          {cur.step ? <StepBody s={cur.step} rep={rep} kind={cur.kind} /> : <HypothesesBody rep={rep} />}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function StepBody({ s, rep, kind }: { s: InvestigationStep; rep: InvestigationReport; kind: StepKind }) {
+  const hot = rep.evidence.releases[0] ? [rep.evidence.releases[0].release_id] : []
+  return (
+    <div className="stack" style={{ gap: 12, minWidth: 0 }}>
+      {kind === 'releases' ? <Releases list={rep.evidence.releases} /> : kind === 'gap' ? (
+        <NoData title="Нет данных — не ноль"><Rich text={s.finding} hot={hot} /></NoData>
+      ) : <p className="step-finding"><Rich text={s.finding} hot={hot} /></p>}
+      {kind === 'funnel' && <Funnel rep={rep} />}
+      {kind === 'gap' && <LinkedTasks rep={rep} />}
+      {kind === 'external' && <Quotes rep={rep} />}
+    </div>
   )
 }
 
@@ -317,9 +409,10 @@ function SourcesCheck({ rep }: { rep: InvestigationReport }) {
 }
 
 /* ---------- гипотезы ---------- */
-function Hypotheses({ rep }: { rep: InvestigationReport }) {
+function HypothesesBody({ rep }: { rep: InvestigationReport }) {
   return (
-    <Card title={<div className="stack" style={{ gap: 6 }}><Kicker tone="violet" icon={<KIcons.flask />}>Гипотезы</Kicker><h2 style={{ fontSize: 20 }}>Что могло сломаться — и как это <Hl tone="violet" sm>проверить</Hl></h2></div>}>
+    <div className="stack" style={{ gap: 12 }}>
+      <p className="step-finding">Что могло сломаться — и как это <Hl tone="violet" sm>проверить</Hl>:</p>
       <div className="grid grid-2">
         {rep.hypotheses.map((h, i) => (
           <div key={i} className="hypo">
@@ -332,7 +425,7 @@ function Hypotheses({ rep }: { rep: InvestigationReport }) {
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   )
 }
 
