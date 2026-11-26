@@ -83,7 +83,7 @@ export default function Chat() {
           <div className="suggest-grid">
             {SUGGESTIONS.map((s, i) => (
               <button key={s} className="suggest reveal" style={{ ['--i' as string]: i + 2 }} onClick={() => ask(s)}>
-                <span className="suggest-arrow">↗</span>{s}
+                {s}
               </button>
             ))}
           </div>
@@ -111,7 +111,7 @@ export default function Chat() {
           <span className="row faint" style={{ gap: 6 }}><span className="kbd">Enter</span> отправить <span className="kbd">Shift</span>+<span className="kbd">Enter</span> новая строка</span>
           <span className="row" style={{ gap: 6 }}>
             {!empty && <button type="button" className="btn btn-sm btn-ghost" onClick={() => setTurns([])} disabled={busy}>Новый диалог</button>}
-            <button className="btn btn-primary btn-sm" disabled={busy || !text.trim()}>{busy ? <span className="spinner" /> : 'Спросить ↵'}</button>
+            <button className="btn btn-primary btn-sm" disabled={busy || !text.trim()}>{busy ? <span className="spinner" /> : <>Спросить <span className="kbd">Enter</span></>}</button>
           </span>
         </div>
       </form>

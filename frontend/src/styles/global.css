@@ -143,8 +143,7 @@ code, .mono { font-family: var(--mono); font-size: 12.5px; }
 .icon-btn svg { width: 17px; height: 17px; }
 .icon-btn:hover { color: var(--text); background: var(--surface-2); border-color: var(--border-strong); text-decoration: none; }
 .icon-btn.on { color: var(--text); background: var(--surface-3); border-color: var(--border-strong); }
-.btn-cta { height: 40px; padding: 0 18px; border-radius: 12px; font-weight: 650; margin-left: 4px; }
-.btn-cta.active { box-shadow: 0 0 0 4px var(--warm-soft); }
+.btn-cta { height: 36px; padding: 0 12px; border-radius: 8px; margin-left: 6px; }
 
 .content { padding: 28px 20px 64px; display: flex; flex-direction: column; gap: 20px; max-width: 1240px; width: 100%; margin: 0 auto; flex: 1; }
 .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -184,18 +183,39 @@ code, .mono { font-family: var(--mono); font-size: 12.5px; }
 .grad-text { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .eyebrow { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
 
+/* Кнопки — микс рефов:
+   .btn          обычная — «стекло» Resend: почти прозрачная, тонкая рамка, скругление 10
+   .btn-primary  главная (одна на экран) — «клавиша» Raycast: светло-серая, блик сверху, тёмное кольцо
+   .btn-ghost    третьестепенная — просто серый текст, как «Log in» у Raycast */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px;
-  border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text);
-  font: inherit; font-weight: 550; cursor: pointer; transition: background .15s, border-color .15s, transform .08s, box-shadow .2s;
+  border-radius: 10px; border: 1px solid rgba(255, 255, 255, .08); color: var(--text);
+  background: linear-gradient(104deg, rgba(253, 253, 253, .05) 5%, rgba(240, 240, 228, .1) 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .1), 0 1px 2px rgba(0, 0, 0, .1);
+  font: inherit; font-size: 14px; font-weight: 500; letter-spacing: -.005em; white-space: nowrap; cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s, transform .08s, box-shadow .15s;
 }
-.btn:hover { background: var(--surface-3); text-decoration: none; }
-.btn:active { transform: translateY(1px) scale(.99); }
-.btn:disabled { opacity: .5; cursor: not-allowed; }
-.btn-primary { background: var(--text); color: var(--bg); border-color: transparent; }
-.btn-primary:hover { background: var(--text); box-shadow: 0 0 0 4px var(--accent-soft), 0 8px 30px -6px rgba(143, 125, 255, .6); }
-.btn-ghost { border-color: transparent; background: transparent; }
-.btn-sm { height: 30px; padding: 0 12px; font-size: 13px; }
+.btn:hover { border-color: rgba(255, 255, 255, .16); background: linear-gradient(104deg, rgba(253, 253, 253, .08) 5%, rgba(240, 240, 228, .14) 100%); text-decoration: none; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-primary {
+  background: #e6e6e6; color: #2f3031; border: 0;
+  box-shadow: rgba(0, 0, 0, .5) 0 0 0 2px, rgba(255, 255, 255, .19) 0 0 14px, rgba(0, 0, 0, .2) 0 -1px .4px inset, #fff 0 1px .4px inset;
+}
+.btn-primary:hover { background: #f2f2f2; border: 0; }
+.btn-primary .spinner { color: #2f3031; }
+.btn-primary .kbd { background: rgba(0, 0, 0, .07); color: #5a5b5d; border-color: rgba(0, 0, 0, .1); box-shadow: none; }
+.btn-ghost { background: none; border-color: transparent; box-shadow: none; color: var(--text-2); padding: 0 8px; }
+.btn-ghost:hover { background: none; border-color: transparent; color: var(--text); }
+.btn-sm { height: 30px; padding: 0 10px; font-size: 13px; border-radius: 8px; }
+.btn-ghost.btn-sm { padding: 0 6px; }
+:root[data-theme='light'] .btn { background: #fff; border-color: var(--border-strong); box-shadow: 0 1px 2px rgba(20, 24, 40, .06); }
+:root[data-theme='light'] .btn:hover { background: var(--bg-2); }
+:root[data-theme='light'] .btn-primary { background: #2f3031; color: #f2f2f2; border: 0;
+  box-shadow: rgba(0, 0, 0, .12) 0 0 0 1px, rgba(255, 255, 255, .25) 0 1px .4px inset, rgba(0, 0, 0, .3) 0 -1px .4px inset, 0 2px 6px rgba(20, 24, 40, .18); }
+:root[data-theme='light'] .btn-primary:hover { background: #1f2021; }
+:root[data-theme='light'] .btn-primary .spinner { color: #f2f2f2; }
+:root[data-theme='light'] .btn-ghost { background: none; border-color: transparent; box-shadow: none; }
 .kbd {
   display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 6px;
   font: 600 11px var(--mono); color: var(--text-2); background: var(--surface-3);
@@ -319,7 +339,8 @@ select:focus, input:focus, textarea:focus, .btn:focus-visible { outline: 2px sol
 .hero-sub { margin-top: 20px; font-size: 18px; line-height: 1.5; color: var(--text-2); max-width: 640px; }
 .hero-actions { justify-content: center; margin-top: 28px; gap: 12px; }
 .hero-chips { justify-content: center; margin-top: 22px; gap: 8px; }
-.btn-lg { height: 46px; padding: 0 22px; border-radius: 14px; font-size: 15px; }
+.btn-lg { height: 44px; padding: 0 18px; border-radius: 12px; font-size: 15px; }
+.btn-primary.btn-lg { border-radius: 10px; }
 .chip { display: inline-flex; align-items: center; min-height: 26px; padding: 3px 10px; line-height: 1.35; border-radius: 999px; font-size: 12px; color: var(--text-2);
   background: var(--surface-2); border: 1px solid var(--border); }
 .kpi { transition: transform .25s, border-color .25s; }
@@ -796,3 +817,11 @@ input[type='range']:disabled { opacity: .4; cursor: not-allowed; }
 .segmented { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
 .segmented::-webkit-scrollbar { display: none; }
 .segmented button { flex: none; }
+/* меню: на средних экранах разделы уходят во вторую строку, чтобы не наезжать на логотип и действия */
+@media (max-width: 1100px) {
+  .navbar-inner { flex-wrap: wrap; height: auto; padding: 8px 10px; row-gap: 4px; background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: var(--blur); border-color: var(--border); }
+  .nav { order: 3; flex-basis: 100%; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-actions { margin-left: auto; }
+  .stepper, .mail-list, .inv-aside { top: 120px; }
+}

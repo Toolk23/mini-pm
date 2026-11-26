@@ -90,7 +90,7 @@ function EmailWindow({ inv, a }: { inv: Investigation; a: ApplyResult }) {
       <div className="window-bar">
         <span className="dots"><i /><i /><i /></span>
         <span className="faint">Входящие — Почта</span>
-        <button className="btn btn-sm btn-ghost" onClick={download} title="Скачать письмо как .eml">⭳ .eml</button>
+        <button className="btn btn-sm btn-ghost" onClick={download} title="Скачать письмо как .eml">Скачать .eml</button>
       </div>
       <div className="mail-head">
         <div className="mail-avatar">ПМ</div>
@@ -105,7 +105,7 @@ function EmailWindow({ inv, a }: { inv: Investigation; a: ApplyResult }) {
       <div className="mail-body"><EmailBody text={a.email.body} hot={hot ? [hot] : []} /></div>
       <div className="mail-actions">
         <Link className="btn btn-primary" to={`/investigations/${inv.id}`}>Открыть отчёт</Link>
-        <Link className="btn" to="/backlog">Задача {a.task.task_id} в бэклоге</Link>
+        <Link className="btn btn-ghost" to="/backlog">Задача {a.task.task_id} в бэклоге</Link>
         <AiBadge />
       </div>
     </section>

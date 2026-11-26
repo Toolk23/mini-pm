@@ -95,7 +95,7 @@ export default function SettingsPage() {
             <section className="card reveal">
               <div className="card-head">
                 <h2>Правила по метрикам</h2>
-                <button className="btn btn-sm btn-ghost" onClick={reset}>{saved === 'reset' ? '✓ Сброшено' : '↺ Сбросить к справочнику'}</button>
+                <button className="btn btn-sm btn-ghost" onClick={reset}>{saved === 'reset' ? 'Сброшено' : 'Сбросить к справочнику'}</button>
               </div>
               <div className="rules">
                 {Object.entries(s.metrics).map(([id, r]) => {

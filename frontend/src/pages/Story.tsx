@@ -133,7 +133,7 @@ export default function Story() {
           <StoryStep n={2} kicker={<Kicker tone="blue" icon={<KIcons.search />}>Расследование</Kicker>} refEl={(el) => (refs.current[1] = el)}
             state={inv?.status === 'done' ? 'done' : 'now'}
             title={inv?.report?.summary ? <Rich text={inv.report.summary} hot={inv.report.evidence.releases[0] ? [inv.report.evidence.releases[0].release_id] : []} /> : 'Агент проверяет сигнал по всем источникам'}
-            action={inv?.status === 'done' ? <Link className="btn btn-sm" to={`/investigations/${inv.id}`}>Полный отчёт →</Link> : null}>
+            action={inv?.status === 'done' ? <Link className="btn btn-sm btn-ghost" to={`/investigations/${inv.id}`}>Полный отчёт</Link> : null}>
             {!inv && !running && restored && (
               <button className="btn btn-primary btn-lg" onClick={startInvestigation} disabled={!!busy}>Запустить расследование</button>
             )}
@@ -145,7 +145,7 @@ export default function Story() {
           <StoryStep n={3} kicker={<Kicker tone="warm" icon={<KIcons.send />}>Письмо ПМу</Kicker>} refEl={(el) => (refs.current[2] = el)}
             state={inv?.applied ? 'done' : inv?.status === 'done' ? 'now' : 'locked'}
             title={inv?.applied ? <Rich text={inv.applied.email.subject} /> : 'Отчёт уходит продакту письмом и в Dion'}
-            action={inv?.applied ? <Link className="btn btn-sm" to={`/mail/${inv.id}`}>Открыть письмо →</Link> : null}>
+            action={inv?.applied ? <Link className="btn btn-sm btn-ghost" to={`/mail/${inv.id}`}>Открыть письмо</Link> : null}>
             {inv?.status === 'done' && !inv.applied && (
               <button className="btn btn-primary btn-lg" onClick={apply} disabled={!!busy}>
                 {busy === 'apply' ? <><span className="spinner" /> Отправляю…</> : 'Отправить ПМу и создать задачу'}
@@ -170,7 +170,7 @@ export default function Story() {
           {/* 4. Задача */}
           <StoryStep n={4} kicker={<Kicker tone="violet" icon={<KIcons.bolt />}>Задача в бэклоге</Kicker>} refEl={(el) => (refs.current[3] = el)}
             state={task ? 'done' : 'locked'} title={task ? task.title : 'Задача с тегом «сгенерирована ИИ-помощником»'}
-            action={task ? <Link className="btn btn-sm" to="/backlog">В бэклог →</Link> : null}>
+            action={task ? <Link className="btn btn-sm btn-ghost" to="/backlog">В бэклог</Link> : null}>
             {task && (
               <div className="row" style={{ gap: 12, alignItems: 'stretch' }}>
                 <div className="task-card ai" style={{ cursor: 'default', flex: '1 1 320px' }}>
@@ -213,10 +213,10 @@ export default function Story() {
                 <div className="row" style={{ gap: 10 }}>
                   <span className="faint">Данные «после хотфикса» — синтетика для демо:</span>
                   <button className={`btn ${measure?.scenario === 'recovered' ? 'btn-primary' : ''}`} onClick={() => doMeasure('recovered')} disabled={!!busy}>
-                    {busy === 'recovered' ? <span className="spinner" /> : '↗'} Индекс вернулся
+                    {busy === 'recovered' && <span className="spinner" />} Индекс вернулся
                   </button>
                   <button className={`btn ${measure?.scenario === 'not_recovered' ? 'btn-primary' : ''}`} onClick={() => doMeasure('not_recovered')} disabled={!!busy}>
-                    {busy === 'not_recovered' ? <span className="spinner" /> : '↘'} Не вернулся
+                    {busy === 'not_recovered' && <span className="spinner" />} Не вернулся
                   </button>
                 </div>
                 {measure && sig.series && (
@@ -241,7 +241,7 @@ export default function Story() {
 
       {inv?.status === 'done' && (
         <div className="row" style={{ justifyContent: 'center', marginTop: 8 }}>
-          <button className="btn btn-ghost" onClick={startInvestigation} disabled={!!busy}>↺ Пройти историю заново (новое расследование)</button>
+          <button className="btn btn-ghost" onClick={startInvestigation} disabled={!!busy}>Пройти историю заново</button>
         </div>
       )}
     </>

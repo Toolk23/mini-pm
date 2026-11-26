@@ -477,9 +477,9 @@ function Decision({ inv, rep }: { inv: Investigation; rep: InvestigationReport }
             <li>Гипотеза <code>{applied.hypothesis.id}</code> с критерием успеха — ждёт замера после релиза</li>
           </ul>
           <div className="row" style={{ gap: 10 }}>
-            <Link className="btn btn-primary" to={`/mail/${inv.id}`}>Открыть письмо →</Link>
+            <Link className="btn btn-primary" to={`/mail/${inv.id}`}>Открыть письмо</Link>
             <Link className="btn" to="/backlog">В бэклог</Link>
-            <Link className="btn" to="/story">К замеру эффекта</Link>
+            <Link className="btn btn-ghost" to="/story">К замеру эффекта</Link>
           </div>
         </div>
       )}

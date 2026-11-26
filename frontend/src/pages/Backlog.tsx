@@ -59,11 +59,11 @@ export default function Backlog() {
       <div className="row board-toolbar">
         <div className="segmented">
           <button className={!onlyAi ? 'on' : ''} onClick={() => setOnlyAi(false)}>Все · {tasks.data?.length ?? 0}</button>
-          <button className={onlyAi ? 'on' : ''} onClick={() => setOnlyAi(true)}>✦ От ИИ-помощника · {(tasks.data ?? []).filter(touchedByAi).length}</button>
+          <button className={onlyAi ? 'on' : ''} onClick={() => setOnlyAi(true)}>От ИИ-помощника · {(tasks.data ?? []).filter(touchedByAi).length}</button>
         </div>
         {aiCount === 0 && tasks.data && <span className="faint">Пока ни одной задачи от агента — запусти расследование и нажми «Отправить ПМу».</span>}
         <span style={{ flex: 1 }} />
-        <button className="btn btn-sm btn-ghost" onClick={tasks.reload}>↻ Обновить</button>
+        <button className="btn btn-sm btn-ghost" onClick={tasks.reload}>Обновить</button>
       </div>
 
       {err && <ErrorBox error={err} />}
@@ -194,8 +194,8 @@ function TaskDrawer({ task, onClose, onPatch }: { task: Task; onClose: () => voi
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <span className="row"><span className="redmine-logo">R</span><b>Экспорт в Redmine</b><span className="faint mono">POST /issues.json</span></span>
             <span className="row" style={{ gap: 6 }}>
-              <button className="btn btn-sm" onClick={copy} disabled={!json}>{copied ? '✓ Скопировано' : 'Копировать'}</button>
-              <button className="btn btn-sm btn-primary" onClick={download} disabled={!json}>Скачать .json</button>
+              <button className="btn btn-sm" onClick={copy} disabled={!json}>{copied ? 'Скопировано' : 'Копировать'}</button>
+              <button className="btn btn-sm" onClick={download} disabled={!json}>Скачать .json</button>
             </span>
           </div>
           {redmine.loading ? <Loading /> : redmine.error ? <ErrorBox error={redmine.error} /> : <pre className="code">{json}</pre>}

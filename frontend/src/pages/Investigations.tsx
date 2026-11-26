@@ -58,7 +58,7 @@ export default function Investigations() {
               disabled={!!starting} onClick={() => start(s.id)}>
               <div className="row" style={{ justifyContent: 'space-between' }}><PriorityBadge p={s.priority} /><span className="faint mono">{s.product}</span></div>
               <div className="signal-title"><Rich text={s.title} /></div>
-              <span className="signal-cta" style={{ opacity: starting === s.id ? 1 : undefined }}>{starting === s.id ? <><span className="spinner" /> Запускаю…</> : 'Расследовать →'}</span>
+              <span className="signal-cta" style={{ opacity: starting === s.id ? 1 : undefined }}>{starting === s.id ? <><span className="spinner" /> Запускаю…</> : 'Расследовать'}</span>
             </button>
           ))}
         </div>

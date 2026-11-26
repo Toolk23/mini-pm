@@ -64,7 +64,7 @@ function Hero({ s, all, onInvestigate }: { s: Signal; all: Signal[]; onInvestiga
       </p>
       <div className="row hero-actions">
         <button className="btn btn-primary btn-lg" onClick={onInvestigate}>Запустить расследование</button>
-        <Link className="btn btn-lg" to="/story">Вся история →</Link>
+        <Link className="btn btn-lg" to="/story">Вся история</Link>
       </div>
       {chips.length > 0 && (
         <div className="row hero-chips">
@@ -224,7 +224,7 @@ function SignalFeed({ signals, loading }: { signals: Signal[]; loading: boolean 
             </div>
             <div className="signal-title"><Rich text={s.title} /></div>
             {s.caveats[0] && <div className="faint">{shortCaveat(s.caveats[0])}</div>}
-            <span className="signal-cta">Расследовать →</span>
+            <span className="signal-cta">Расследовать</span>
           </Link>
         ))}
       </div>

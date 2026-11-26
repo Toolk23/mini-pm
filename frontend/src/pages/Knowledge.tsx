@@ -79,7 +79,7 @@ export default function Knowledge() {
             <div className="faint">или нажмите, чтобы выбрать · xlsx, csv, txt, md, docx</div>
           </section>
           <div className="row" style={{ gap: 8, justifyContent: 'center' }}>
-            <button className="btn btn-sm" onClick={uploadDemo} disabled={!!busy}>Загрузить демо-интервью</button>
+            <button className="btn btn-sm btn-ghost" onClick={uploadDemo} disabled={!!busy}>Загрузить демо-интервью</button>
             <span className="faint">синтетический файл для показа — не данные заказчика</span>
           </div>
 
@@ -96,7 +96,7 @@ export default function Knowledge() {
                 {!u.error && (
                   <span className="row" style={{ gap: 6 }}>
                     <button className="btn btn-sm" onClick={() => { setSrc('upload'); setQ('корзина конфигуратор'); search('корзина конфигуратор', 'upload') }}>Найти в файле</button>
-                    <button className="btn btn-sm btn-primary" onClick={() => nav('/chat', { state: { ask: 'Что говорят клиенты про добавление KES в корзину из конфигуратора?' } })}>Спросить в чате →</button>
+                    <button className="btn btn-sm btn-primary" onClick={() => nav('/chat', { state: { ask: 'Что говорят клиенты про добавление KES в корзину из конфигуратора?' } })}>Спросить в чате</button>
                   </span>
                 )}
               </div>
@@ -127,7 +127,7 @@ export default function Knowledge() {
         <aside className="inv-aside stack" style={{ gap: 16 }}>
           <section className="card">
             <div className="card-head"><h2>Индекс</h2>
-              <button className="btn btn-sm" onClick={reindex} disabled={!!busy}>{busy === 'reindex' ? <><span className="spinner" /> Переобучаю ~10 с…</> : '↻ Переобучить'}</button>
+              <button className="btn btn-sm" onClick={reindex} disabled={!!busy}>{busy === 'reindex' ? <><span className="spinner" /> Переобучаю ~10 с…</> : 'Переобучить'}</button>
             </div>
             {stats ? (
               <div className="stack" style={{ gap: 12 }}>
