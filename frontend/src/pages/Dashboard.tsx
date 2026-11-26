@@ -6,6 +6,7 @@ import MetricChart, { parsePeriod, type ChartWindow } from '../components/Metric
 import MetrikaLivePanel from '../components/MetrikaLivePanel'
 import { CountUp, Radar } from '../components/live'
 import { Card, ErrorBox, Loading, NoData, NoDataBadge, PriorityBadge, useApi } from '../components/ui'
+import { Hl, KIcons, Kicker, Rich, SectionHead } from '../components/highlight'
 
 type Mode = 'sales' | 'metric' | 'live'
 const PRODUCTS = ['Конфигуратор Kaspersky', 'Конфигуратор Астра', 'ЛК'] as const
@@ -21,6 +22,14 @@ export default function Dashboard() {
       {signals.loading && !signals.data && <Loading label="Детектор считает сигналы…" />}
 
       {main && <Hero s={main} all={signals.data ?? []} onInvestigate={() => nav(`/investigations?signal=${encodeURIComponent(main.id)}`)} />}
+      {main && (
+        <SectionHead
+          kicker={<Kicker tone="teal" icon={<KIcons.pulse />}>Детектор</Kicker>}
+          title={<>Не шум, а <Hl tone="teal">тренд</Hl></>}
+          lead={<>Статистику считает детерминированный детектор: <b>скользящее за 4 недели</b>, <b>контрольная группа</b>,
+            разовые всплески исключены, а пропуски учёта помечены как <b>«нет данных»</b>, а не ноль.</>}
+        />
+      )}
       {main?.change && <Kpis s={main} />}
 
       <div className="grid grid-main-side">
@@ -47,11 +56,11 @@ function Hero({ s, all, onInvestigate }: { s: Signal; all: Signal[]; onInvestiga
       </button>
       <h1 className="hero-title">
         <span className="grad-silver">Заказы {s.family}</span><br />
-        <span className="grad-warm">упали на {pct}%</span>
+        <span className="grad-silver">упали на </span><Hl tone="red">{pct}%</Hl>
       </h1>
-      <p className="hero-sub">
-        Устойчиво — по скользящему среднему, а не по отдельной неделе.
-        {ctrl && <> Контроль {ctrl.name}: {ctrl.change_pct > 0 ? '+' : ''}{ctrl.change_pct}% — {ctrl.stable ? 'падение специфично для ' + s.family : 'контроль тоже изменился'}.</>}
+      <p className="hero-sub lead">
+        Устойчиво — по <b>скользящему среднему</b>, а не по отдельной неделе.
+        {ctrl && <> Контроль <b>{ctrl.family} {ctrl.change_pct > 0 ? '+' : ''}{ctrl.change_pct}%</b> — {ctrl.stable ? <>падение <b>специфично для {s.family}</b></> : 'контроль тоже изменился'}.</>}
       </p>
       <div className="row hero-actions">
         <button className="btn btn-primary btn-lg" onClick={onInvestigate}>Запустить расследование</button>
@@ -213,7 +222,7 @@ function SignalFeed({ signals, loading }: { signals: Signal[]; loading: boolean 
               <PriorityBadge p={s.priority} />
               <span className="faint mono">{s.product}</span>
             </div>
-            <div className="signal-title">{s.title}</div>
+            <div className="signal-title"><Rich text={s.title} /></div>
             {s.caveats[0] && <div className="faint">{shortCaveat(s.caveats[0])}</div>}
             <span className="signal-cta">Расследовать →</span>
           </Link>

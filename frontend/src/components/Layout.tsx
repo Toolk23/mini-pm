@@ -29,6 +29,19 @@ export default function Layout() {
   }, [])
   useEffect(() => { window.scrollTo(0, 0) }, [loc.pathname])
 
+  // Spotlight: карточка под курсором подсвечивается мягким пятном (как у Raycast).
+  useEffect(() => {
+    const on = (e: PointerEvent) => {
+      const card = (e.target as Element | null)?.closest?.('.card') as HTMLElement | null
+      if (!card) return
+      const r = card.getBoundingClientRect()
+      card.style.setProperty('--mx', `${e.clientX - r.left}px`)
+      card.style.setProperty('--my', `${e.clientY - r.top}px`)
+    }
+    document.addEventListener('pointermove', on, { passive: true })
+    return () => document.removeEventListener('pointermove', on)
+  }, [])
+
   const toggleMock = () => {
     setUseMocks(!mock)
     setMock(!mock)

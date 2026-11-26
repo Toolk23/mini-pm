@@ -4,6 +4,7 @@ import { api, pollInvestigation } from '../api/client'
 import type { ApplyResult, Investigation, InvestigationReport, InvestigationStep, KnowledgeHit, ReleaseCandidate } from '../api/types'
 import MetricChart from '../components/MetricChart'
 import { Radar } from '../components/live'
+import { Hl, KIcons, Kicker, Rich } from '../components/highlight'
 import { AiBadge, Card, ErrorBox, NoData, NoDataBadge, PriorityBadge, useApi } from '../components/ui'
 
 export default function InvestigationPage() {
@@ -71,6 +72,7 @@ function Report({ inv, rep }: { inv: Investigation; rep: InvestigationReport }) 
   const full = signals.data?.find((s) => s.id === inv.signal_id)
   const salesMeta = useApi(() => api.series('family_orders_idx', 'Конфигуратор Kaspersky'))
   const pct = Math.abs(Math.round(sig.change?.change_pct ?? 0))
+  const hot = rep.evidence.releases[0] ? [rep.evidence.releases[0].release_id] : []
 
   return (
     <>
@@ -85,9 +87,9 @@ function Report({ inv, rep }: { inv: Investigation; rep: InvestigationReport }) 
         </div>
         <h1 className="inv-title">
           <span className="grad-silver">Почему заказы {sig.family}</span><br />
-          <span className="grad-warm">упали на {pct}%</span>
+          <span className="grad-silver">упали на </span><Hl tone="red">{pct}%</Hl>
         </h1>
-        {rep.summary && <p className="hero-sub" style={{ margin: '16px auto 0' }}>{rep.summary}</p>}
+        {rep.summary && <p className="hero-sub" style={{ margin: '16px auto 0' }}><Rich text={rep.summary} hot={hot} /></p>}
       </header>
 
       {full?.series && (
@@ -101,7 +103,7 @@ function Report({ inv, rep }: { inv: Investigation; rep: InvestigationReport }) 
 
       <div className="grid grid-main-side" style={{ alignItems: 'start' }}>
         <div className="stack" style={{ gap: 16 }}>
-          <Card title={<h2>Ход расследования · {rep.steps.length} шагов</h2>}>
+          <Card title={<div className="stack" style={{ gap: 6 }}><Kicker tone="blue" icon={<KIcons.search />}>Следствие</Kicker><h2 style={{ fontSize: 20 }}>Ход расследования · {rep.steps.length} шагов</h2></div>}>
             <ol className="timeline">
               {rep.steps.map((s, i) => <Step key={s.n} s={s} rep={rep} i={i} />)}
             </ol>
@@ -135,6 +137,7 @@ function Report({ inv, rep }: { inv: Investigation; rep: InvestigationReport }) 
 /* ---------- шаг таймлайна + обогащения по типу шага ---------- */
 function Step({ s, rep, i }: { s: InvestigationStep; rep: InvestigationReport; i: number }) {
   const t = (s.title ?? '').toLowerCase()
+  const hot = rep.evidence.releases[0] ? [rep.evidence.releases[0].release_id] : []
   const kind = t.includes('релиз') ? 'releases' : t.includes('теряем') || t.includes('воронк') ? 'funnel'
     : t.includes('пробел') || t.includes('нет данных') ? 'gap' : t.includes('внешн') || t.includes('интервью') ? 'external' : 'plain'
   return (
@@ -146,8 +149,8 @@ function Step({ s, rep, i }: { s: InvestigationStep; rep: InvestigationReport; i
           <div className="row" style={{ gap: 4 }}>{s.sources.map((src, k) => <span key={k} className="src-chip">{typeof src === 'string' ? src : src.sheet ?? src.file ?? src.type}</span>)}</div>
         </div>
         {kind === 'releases' ? <Releases list={rep.evidence.releases} /> : kind === 'gap' ? (
-          <NoData title="Нет данных — не ноль">{s.finding}</NoData>
-        ) : <p className="muted">{s.finding}</p>}
+          <NoData title="Нет данных — не ноль"><Rich text={s.finding} hot={hot} /></NoData>
+        ) : <p className="muted"><Rich text={s.finding} hot={hot} /></p>}
         {kind === 'funnel' && <Funnel rep={rep} />}
         {kind === 'gap' && <LinkedTasks rep={rep} />}
         {kind === 'external' && <Quotes rep={rep} />}
@@ -169,7 +172,7 @@ function Releases({ list }: { list: ReleaseCandidate[] }) {
               <span className="cause-score">{score}%</span>
             </div>
             <div className="cause-bar"><span style={{ width: `${Math.max(score, 2)}%` }} /></div>
-            <div className="faint" style={{ color: main ? 'var(--text-2)' : undefined }}>{r.why}</div>
+            <div className="faint" style={{ color: main ? 'var(--text-2)' : undefined }}><Rich text={r.why ?? ''} /></div>
           </div>
         )
       })}
@@ -276,7 +279,7 @@ function SourcesCheck({ rep }: { rep: InvestigationReport }) {
 /* ---------- гипотезы ---------- */
 function Hypotheses({ rep }: { rep: InvestigationReport }) {
   return (
-    <Card title={<h2>Гипотезы и как их проверить</h2>}>
+    <Card title={<div className="stack" style={{ gap: 6 }}><Kicker tone="violet" icon={<KIcons.flask />}>Гипотезы</Kicker><h2 style={{ fontSize: 20 }}>Что могло сломаться — и как это <Hl tone="violet" sm>проверить</Hl></h2></div>}>
       <div className="grid grid-2">
         {rep.hypotheses.map((h, i) => (
           <div key={i} className="hypo">
@@ -284,7 +287,7 @@ function Hypotheses({ rep }: { rep: InvestigationReport }) {
               <span className="eyebrow">гипотеза {i + 1}</span>
               <span className="badge">{h.status ?? 'не проверена'}</span>
             </div>
-            <p className="hypo-text">{h.text}</p>
+            <p className="hypo-text"><Rich text={h.text} /></p>
             {h.check && <p className="faint"><b style={{ color: 'var(--text-2)' }}>Проверка:</b> {h.check}</p>}
           </div>
         ))}
@@ -305,8 +308,8 @@ function Decision({ inv, rep }: { inv: Investigation; rep: InvestigationReport }
   }
   return (
     <section className="card decision reveal">
-      <div className="eyebrow">рекомендация</div>
-      <h2 className="decision-text">{rep.recommendation}</h2>
+      <Kicker tone="warm" icon={<KIcons.bolt />}>Рекомендация</Kicker>
+      <h2 className="decision-text"><Rich text={rep.recommendation} /></h2>
       <div className="grid grid-2" style={{ marginTop: 16 }}>
         <div className="callout"><div className="stat-label">Критерий успеха</div><div>{rep.success_criterion}</div></div>
         {rep.closing_rule && <div className="callout"><div className="stat-label">Правило закрытия</div><div>{rep.closing_rule}</div></div>}
