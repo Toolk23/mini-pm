@@ -8,7 +8,7 @@ export function Hl({ children, tone = 'red', sm = false }: { children: ReactNode
 }
 
 /** Надзаголовок секции: цветная иконка + подпись. */
-export function Kicker({ children, tone = 'blue', icon }: { children: ReactNode; tone?: 'blue' | 'red' | 'warm' | 'teal' | 'violet'; icon?: ReactNode }) {
+export function Kicker({ children, tone = 'blue', icon }: { children: ReactNode; tone?: 'blue' | 'red' | 'warm' | 'teal' | 'violet' | 'green'; icon?: ReactNode }) {
   return <span className={`kicker kicker-${tone}`}>{icon}{children}</span>
 }
 
