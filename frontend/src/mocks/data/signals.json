@@ -6,15 +6,15 @@
   "product": "Kaspersky Endpoint Security",
   "family": "KES",
   "priority": "Critical",
-  "title": "Падение самостоятельных заказов KES: -33.9% к базе",
+  "title": "Падение самостоятельных заказов KES: -32.7% к базе",
   "change": {
    "baseline_mean": 165.8,
-   "post_mean": 109.7,
-   "change_pct": -33.9,
+   "post_mean": 111.6,
+   "change_pct": -32.7,
    "baseline_period": "29.06.2026–21.09.2026",
-   "post_period": "05.10.2026–09.11.2026",
+   "post_period": "05.10.2026–16.11.2026",
    "baseline_weeks": 13,
-   "post_weeks": 6
+   "post_weeks": 7
   },
   "split_week": "28.09.2026",
   "rolling": {
@@ -27,12 +27,12 @@
    "family": "Astra",
    "name": "Astra Linux Special Edition",
    "baseline_mean": 98.5,
-   "post_mean": 101.5,
-   "change_pct": 3.0,
+   "post_mean": 96.0,
+   "change_pct": -2.6,
    "baseline_period": "29.06.2026–21.09.2026",
-   "post_period": "05.10.2026–09.11.2026",
+   "post_period": "05.10.2026–16.11.2026",
    "baseline_weeks": 13,
-   "post_weeks": 6,
+   "post_weeks": 7,
    "stable": true,
    "conclusion": "Контроль стабилен — падение специфично для KES"
   },
@@ -88,9 +88,8 @@
    }
   ],
   "caveats": [
-   "Неделя 08.06.2026 — разовый всплеск (144.0), исключена из расчёта: это не эффект релиза.",
    "Неделя 28.09.2026 — разовый всплеск (246.0), исключена из расчёта: это не эффект релиза.",
-   "Последняя неделя (16.11.2026, 123.0) может быть неполной — исключена.",
+   "Последняя неделя (16.11.2026, 123.0) может быть неполной (G-09): оставлена в среднем, вывод перепроверить после закрытия недели.",
    "Выводы сделаны по средним за периоды и скользящему среднему, а не по отдельным неделям: заказов мало, недели шумят.",
    "В продажах только самостоятельные заказы: уход клиентов к менеджеру в данных не виден."
   ],
@@ -139,7 +138,7 @@
     "week_start": "2026-06-08",
     "value": 144.0,
     "rolling": 113.2,
-    "spike": true,
+    "spike": false,
     "incomplete": false,
     "comment": null
    },
@@ -365,7 +364,7 @@
     "week_start": "2026-06-01",
     "value": 189.0,
     "rolling": 115.5,
-    "spike": false,
+    "spike": true,
     "incomplete": false,
     "comment": null
    },
@@ -405,7 +404,7 @@
     "week_start": "2026-07-06",
     "value": 105.0,
     "rolling": 99.8,
-    "spike": false,
+    "spike": true,
     "incomplete": false,
     "comment": null
    },
@@ -445,7 +444,7 @@
     "week_start": "2026-08-10",
     "value": 147.0,
     "rolling": 126.0,
-    "spike": true,
+    "spike": false,
     "incomplete": false,
     "comment": null
    },
@@ -469,7 +468,7 @@
     "week_start": "2026-08-31",
     "value": 147.0,
     "rolling": 105.0,
-    "spike": true,
+    "spike": false,
     "incomplete": false,
     "comment": null
    },

@@ -165,8 +165,25 @@ export interface InvestigationReport {
     data_gaps: DataGap[]
     interviews: KnowledgeHit[]
     competitors: KnowledgeHit[]
+    /** Сводка аналитика по внешним источникам (data/curated/evidence_kaspersky.json) */
+    analyst_evidence?: AnalystEvidence | null
+    /** Результаты Yandex Search API */
+    web?: { url: string; domain?: string; title?: string; snippet?: string }[]
     reference_case_traps: string[]
   }
+}
+
+export interface AnalystEvidence {
+  question: string
+  verdict: string
+  items: {
+    id: string
+    topic: string
+    supports_hypothesis: boolean
+    source: { file: string; sheet?: string; row?: number; inner?: string }
+    quote: string
+    finding: string
+  }[]
 }
 
 export interface Investigation {

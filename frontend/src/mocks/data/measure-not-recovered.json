@@ -34,7 +34,7 @@
   }
  ],
  "baseline_mean": 165.8,
- "before_fix_mean": 109.7,
+ "before_fix_mean": 111.6,
  "after_rolling_4w": 101.5,
  "change_vs_baseline_pct": -38.8,
  "control": {

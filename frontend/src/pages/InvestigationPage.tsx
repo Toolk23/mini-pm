@@ -221,18 +221,58 @@ function LinkedTasks({ rep }: { rep: InvestigationReport }) {
 }
 
 function Quotes({ rep }: { rep: InvestigationReport }) {
-  const [tab, setTab] = useState<'interview' | 'competitor'>('interview')
-  const all = tab === 'interview' ? rep.evidence.interviews : rep.evidence.competitors
+  const ae = rep.evidence.analyst_evidence
+  const web = rep.evidence.web ?? []
+  const [tab, setTab] = useState<'analyst' | 'interview' | 'competitor' | 'web'>(ae?.items?.length ? 'analyst' : 'interview')
+  const all = tab === 'interview' ? rep.evidence.interviews : tab === 'competitor' ? rep.evidence.competitors : []
   const hits = useMemo(() => dedupe(all).slice(0, 4), [all])
   return (
     <div className="stack" style={{ gap: 10 }}>
-      <div className="segmented" style={{ alignSelf: 'flex-start' }}>
+      <div className="segmented" style={{ alignSelf: 'flex-start', flexWrap: 'wrap' }}>
+        {ae?.items?.length ? <button className={tab === 'analyst' ? 'on' : ''} onClick={() => setTab('analyst')}>✓ Проверено аналитиком · {ae.items.length}</button> : null}
         <button className={tab === 'interview' ? 'on' : ''} onClick={() => setTab('interview')}>Интервью · {dedupe(rep.evidence.interviews).length}</button>
         <button className={tab === 'competitor' ? 'on' : ''} onClick={() => setTab('competitor')}>Конкуренты · {dedupe(rep.evidence.competitors).length}</button>
+        {web.length > 0 && <button className={tab === 'web' ? 'on' : ''} onClick={() => setTab('web')}>Интернет · {web.length}</button>}
       </div>
-      {hits.length === 0 ? <NoData title="Не подтверждено внешними источниками">По этой теме в базе ничего не нашлось.</NoData> :
-        hits.map((h) => <Quote key={h.id} h={h} />)}
-      <p className="faint">Найденные фрагменты — кандидаты в доказательства; вывод о причине по ним делается только вместе с метриками.</p>
+
+      {tab === 'analyst' && ae && <AnalystEvidenceView ae={ae} />}
+      {tab === 'web' && web.map((w) => (
+        <figure key={w.url} className="quote">
+          <blockquote><b>{w.title}</b>{w.snippet ? <><br />{w.snippet}</> : null}</blockquote>
+          <figcaption className="faint mono"><a href={w.url} target="_blank" rel="noreferrer">{w.domain ?? w.url}</a> · Yandex Search API</figcaption>
+        </figure>
+      ))}
+      {(tab === 'interview' || tab === 'competitor') && (hits.length === 0
+        ? <NoData title="Не подтверждено внешними источниками">По этой теме в базе ничего не нашлось.</NoData>
+        : hits.map((h) => <Quote key={h.id} h={h} />))}
+      {tab !== 'analyst' && <p className="faint">Найденные поиском фрагменты — кандидаты в доказательства; вывод о причине по ним делается только вместе с метриками.</p>}
+    </div>
+  )
+}
+
+/** Сводка аналитика: вердикт + цитаты с источником; «нет данных» — отдельным стилем. */
+function AnalystEvidenceView({ ae }: { ae: NonNullable<InvestigationReport['evidence']['analyst_evidence']> }) {
+  return (
+    <div className="stack" style={{ gap: 10 }}>
+      <div className="verdict">
+        <span className="eyebrow">вывод по внешним источникам</span>
+        <p><Rich text={ae.verdict} /></p>
+      </div>
+      {ae.items.map((it) => {
+        const noData = /^нет данных/i.test(it.finding)
+        return (
+          <figure key={it.id} className={`quote ev${noData ? ' ev-nodata' : ''}`}>
+            <div className="row" style={{ justifyContent: 'space-between', marginLeft: 10, marginBottom: 6 }}>
+              <span className="row" style={{ gap: 6 }}><code className="tok-id">{it.id}</code><b>{it.topic}</b></span>
+              {noData ? <NoDataBadge label="нет данных" /> : it.supports_hypothesis
+                ? <span className="badge badge-high">подтверждает</span> : <span className="badge">не подтверждает падение</span>}
+            </div>
+            <blockquote>{it.quote}</blockquote>
+            <div className="ev-finding"><Rich text={it.finding} /></div>
+            <figcaption className="faint mono">{it.source.inner ? `${it.source.inner} (${it.source.file})` : it.source.file}{it.source.sheet ? ` · ${it.source.sheet}` : ''}{it.source.row ? ` · строка ${it.source.row}` : ''}</figcaption>
+          </figure>
+        )
+      })}
     </div>
   )
 }

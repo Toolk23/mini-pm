@@ -540,3 +540,12 @@ select:focus, input:focus, textarea:focus, .btn:focus-visible { outline: 2px sol
 .redmine-logo { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font: 800 12px var(--font); color: #fff; background: #b32024; }
 .code { margin: 0; padding: 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); font: 12px/1.55 var(--mono);
   color: var(--text-2); overflow-x: auto; max-height: 320px; }
+
+/* сводка аналитика по внешним источникам */
+.verdict { padding: 12px 14px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--chart-control) 35%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--chart-control) 12%, transparent), transparent); display: flex; flex-direction: column; gap: 4px; }
+.verdict p { font-weight: 550; line-height: 1.5; }
+.ev-finding { margin: 6px 0 4px 10px; color: var(--text-2); font-size: 13.5px; line-height: 1.5; }
+.quote.ev-nodata { border-style: dashed; border-color: color-mix(in srgb, var(--nodata) 55%, transparent);
+  background: repeating-linear-gradient(135deg, var(--nodata-soft) 0 8px, transparent 8px 14px); }
+.quote.ev-nodata::before { color: var(--nodata); }

@@ -19,5 +19,8 @@
  },
  "metrika": {
   "configured": false
+ },
+ "web_search": {
+  "configured": false
  }
 }

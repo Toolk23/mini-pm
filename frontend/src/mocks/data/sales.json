@@ -44,7 +44,7 @@
    "week_start": "2026-06-08",
    "value": 144.0,
    "rolling": 113.2,
-   "spike": true,
+   "spike": false,
    "incomplete": false,
    "comment": null
   },
@@ -270,7 +270,7 @@
    "week_start": "2026-06-01",
    "value": 189.0,
    "rolling": 115.5,
-   "spike": false,
+   "spike": true,
    "incomplete": false,
    "comment": null
   },
@@ -310,7 +310,7 @@
    "week_start": "2026-07-06",
    "value": 105.0,
    "rolling": 99.8,
-   "spike": false,
+   "spike": true,
    "incomplete": false,
    "comment": null
   },
@@ -350,7 +350,7 @@
    "week_start": "2026-08-10",
    "value": 147.0,
    "rolling": 126.0,
-   "spike": true,
+   "spike": false,
    "incomplete": false,
    "comment": null
   },
@@ -374,7 +374,7 @@
    "week_start": "2026-08-31",
    "value": 147.0,
    "rolling": 105.0,
-   "spike": true,
+   "spike": false,
    "incomplete": false,
    "comment": null
   },
