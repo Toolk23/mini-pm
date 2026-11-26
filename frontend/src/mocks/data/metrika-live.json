@@ -1,0 +1,5 @@
+{
+ "ok": false,
+ "error": "METRIKA_TOKEN / METRIKA_COUNTER_ID не заданы",
+ "source": "metrika"
+}

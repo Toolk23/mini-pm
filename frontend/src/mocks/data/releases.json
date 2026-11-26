@@ -1,0 +1,153 @@
+[
+ {
+  "release_id": "R-01",
+  "release_date": "2026-04-06",
+  "release_type": "major",
+  "description": "Конфигуратор Astra Linux: на странице семейства вместо полного списка лицензий пошаговый подбор в отдельном окне",
+  "related_task_ids": [
+   "T-01"
+  ],
+  "affected_metrics": [
+   "cfg_family_views"
+  ],
+  "status": "выпущен"
+ },
+ {
+  "release_id": "R-02",
+  "release_date": "2026-05-12",
+  "release_type": "minor",
+  "description": "Доработки конфигуратора Astra Linux: автопропуск шагов без выбора, цена «от» у вариантов, количество для позиций, которые продаются по несколько штук",
+  "related_task_ids": [
+   "T-02"
+  ],
+  "affected_metrics": [
+   "cfg_family_views"
+  ],
+  "status": "выпущен"
+ },
+ {
+  "release_id": "R-03",
+  "release_date": "2026-06-04",
+  "release_type": "analytics",
+  "description": "Сбор событий конфигураторов переведен на одно событие с параметрами (конфигуратор, тип события, шаг, опция). События конфигуратора до этой даты недоступны",
+  "related_task_ids": [
+   "T-03"
+  ],
+  "affected_metrics": [
+   "cfg_open",
+   "cfg_completion_rate",
+   "cfg_step_dropoff",
+   "cfg_back_reset_rate",
+   "cfg_reach_rate"
+  ],
+  "status": "выпущен"
+ },
+ {
+  "release_id": "R-04",
+  "release_date": "2026-08-06",
+  "release_type": "major",
+  "description": "Блок рекомендаций «Вам может подойти» на главной ЛК: товары подбираются по ручным связкам интернет-магазина к купленным клиентом продуктам. Начат сбор кликов по рекомендациям",
+  "related_task_ids": [
+   "T-04",
+   "T-05"
+  ],
+  "affected_metrics": [
+   "lk_home_views",
+   "lk_reco_click_visits"
+  ],
+  "status": "выпущен"
+ },
+ {
+  "release_id": "R-05",
+  "release_date": "2026-08-20",
+  "release_type": "minor",
+  "description": "Блок рекомендаций ЛК: бесконечная прокрутка карусели, исправлено отображение на мобильных",
+  "related_task_ids": [
+   "T-05"
+  ],
+  "affected_metrics": [
+   "lk_reco_click_visits"
+  ],
+  "status": "выпущен"
+ },
+ {
+  "release_id": "R-06",
+  "release_date": "2026-08-24",
+  "release_type": "analytics",
+  "description": "Начат сбор кликов по товарам и добавлений в корзину из конфигуратора Astra Linux",
+  "related_task_ids": [],
+  "affected_metrics": [
+   "cfg_add_to_cart_rate"
+  ],
+  "status": "выпущен"
+ },
+ {
+  "release_id": "R-07",
+  "release_date": "2026-09-16",
+  "release_type": "major",
+  "description": "Новая шапка ЛК с поиском товаров интернет-магазина, каталогом, корзиной и избранным магазина, обновленное боковое меню",
+  "related_task_ids": [
+   "T-06"
+  ],
+  "affected_metrics": [
+   "lk_search_to_store",
+   "lk_home_views"
+  ],
+  "status": "выпущен"
+ },
+ {
+  "release_id": "R-08",
+  "release_date": "2026-09-29",
+  "release_type": "infrastructure",
+  "description": "Изменен механизм входа на сайт интернет-магазина. С 29.09 по 05.10 терялись источники трафика, с 06.10 визитные показатели несопоставимы с прошлым периодом",
+  "related_task_ids": [],
+  "affected_metrics": [
+   "cfg_family_views",
+   "cfg_reach_rate"
+  ],
+  "status": "выпущен"
+ },
+ {
+  "release_id": "R-09",
+  "release_date": "2026-10-01",
+  "release_type": "major",
+  "description": "Конфигураторы для семейств Kaspersky Endpoint Security (Стандартный, Расширенный, Cloud): фильтры по типу лицензии, типу организации, сроку и редакции",
+  "related_task_ids": [
+   "T-07"
+  ],
+  "affected_metrics": [
+   "cfg_open",
+   "cfg_option_share",
+   "cfg_reach_rate",
+   "family_orders_idx"
+  ],
+  "status": "выпущен"
+ },
+ {
+  "release_id": "R-10",
+  "release_date": "2026-10-08",
+  "release_type": "marketing",
+  "description": "Email-рассылка клиентам со ссылкой в ЛК. Не релиз, разовый всплеск трафика",
+  "related_task_ids": [],
+  "affected_metrics": [
+   "lk_home_views"
+  ],
+  "status": "проведено"
+ },
+ {
+  "release_id": "R-11",
+  "release_date": "2026-10-21",
+  "release_type": "analytics",
+  "description": "Разметка вывода и просмотра блока рекомендаций ЛК, метки на ссылках рекомендаций",
+  "related_task_ids": [
+   "T-05"
+  ],
+  "affected_metrics": [
+   "lk_reco_status_visits",
+   "lk_reco_shown_share",
+   "lk_reco_viewed_visits",
+   "lk_reco_ctr"
+  ],
+  "status": "выпущен"
+ }
+]

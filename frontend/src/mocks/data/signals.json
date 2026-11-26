@@ -1,0 +1,609 @@
+[
+ {
+  "id": "SIG-SALES-KES",
+  "kind": "sales_drop",
+  "metric_id": "family_orders_idx",
+  "product": "Kaspersky Endpoint Security",
+  "family": "KES",
+  "priority": "Critical",
+  "title": "Падение самостоятельных заказов KES: -33.9% к базе",
+  "change": {
+   "baseline_mean": 165.8,
+   "post_mean": 109.7,
+   "change_pct": -33.9,
+   "baseline_period": "29.06.2026–21.09.2026",
+   "post_period": "05.10.2026–09.11.2026",
+   "baseline_weeks": 13,
+   "post_weeks": 6
+  },
+  "split_week": "28.09.2026",
+  "rolling": {
+   "before": 169.5,
+   "after_min": 97.8,
+   "after_last": 118.2
+  },
+  "threshold_pct": 20,
+  "control": {
+   "family": "Astra",
+   "name": "Astra Linux Special Edition",
+   "baseline_mean": 98.5,
+   "post_mean": 101.5,
+   "change_pct": 3.0,
+   "baseline_period": "29.06.2026–21.09.2026",
+   "post_period": "05.10.2026–09.11.2026",
+   "baseline_weeks": 13,
+   "post_weeks": 6,
+   "stable": true,
+   "conclusion": "Контроль стабилен — падение специфично для KES"
+  },
+  "release_candidates": [
+   {
+    "release_id": "R-07",
+    "date": "16.09.2026",
+    "type": "major",
+    "description": "Новая шапка ЛК с поиском товаров интернет-магазина, каталогом, корзиной и избранным магазина, обновленное боковое меню",
+    "affected_metrics": [
+     "lk_search_to_store",
+     "lk_home_views"
+    ],
+    "related_task_ids": [
+     "T-06"
+    ]
+   },
+   {
+    "release_id": "R-08",
+    "date": "29.09.2026",
+    "type": "infrastructure",
+    "description": "Изменен механизм входа на сайт интернет-магазина. С 29.09 по 05.10 терялись источники трафика, с 06.10 визитные показатели несопоставимы с прошлым периодом",
+    "affected_metrics": [
+     "cfg_family_views",
+     "cfg_reach_rate"
+    ],
+    "related_task_ids": []
+   },
+   {
+    "release_id": "R-09",
+    "date": "01.10.2026",
+    "type": "major",
+    "description": "Конфигураторы для семейств Kaspersky Endpoint Security (Стандартный, Расширенный, Cloud): фильтры по типу лицензии, типу организации, сроку и редакции",
+    "affected_metrics": [
+     "cfg_open",
+     "cfg_option_share",
+     "cfg_reach_rate",
+     "family_orders_idx"
+    ],
+    "related_task_ids": [
+     "T-07"
+    ]
+   },
+   {
+    "release_id": "R-10",
+    "date": "08.10.2026",
+    "type": "marketing",
+    "description": "Email-рассылка клиентам со ссылкой в ЛК. Не релиз, разовый всплеск трафика",
+    "affected_metrics": [
+     "lk_home_views"
+    ],
+    "related_task_ids": []
+   }
+  ],
+  "caveats": [
+   "Неделя 08.06.2026 — разовый всплеск (144.0), исключена из расчёта: это не эффект релиза.",
+   "Неделя 28.09.2026 — разовый всплеск (246.0), исключена из расчёта: это не эффект релиза.",
+   "Последняя неделя (16.11.2026, 123.0) может быть неполной — исключена.",
+   "Выводы сделаны по средним за периоды и скользящему среднему, а не по отдельным неделям: заказов мало, недели шумят.",
+   "В продажах только самостоятельные заказы: уход клиентов к менеджеру в данных не виден."
+  ],
+  "series": [
+   {
+    "week_start": "2026-05-04",
+    "value": 62.0,
+    "rolling": null,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-05-11",
+    "value": 123.0,
+    "rolling": null,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-05-18",
+    "value": 103.0,
+    "rolling": null,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-05-25",
+    "value": 62.0,
+    "rolling": 87.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-01",
+    "value": 144.0,
+    "rolling": 108.0,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-08",
+    "value": 144.0,
+    "rolling": 113.2,
+    "spike": true,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-15",
+    "value": 144.0,
+    "rolling": 123.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-22",
+    "value": 21.0,
+    "rolling": 113.2,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-29",
+    "value": 226.0,
+    "rolling": 133.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-07-06",
+    "value": 185.0,
+    "rolling": 144.0,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-07-13",
+    "value": 164.0,
+    "rolling": 149.0,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-07-20",
+    "value": 164.0,
+    "rolling": 184.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-07-27",
+    "value": 82.0,
+    "rolling": 148.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-03",
+    "value": 123.0,
+    "rolling": 133.2,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-10",
+    "value": 164.0,
+    "rolling": 133.2,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-17",
+    "value": 185.0,
+    "rolling": 138.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-24",
+    "value": 185.0,
+    "rolling": 164.2,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-31",
+    "value": 144.0,
+    "rolling": 169.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-09-07",
+    "value": 185.0,
+    "rolling": 174.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-09-14",
+    "value": 164.0,
+    "rolling": 169.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-09-21",
+    "value": 185.0,
+    "rolling": 169.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-09-28",
+    "value": 246.0,
+    "rolling": 195.0,
+    "spike": true,
+    "incomplete": false,
+    "comment": "Неделя релиза конфигуратора Kaspersky (01.10.2026). С 29.09.2026 изменился механизм входа на сайт"
+   },
+   {
+    "week_start": "2026-10-05",
+    "value": 123.0,
+    "rolling": 179.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-10-12",
+    "value": 103.0,
+    "rolling": 164.2,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-10-19",
+    "value": 82.0,
+    "rolling": 138.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-10-26",
+    "value": 144.0,
+    "rolling": 113.0,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-11-02",
+    "value": 62.0,
+    "rolling": 97.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-11-09",
+    "value": 144.0,
+    "rolling": 108.0,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-11-16",
+    "value": 123.0,
+    "rolling": 118.2,
+    "spike": false,
+    "incomplete": true,
+    "comment": "Последняя неделя может быть неполной: данные по 19.11.2026"
+   }
+  ],
+  "control_series": [
+   {
+    "week_start": "2026-05-04",
+    "value": 42.0,
+    "rolling": null,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-05-11",
+    "value": 42.0,
+    "rolling": null,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-05-18",
+    "value": 126.0,
+    "rolling": null,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-05-25",
+    "value": 105.0,
+    "rolling": 78.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-01",
+    "value": 189.0,
+    "rolling": 115.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-08",
+    "value": 42.0,
+    "rolling": 115.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-15",
+    "value": 168.0,
+    "rolling": 126.0,
+    "spike": true,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-22",
+    "value": 84.0,
+    "rolling": 120.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-06-29",
+    "value": 42.0,
+    "rolling": 84.0,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-07-06",
+    "value": 105.0,
+    "rolling": 99.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-07-13",
+    "value": 42.0,
+    "rolling": 68.2,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-07-20",
+    "value": 126.0,
+    "rolling": 78.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-07-27",
+    "value": 105.0,
+    "rolling": 94.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-03",
+    "value": 126.0,
+    "rolling": 99.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-10",
+    "value": 147.0,
+    "rolling": 126.0,
+    "spike": true,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-17",
+    "value": 84.0,
+    "rolling": 115.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-24",
+    "value": 42.0,
+    "rolling": 99.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-08-31",
+    "value": 147.0,
+    "rolling": 105.0,
+    "spike": true,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-09-07",
+    "value": 105.0,
+    "rolling": 94.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-09-14",
+    "value": 42.0,
+    "rolling": 84.0,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-09-21",
+    "value": 168.0,
+    "rolling": 115.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-09-28",
+    "value": 126.0,
+    "rolling": 110.2,
+    "spike": false,
+    "incomplete": false,
+    "comment": "С 29.09.2026 изменился механизм входа на сайт"
+   },
+   {
+    "week_start": "2026-10-05",
+    "value": 147.0,
+    "rolling": 120.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-10-12",
+    "value": 105.0,
+    "rolling": 136.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-10-19",
+    "value": 63.0,
+    "rolling": 110.2,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-10-26",
+    "value": 147.0,
+    "rolling": 115.5,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-11-02",
+    "value": 84.0,
+    "rolling": 99.8,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-11-09",
+    "value": 63.0,
+    "rolling": 89.2,
+    "spike": false,
+    "incomplete": false,
+    "comment": null
+   },
+   {
+    "week_start": "2026-11-16",
+    "value": 63.0,
+    "rolling": 89.2,
+    "spike": false,
+    "incomplete": true,
+    "comment": "Последняя неделя может быть неполной: данные по 19.11.2026"
+   }
+  ]
+ },
+ {
+  "id": "SIG-lk_reco_click_visits-ЛК",
+  "kind": "zero_weeks",
+  "metric_id": "lk_reco_click_visits",
+  "product": "ЛК",
+  "priority": "High",
+  "title": "lk_reco_click_visits: 5 нед. без событий из 15",
+  "facts": {
+   "zero_weeks": [
+    "17.08.2026",
+    "14.09.2026",
+    "28.09.2026",
+    "05.10.2026",
+    "02.11.2026"
+   ],
+   "weeks_total": 15,
+   "last_values": [
+    0.0,
+    2.0,
+    1.0,
+    1.0,
+    0.0,
+    2.0
+   ]
+  },
+  "caveats": []
+ },
+ {
+  "id": "SIG-cfg_open-Конфигуратор Астра",
+  "kind": "metric_change",
+  "metric_id": "cfg_open",
+  "product": "Конфигуратор Астра",
+  "priority": "High",
+  "title": "cfg_open (Конфигуратор Астра): -21.1% за 4 нед.",
+  "facts": {
+   "baseline": 288.25,
+   "current": 227.5,
+   "change_pct": -21.1,
+   "change_pp": -60.75,
+   "window_weeks": 4
+  },
+  "caveats": []
+ }
+]

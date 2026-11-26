@@ -1,0 +1,235 @@
+[
+ {
+  "id": "60c6f9fe69aa",
+  "source_type": "competitor",
+  "file": "competitors.xlsx",
+  "sheet": "02B_Спрос_уходит_к_конкурентам",
+  "row": 480,
+  "title": "Конкуренты / 02B Спрос уходит к конкурентам / kaspersky endpoint security лицензия / Kaspersky",
+  "text": "[Конкуренты / 02B Спрос уходит к конкурентам] Запрос: kaspersky endpoint security лицензия; Продукт: Kaspersky; Точная частота (wsk, Москва): 23; Конкурентов в ТОП-10: 4; Кто в ТОП-10: allsoft.ru, iesoft.ru, softmagazin.ru, Сиссофт; Позиция Store: >20/нет",
+  "score": 6.3989,
+  "meta": {
+   "study": "competitors",
+   "kind": "table_row",
+   "block": "search_lost_demand",
+   "product": "Kaspersky",
+   "products": [
+    "Kaspersky"
+   ],
+   "tags": [
+    "license",
+    "competitor"
+   ],
+   "question_col": 0,
+   "competitors_mentioned": [
+    "store.softline.ru",
+    "allsoft.ru",
+    "softmagazin.ru",
+    "iesoft.ru"
+   ]
+  }
+ },
+ {
+  "id": "d09bffa5b1df",
+  "source_type": "competitor",
+  "file": "competitors.xlsx",
+  "sheet": "02B_Спрос_уходит_к_конкурентам",
+  "row": 946,
+  "title": "Конкуренты / 02B Спрос уходит к конкурентам / касперский лицензия на год / Kaspersky",
+  "text": "[Конкуренты / 02B Спрос уходит к конкурентам] Запрос: касперский лицензия на год; Продукт: Kaspersky; Точная частота (wsk, Москва): 11; Конкурентов в ТОП-10: 1; Кто в ТОП-10: softmagazin.ru; Позиция Store: >20/нет",
+  "score": 5.6809,
+  "meta": {
+   "study": "competitors",
+   "kind": "table_row",
+   "block": "search_lost_demand",
+   "product": "Kaspersky",
+   "products": [
+    "Kaspersky"
+   ],
+   "tags": [
+    "subscription",
+    "license",
+    "competitor"
+   ],
+   "question_col": 0,
+   "competitors_mentioned": [
+    "store.softline.ru",
+    "softmagazin.ru"
+   ]
+  }
+ },
+ {
+  "id": "f65512e0d968",
+  "source_type": "competitor",
+  "file": "competitors.xlsx",
+  "sheet": "02B_Спрос_уходит_к_конкурентам",
+  "row": 958,
+  "title": "Конкуренты / 02B Спрос уходит к конкурентам / касперский бессрочная лицензия / Kaspersky",
+  "text": "[Конкуренты / 02B Спрос уходит к конкурентам] Запрос: касперский бессрочная лицензия; Продукт: Kaspersky; Точная частота (wsk, Москва): 11; Конкурентов в ТОП-10: 1; Кто в ТОП-10: allsoft.ru; Позиция Store: >20/нет",
+  "score": 5.6809,
+  "meta": {
+   "study": "competitors",
+   "kind": "table_row",
+   "block": "search_lost_demand",
+   "product": "Kaspersky",
+   "products": [
+    "Kaspersky"
+   ],
+   "tags": [
+    "license",
+    "competitor"
+   ],
+   "question_col": 0,
+   "competitors_mentioned": [
+    "store.softline.ru",
+    "allsoft.ru"
+   ]
+  }
+ },
+ {
+  "id": "13b6726af816",
+  "source_type": "competitor",
+  "file": "competitors.xlsx",
+  "sheet": "02B_Спрос_уходит_к_конкурентам",
+  "row": 892,
+  "title": "Конкуренты / 02B Спрос уходит к конкурентам / касперский продление лицензии купить / Kaspersky",
+  "text": "[Конкуренты / 02B Спрос уходит к конкурентам] Запрос: касперский продление лицензии купить; Продукт: Kaspersky; Точная частота (wsk, Москва): 12; Конкурентов в ТОП-10: 1; Кто в ТОП-10: allsoft.ru; Позиция Store: >20/нет",
+  "score": 5.5946,
+  "meta": {
+   "study": "competitors",
+   "kind": "table_row",
+   "block": "search_lost_demand",
+   "product": "Kaspersky",
+   "products": [
+    "Kaspersky"
+   ],
+   "tags": [
+    "subscription",
+    "license",
+    "competitor"
+   ],
+   "question_col": 0,
+   "competitors_mentioned": [
+    "store.softline.ru",
+    "allsoft.ru"
+   ]
+  }
+ },
+ {
+  "id": "61e930697b17",
+  "source_type": "competitor",
+  "file": "competitors.xlsx",
+  "sheet": "02B_Спрос_уходит_к_конкурентам",
+  "row": 961,
+  "title": "Конкуренты / 02B Спрос уходит к конкурентам / касперский для андроид купить лицензию / Kaspersky",
+  "text": "[Конкуренты / 02B Спрос уходит к конкурентам] Запрос: касперский для андроид купить лицензию; Продукт: Kaspersky; Точная частота (wsk, Москва): 11; Конкурентов в ТОП-10: 1; Кто в ТОП-10: allsoft.ru; Позиция Store: >20/нет",
+  "score": 5.5946,
+  "meta": {
+   "study": "competitors",
+   "kind": "table_row",
+   "block": "search_lost_demand",
+   "product": "Kaspersky",
+   "products": [
+    "Kaspersky"
+   ],
+   "tags": [
+    "license",
+    "competitor"
+   ],
+   "question_col": 0,
+   "competitors_mentioned": [
+    "store.softline.ru",
+    "allsoft.ru"
+   ]
+  }
+ },
+ {
+  "id": "b8f0bf16f9f1",
+  "source_type": "competitor",
+  "file": "competitors.xlsx",
+  "sheet": "02B_Спрос_уходит_к_конкурентам",
+  "row": 1479,
+  "title": "Конкуренты / 02B Спрос уходит к конкурентам / стоимость продления лицензии касперского / Kaspersky",
+  "text": "[Конкуренты / 02B Спрос уходит к конкурентам] Запрос: стоимость продления лицензии касперского; Продукт: Kaspersky; Точная частота (wsk, Москва): 6; Конкурентов в ТОП-10: 1; Кто в ТОП-10: allsoft.ru; Позиция Store: >20/нет",
+  "score": 5.5946,
+  "meta": {
+   "study": "competitors",
+   "kind": "table_row",
+   "block": "search_lost_demand",
+   "product": "Kaspersky",
+   "products": [
+    "Kaspersky"
+   ],
+   "tags": [
+    "price",
+    "subscription",
+    "license",
+    "competitor"
+   ],
+   "question_col": 0,
+   "competitors_mentioned": [
+    "store.softline.ru",
+    "allsoft.ru"
+   ]
+  }
+ },
+ {
+  "id": "6446b653ff28",
+  "source_type": "competitor",
+  "file": "competitors.xlsx",
+  "sheet": "02B_Спрос_уходит_к_конкурентам",
+  "row": 444,
+  "title": "Конкуренты / 02B Спрос уходит к конкурентам / касперский продление лицензии / Kaspersky",
+  "text": "[Конкуренты / 02B Спрос уходит к конкурентам] Запрос: касперский продление лицензии; Продукт: Kaspersky; Точная частота (wsk, Москва): 25; Конкурентов в ТОП-10: 2; Кто в ТОП-10: allsoft.ru, softmagazin.ru; Позиция Store: 11",
+  "score": 5.5525,
+  "meta": {
+   "study": "competitors",
+   "kind": "table_row",
+   "block": "search_lost_demand",
+   "product": "Kaspersky",
+   "products": [
+    "Kaspersky"
+   ],
+   "tags": [
+    "subscription",
+    "license",
+    "competitor"
+   ],
+   "question_col": 0,
+   "competitors_mentioned": [
+    "store.softline.ru",
+    "allsoft.ru",
+    "softmagazin.ru"
+   ]
+  }
+ },
+ {
+  "id": "71e0732f40cf",
+  "source_type": "competitor",
+  "file": "competitors.xlsx",
+  "sheet": "02B_Спрос_уходит_к_конкурентам",
+  "row": 1248,
+  "title": "Конкуренты / 02B Спрос уходит к конкурентам / касперский продление лицензии на 1 компьютер цена / Kaspersky",
+  "text": "[Конкуренты / 02B Спрос уходит к конкурентам] Запрос: касперский продление лицензии на 1 компьютер цена; Продукт: Kaspersky; Точная частота (wsk, Москва): 8; Конкурентов в ТОП-10: 1; Кто в ТОП-10: allsoft.ru; Позиция Store: >20/нет",
+  "score": 5.4298,
+  "meta": {
+   "study": "competitors",
+   "kind": "table_row",
+   "block": "search_lost_demand",
+   "product": "Kaspersky",
+   "products": [
+    "Kaspersky"
+   ],
+   "tags": [
+    "subscription",
+    "license",
+    "competitor"
+   ],
+   "question_col": 0,
+   "competitors_mentioned": [
+    "store.softline.ru",
+    "allsoft.ru"
+   ]
+  }
+ }
+]
