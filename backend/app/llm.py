@@ -29,6 +29,8 @@ def chat(messages: list[dict], step: str, *, temperature: float = 0.2, max_token
         headers["OpenAI-Project"] = config.LLM_FOLDER_ID  # YandexGPT: каталог
     model = config.model_for(step)
     body = {"model": model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}
+    if config.LLM_REASONING_EFFORT:
+        body["reasoning_effort"] = config.LLM_REASONING_EFFORT
     if json_mode:
         body["response_format"] = {"type": "json_object"}
     url = config.LLM_BASE_URL.rstrip("/") + "/chat/completions"
@@ -44,7 +46,12 @@ def chat(messages: list[dict], step: str, *, temperature: float = 0.2, max_token
     data = r.json()
     usage = data.get("usage") or {}
     store.log_tokens(step, model, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0), request_id)
-    return data["choices"][0]["message"]["content"] or ""
+    choice = data["choices"][0]
+    content = choice["message"].get("content") or ""
+    if not content.strip():
+        raise LLMError(f"Пустой ответ модели (finish_reason={choice.get('finish_reason')}): "
+                       "вероятно, не хватило max_tokens на размышления")
+    return content
 
 
 def chat_json(messages: list[dict], step: str, **kw) -> dict:
@@ -52,4 +59,35 @@ def chat_json(messages: list[dict], step: str, **kw) -> dict:
     m = re.search(r"\{.*\}", text, re.S)
     if not m:
         raise LLMError(f"Модель вернула не JSON: {text[:200]}")
-    return json.loads(m.group(0))
+    raw = m.group(0)
+    for candidate in (raw, _relax(raw)):
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+    raise LLMError("Модель вернула некорректный JSON")
+
+
+def _relax(s: str) -> str:
+    """Чинит типовые огрехи моделей: // комментарии вне строк и висячие запятые."""
+    out, i, in_str = [], 0, False
+    while i < len(s):
+        ch = s[i]
+        if in_str:
+            out.append(ch)
+            if ch == "\\":
+                out.append(s[i + 1: i + 2])
+                i += 1
+            elif ch == '"':
+                in_str = False
+        elif ch == '"':
+            in_str = True
+            out.append(ch)
+        elif s.startswith("//", i):
+            while i < len(s) and s[i] != "\n":
+                i += 1
+            continue
+        else:
+            out.append(ch)
+        i += 1
+    return re.sub(r",\s*([}\]])", r"\1", "".join(out))

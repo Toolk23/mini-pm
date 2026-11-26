@@ -65,7 +65,9 @@ def _funnel(sig: dict) -> dict:
         res[m] = {"before_mean": round(float(before.value.mean()), 1) if len(before) else None,
                   "after_mean": round(float(after.value.mean()), 1) if len(after) else None,
                   "weeks_after": len(after),
-                  "note": "визитный показатель: после 29.09 несопоставим с прошлым" if m in detector.VISIT_METRICS else ""}
+                  "note": "визитный показатель: после 29.09 несопоставим с прошлым" if m in detector.VISIT_METRICS
+                  else ("событий до релиза нет: конфигуратор этого семейства появился в самом релизе, "
+                        "поэтому сравнения до/после нет — это не пропуск учёта" if not len(before) else "")}
     a2c = md[(md.metric_id == "cfg_add_to_cart_rate") & (md["product"] == product)]
     res["cfg_add_to_cart_rate"] = {"status": "not_measured" if a2c.empty else "measured", "rows": int(len(a2c))}
     return res
@@ -119,8 +121,8 @@ SYSTEM = """Ты — «мини ПМ», ИИ-помощник продакт-м�
 
 SCHEMA_HINT = """{
  "summary": "2-3 предложения: что случилось и главный вывод",
- "steps": [{"n":1,"title":"...","finding":"...","sources":["Продажи", "..."]}],   // 6-8 шагов как у следователя
- "hypotheses": [{"text":"...","check":"как проверить","status":"не проверена|частично подтверждена|подтверждена|опровергнута"}],  // минимум 2
+ "steps": [{"n":1,"title":"...","finding":"...","sources":["Продажи", "..."]}],
+ "hypotheses": [{"text":"...","check":"как проверить","status":"не проверена|частично подтверждена|подтверждена|опровергнута"}],
  "sources_check": {"metrika":"подтверждает|частично|нет данных","backlog":"...","interviews":"...","competitors":"...", "comment":"..."},
  "recommendation": "что сделать",
  "task": {"title":"...","description":"...","priority":"Critical|High|Medium"},
@@ -128,7 +130,8 @@ SCHEMA_HINT = """{
  "success_criterion": "...",
  "closing_rule": "...",
  "email": {"subject":"...","body":"текст письма ПМу"}
-}"""
+}
+Требования: steps — 6–8 шагов, как у следователя (сигнал, контроль, окно релизов, воронка, пробелы данных, внешние источники, итог); hypotheses — минимум 2. Только валидный JSON без комментариев."""
 
 
 def _template_report(ev: dict) -> dict:
@@ -200,7 +203,7 @@ def investigate(sig: dict, inv_id: str) -> dict:
             rep = llm.chat_json(
                 [{"role": "system", "content": SYSTEM},
                  {"role": "user", "content": f"Факты и доказательства (JSON):\n{facts}\n\nСформируй отчёт расследования в формате:\n{SCHEMA_HINT}"}],
-                step="investigation", max_tokens=3000, request_id=inv_id)
+                step="investigation", max_tokens=16000, request_id=inv_id)
         except llm.LLMError as e:
             rep, mode = _template_report(ev), f"template (LLM error: {e})"
     else:
@@ -223,7 +226,7 @@ def answer(message: str, history: list[dict]) -> dict:
             *[m for m in history[-6:] if m.get("role") in ("user", "assistant")],
             {"role": "user", "content": f"Активные сигналы: {json.dumps(sigs, ensure_ascii=False)}\n\nФрагменты базы знаний:\n{ctx or 'ничего не найдено'}\n\nВопрос: {message}"}]
     try:
-        text = llm.chat(msgs, step="chat", max_tokens=900)
+        text = llm.chat(msgs, step="chat", max_tokens=4000)
     except llm.LLMError as e:
         return {"answer": f"LLM недоступна ({e}). Нашёл в базе:\n{ctx}", "sources": hits, "mode": "search_only"}
     return {"answer": text, "sources": hits, "mode": "llm"}
