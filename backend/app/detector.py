@@ -29,15 +29,17 @@ def sales_series(family: str, cfg: dict | None = None) -> dict:
     cfg = cfg or settings_store.load()["detector"]
     df = ingest.sales()
     s = df[df.family == family][["week_start", "orders_index", "comment"]].reset_index(drop=True).copy()
+    if s.empty:  # нет продаж по этому продукту (например, ЛК) — пустой ряд, а не ошибка
+        return {"family": family, "name": FAMILY_NAMES.get(family, family), "points": [], "_df": s}
     s["incomplete"] = False
     s.loc[s.index[-1], "incomplete"] = True  # G-09: последняя неделя может быть неполной
     s["spike"] = False
-    # Разовый всплеск: неделя выше медианы 8 предыдущих × spike_ratio, а следующие 2 недели
-    # снова ниже этой медианы (резкий подъём и откат). Устойчивый рост всплеском не считается.
+    # Разовый всплеск (правило аналитика): неделя выше медианы 4 предыдущих × spike_ratio (1.35),
+    # а следующая неделя снова ниже этой медианы. 28.09 (246 при медиане 174 ≈ 1.41) — всплеск;
+    # отскок 26.10 внутри падения (≈1.27) — нет.
     v = s["orders_index"]
-    med = v.rolling(8, min_periods=4).median().shift(1)
-    nxt = v.shift(-1).rolling(2, min_periods=1).mean().shift(-1).fillna(v.shift(-1))
-    s.loc[(v > med * cfg["spike_ratio"]) & (nxt < med), "spike"] = True
+    med = v.rolling(4, min_periods=4).median().shift(1)
+    s.loc[(v > med * cfg["spike_ratio"]) & (v.shift(-1) < med), "spike"] = True
     s["rolling"] = s["orders_index"].rolling(cfg["rolling_window_weeks"], min_periods=cfg["rolling_window_weeks"]).mean()
     return {
         "family": family,
@@ -55,11 +57,12 @@ def sales_series(family: str, cfg: dict | None = None) -> dict:
 def _window_change(s: pd.DataFrame, split: pd.Timestamp, cfg: dict, windows: dict | None = None) -> dict | None:
     """windows — те же календарные периоды, что у сигнала (для контрольной группы)."""
     if windows:
-        clean = s[~s.incomplete]
-        base = clean[(clean.week_start >= windows["b0"]) & (clean.week_start <= windows["b1"])]
-        post = clean[(clean.week_start >= windows["p0"]) & (clean.week_start <= windows["p1"])]
+        # контроль — ровно те же календарные недели, без исключений
+        base = s[(s.week_start >= windows["b0"]) & (s.week_start <= windows["b1"])]
+        post = s[(s.week_start >= windows["p0"]) & (s.week_start <= windows["p1"])]
     else:
-        clean = s[~s.spike & ~s.incomplete]
+        # неполная последняя неделя остаётся в среднем (как в эталонном кейсе), но помечается
+        clean = s[~s.spike]
         base = clean[clean.week_start < split].tail(cfg["baseline_weeks"])
         post = clean[clean.week_start >= split]
     if len(base) < 4 or len(post) < cfg["min_post_weeks"]:
@@ -119,10 +122,13 @@ def detect_sales(family: str, control: str, settings: dict) -> dict | None:
     for r in spikes.itertuples():
         caveats.append(f"Неделя {_d(r.week_start)} — разовый всплеск ({_r(r.orders_index)}), исключена из расчёта: это не эффект релиза.")
     last = s.iloc[-1]
-    caveats.append(f"Последняя неделя ({_d(last.week_start)}, {_r(last.orders_index)}) может быть неполной — исключена.")
+    caveats.append(f"Последняя неделя ({_d(last.week_start)}, {_r(last.orders_index)}) может быть неполной (G-09): "
+                   "оставлена в среднем, вывод перепроверить после закрытия недели.")
     caveats.append("Выводы сделаны по средним за периоды и скользящему среднему, а не по отдельным неделям: заказов мало, недели шумят.")
     caveats.append("В продажах только самостоятельные заказы: уход клиентов к менеджеру в данных не виден.")
     control_stable = ctrl is not None and abs(ctrl["change_pct"]) < cfg["control_max_change_pct"]
+    if not control_stable:
+        return None  # контроль тоже сдвинулся — падение не специфично для семейства (правило аналитика)
     return {
         "id": f"SIG-SALES-{family}",
         "kind": "sales_drop",

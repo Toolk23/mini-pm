@@ -24,14 +24,25 @@ LLM_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "180"))
 LLM_REASONING_EFFORT = os.getenv("LLM_REASONING_EFFORT", "")
 
 
+# Yandex AI Studio: каталог входит в URI модели (gpt://<каталог>/<модель>)
+LLM_FOLDER_ID = os.getenv("LLM_FOLDER_ID", "")
+# Схема авторизации: Yandex — «Api-Key <ключ>», остальные — «Bearer <ключ>»
+LLM_AUTH_SCHEME = os.getenv("LLM_AUTH_SCHEME", "Api-Key" if LLM_PROVIDER == "yandex" else "Bearer")
+
+
 def model_for(step: str) -> str:
     """Своя модель на каждый шаг агента: LLM_MODEL_INVESTIGATION, LLM_MODEL_CHAT, ...
-    Например, расследование — сильная модель, чат — быстрая и дешёвая. По умолчанию — LLM_MODEL."""
-    return os.getenv(f"LLM_MODEL_{step.upper()}", LLM_MODEL)
+    Например, расследование — сильная модель, чат — быстрая и дешёвая. По умолчанию — LLM_MODEL.
+    Для Yandex короткое имя (qwen3.6-35b-a3b) разворачивается в gpt://<каталог>/qwen3.6-35b-a3b."""
+    name = os.getenv(f"LLM_MODEL_{step.upper()}", LLM_MODEL)
+    if LLM_PROVIDER == "yandex" and LLM_FOLDER_ID and "://" not in name:
+        name = f"gpt://{LLM_FOLDER_ID}/{name}"
+    return name
 
 
-# Для YandexGPT нужен заголовок с каталогом
-LLM_FOLDER_ID = os.getenv("LLM_FOLDER_ID", "")
+# Yandex Search API — поиск в интернете для агента. По умолчанию тот же ключ и каталог, что у LLM на Yandex.
+SEARCH_API_KEY = os.getenv("SEARCH_API_KEY", LLM_API_KEY if LLM_PROVIDER == "yandex" else "")
+SEARCH_FOLDER_ID = os.getenv("SEARCH_FOLDER_ID", LLM_FOLDER_ID)
 
 # Яндекс.Метрика (свой тестовый счётчик команды)
 METRIKA_TOKEN = os.getenv("METRIKA_TOKEN", "")

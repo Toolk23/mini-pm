@@ -779,6 +779,18 @@
 ```
 `facts` — какие данные магазина модель видела при ответе (можно показать в UI блоком «На чём основан ответ»).
 
+## Поиск в интернете (Yandex Search API)
+`GET /api/web/search?q=купить kaspersky endpoint security&k=5`
+
+Ответ:
+```json
+{"ok": true, "query": "…", "source": "Yandex Search API",
+ "results": [{"url": "…", "domain": "…", "title": "…", "snippet": "…"}]}
+```
+Без ключа: `{"ok": false, "results": [], "error": "Yandex Search API не настроен …"}`. В `/api/health` — `web_search.configured`.
+Результаты также попадают в отчёт расследования (`evidence.web`) и в чат (`facts.web`, если в вопросе «поищи в интернете», «конкуренты», «рынок» и т.п.).
+Сводка аналитика по внешним источникам — `evidence.analyst_evidence`.
+
 ## Живой счётчик Яндекс.Метрики
 `GET /api/metrika/live?date1=7daysAgo&date2=today`
 

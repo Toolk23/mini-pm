@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import config, detector, ingest, llm, metrika, settings_store, store
+from . import config, detector, ingest, llm, metrika, settings_store, store, websearch
 
 app = FastAPI(title="мини ПМ", version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -29,7 +29,7 @@ def health():
     return {"ok": True, "data": ingest.warmup(), "llm": {"configured": llm.available(), "provider": config.LLM_PROVIDER,
                                                           "model": config.LLM_MODEL,
                                                           "models_by_step": {s: config.model_for(s) for s in ("investigation", "chat")}},
-            "metrika": {"configured": metrika.configured()}}
+            "metrika": {"configured": metrika.configured()}, "web_search": {"configured": websearch.configured()}}
 
 
 # ------------------------------------------------------------------ метрики и данные
@@ -286,6 +286,12 @@ class ChatIn(BaseModel):
 def chat(body: ChatIn):
     from . import investigator
     return investigator.answer(body.message, body.history)
+
+
+# ------------------------------------------------------------------ поиск в интернете (Yandex Search API)
+@app.get("/api/web/search")
+def web_search(q: str, k: int = 5):
+    return websearch.search(q, k)
 
 
 # ------------------------------------------------------------------ Яндекс.Метрика (живой счётчик команды)

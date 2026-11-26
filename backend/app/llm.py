@@ -24,9 +24,9 @@ def chat(messages: list[dict], step: str, *, temperature: float = 0.2, max_token
          json_mode: bool = False, request_id: str | None = None) -> str:
     if not available():
         raise LLMError("LLM_API_KEY не задан — работаем в режиме без модели")
-    headers = {"Authorization": f"Bearer {config.LLM_API_KEY}"}
+    headers = {"Authorization": f"{config.LLM_AUTH_SCHEME} {config.LLM_API_KEY}"}
     if config.LLM_FOLDER_ID:
-        headers["OpenAI-Project"] = config.LLM_FOLDER_ID  # YandexGPT: каталог
+        headers["OpenAI-Project"] = config.LLM_FOLDER_ID  # Yandex: каталог (дублирует URI модели)
     model = config.model_for(step)
     body = {"model": model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}
     if config.LLM_REASONING_EFFORT:
@@ -36,8 +36,10 @@ def chat(messages: list[dict], step: str, *, temperature: float = 0.2, max_token
     url = config.LLM_BASE_URL.rstrip("/") + "/chat/completions"
     try:
         r = httpx.post(url, headers=headers, json=body, timeout=config.LLM_TIMEOUT)
-        if r.status_code == 400 and json_mode:  # не все провайдеры поддерживают response_format
-            body.pop("response_format")
+        if r.status_code == 400 and ("response_format" in body or "reasoning_effort" in body):
+            # не все провайдеры поддерживают response_format / reasoning_effort — повторяем без них
+            body.pop("response_format", None)
+            body.pop("reasoning_effort", None)
             r = httpx.post(url, headers=headers, json=body, timeout=config.LLM_TIMEOUT)
         r.raise_for_status()
     except httpx.HTTPError as e:

@@ -40,7 +40,7 @@ def _render_email(rep: dict, task: dict, raised: list[dict]) -> dict:
     path.write_bytes(bytes(msg))
     # мессенджер заказчика — Dion; в прототипе — мок сообщения в том же формате
     dion = {"channel": "Dion · мини ПМ", "text": f"🔔 {subject}\n{rep.get('summary', '')}\nЗадача: {task['task_id']}"}
-    return {"subject": subject, "body": body, "eml_path": str(path.relative_to(config.DATA_DIR)), "dion": dion}
+    return {"subject": subject, "body": body, "eml_path": f"outbox/{path.name}", "dion": dion}
 
 
 def apply(rep: dict) -> dict:

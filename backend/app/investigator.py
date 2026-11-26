@@ -105,8 +105,29 @@ def collect_evidence(sig: dict) -> dict:
         "data_gaps": uniq,
         "interviews": [h for q in interview_q for h in _search(q, 3, "interview")],
         "competitors": [h for q in competitor_q for h in _search(q, 3, "competitor")],
+        "analyst_evidence": _analyst_evidence(fam),
+        "web": _web(sig),
         "reference_case_traps": ingest.reference_case()["traps"],
     }
+
+
+def _analyst_evidence(fam: str) -> dict | None:
+    """Проверенная аналитиком сводка внешних источников (data/curated/evidence_<семейство>.json)."""
+    p = config.DATA_DIR / "curated" / f"evidence_{ {'KES': 'kaspersky', 'Astra': 'astra'}.get(fam, fam.lower()) }.json"
+    return json.loads(p.read_text("utf-8")) if p.exists() else None
+
+
+def _web(sig: dict) -> list[dict]:
+    """Свежий внешний контекст из Yandex Search API (если настроен): что видит покупатель в поиске."""
+    from . import websearch
+    if not websearch.configured() or sig.get("kind") != "sales_drop":
+        return []
+    name = sig.get("product", sig.get("family", ""))
+    out = []
+    for q in (f"купить {name} лицензия", f"{name} конфигуратор подбор лицензии"):
+        res = websearch.search(q, 4)
+        out += [{**r, "query": q} for r in res["results"]]
+    return out
 
 
 # ------------------------------------------------------------------ отчёт
@@ -117,13 +138,14 @@ SYSTEM = """Ты — «мини ПМ», ИИ-помощник продакт-м�
 3. Выводы — только по средним за периоды и скользящему среднему, не по отдельным неделям.
 4. Каждое утверждение — со ссылкой на источник (лист, файл, строка, id задачи/релиза).
 5. Пиши по-русски, коротко и по делу, как опытный продакт-аналитик.
+6. Результаты поиска Яндекса (web) — внешний контекст, а не данные магазина: ссылайся на URL и не делай по ним выводов о причине падения без подтверждения в данных. Вывод аналитика (analyst_evidence) — проверенная сводка внешних источников.
 Верни строго JSON."""
 
 SCHEMA_HINT = """{
  "summary": "2-3 предложения: что случилось и главный вывод",
  "steps": [{"n":1,"title":"...","finding":"...","sources":["Продажи", "..."]}],
  "hypotheses": [{"text":"...","check":"как проверить","status":"не проверена|частично подтверждена|подтверждена|опровергнута"}],
- "sources_check": {"metrika":"подтверждает|частично|нет данных","backlog":"...","interviews":"...","competitors":"...", "comment":"..."},
+ "sources_check": {"metrika":"подтверждает|частично|нет данных","backlog":"...","interviews":"...","competitors":"...","web":"...", "comment":"..."},
  "recommendation": "что сделать",
  "task": {"title":"...","description":"...","priority":"Critical|High|Medium"},
  "raise_tasks": [{"task_id":"T-08","new_priority":"High","why":"..."}],
@@ -164,7 +186,9 @@ def _template_report(ev: dict) -> dict:
         {"n": 6, "title": "Внешние источники", "sources": ["Интервью", "Конкурентный анализ"],
          "finding": (f"Интервью: найдено {len(ev['interviews'])} фрагментов по теме подбора и покупки лицензий. " if ev["interviews"] else
                      "Интервью: прямых упоминаний не найдено — не подтверждено внешними источниками. ")
-                    + (f"Конкуренты: {len(ev['competitors'])} фрагментов." if ev["competitors"] else "Конкуренты: данных нет.")},
+                    + (f"Конкуренты: {len(ev['competitors'])} фрагментов. " if ev["competitors"] else "Конкуренты: данных нет. ")
+                    + (f"Вывод аналитика по внешним источникам: {ev['analyst_evidence']['verdict']} " if ev.get("analyst_evidence") else "")
+                    + (f"Поиск Яндекса: {len(ev['web'])} результатов." if ev.get("web") else "")},
     ]
     return {
         "summary": f"Устойчивое падение самостоятельных заказов {s.get('family')} на {abs(ch.get('change_pct') or 0)}% после "
@@ -268,9 +292,15 @@ def chat_facts(message: str) -> dict:
     return {"signals_detailed": detailed, "other_signals": others}
 
 
+WEB_TRIGGERS = ("интернет", "в сети", "поищи", "погугли", "загугли", "найди в", "рынок", "конкурент", "яндекс", "сейчас на сайт")
+
+
 def answer(message: str, history: list[dict]) -> dict:
     hits = _search(message, 6)
     facts = chat_facts(message)
+    from . import websearch
+    if websearch.configured() and any(t in message.lower() for t in WEB_TRIGGERS):
+        facts["web"] = websearch.search(message, 5)
     ctx = "\n".join(f"[{i + 1}] {h['title']} ({h['file']}, лист {h['sheet']}, строка {h['row']}): {h['text']}" for i, h in enumerate(hits))
     if not llm.available():
         return {"answer": ("Режим без LLM. Нашёл в базе:\n" + ctx) if hits else "В базе нет данных по этому вопросу.",
