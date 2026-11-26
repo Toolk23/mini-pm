@@ -780,3 +780,19 @@ input[type='range']:disabled { opacity: .4; cursor: not-allowed; }
 .hit-score span { display: block; height: 100%; background: var(--accent); }
 .q-mark { background: color-mix(in srgb, var(--warm) 25%, transparent); color: var(--text); border-radius: 3px; padding: 0 2px; box-shadow: 0 0 10px -3px var(--warm); }
 .traps.known li::before { content: '•'; color: var(--accent); }
+.start-card { text-align: left; font: inherit; cursor: pointer; }
+.start-card:disabled { cursor: progress; opacity: .7; }
+.start-card .signal-cta { margin-top: auto; }
+.inv-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); transition: all .15s; flex-wrap: wrap; }
+.inv-row:hover { text-decoration: none; background: var(--surface-3); border-color: var(--border-strong); transform: translateX(2px); }
+.inv-row-title { flex: 1; min-width: 220px; font-weight: 550; }
+.inv-row-arrow { color: var(--text-3); transition: transform .15s; }
+.inv-row:hover .inv-row-arrow { transform: translateX(3px); color: var(--text); }
+/* элементы сеток не растягиваются по содержимому (ряды плиток, длинные строки) */
+.grid > *, .steps-picker, .step-panel, .story-card, .mail-layout > * { min-width: 0; }
+.step-panel-body, .answer, .mail-body, .drawer-desc { overflow-wrap: anywhere; }
+/* декоративное свечение не должно давать горизонтальную прокрутку (clip не ломает sticky) */
+.app { overflow-x: clip; }
+.segmented { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.segmented::-webkit-scrollbar { display: none; }
+.segmented button { flex: none; }

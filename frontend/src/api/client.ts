@@ -39,7 +39,12 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     init.body = JSON.stringify(body)
     ;(init.headers as Record<string, string>)['Content-Type'] = 'application/json'
   }
-  const res = await fetch(`/api${path}`, init)
+  let res = await fetch(`/api${path}`, init)
+  // Холодный старт стенда: первые параллельные чтения иногда отдают 5xx — повторяем GET один раз.
+  if (res.status >= 500 && method === 'GET') {
+    await new Promise((r) => setTimeout(r, 700))
+    res = await fetch(`/api${path}`, init)
+  }
   if (!res.ok) {
     let msg = `${res.status} ${res.statusText}`
     try {
