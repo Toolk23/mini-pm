@@ -8,9 +8,11 @@ from __future__ import annotations
 import html
 import re
 
+import json
+
 import httpx
 
-from . import store
+from . import config, store
 
 CARDS = {
     "KES": "https://store.softline.ru/kaspersky/kaspersky-endpoint-security-dlya-biznesa-standartnyiy/",
@@ -50,9 +52,37 @@ def read_card(url: str) -> dict:
     if title and "купить" not in text_lower(raw) and "корзин" not in excerpt.lower():
         issues.append("Нет кнопки покупки в тексте карточки")
     return {"ok": True, "url": str(r.url), "title": title, "prices_rub": prices[:10], "excerpt": excerpt, "issues": issues,
-            "fetched_at": store.now(), "source": "store.softline.ru (живая карточка)"}
+            "fetched_at": store.now(), "source": "store.softline.ru (живая карточка)", "live": True}
+
+
+def _snapshot_path(family: str):
+    return config.DATA_DIR / "curated" / f"store_card_{family.lower()}.json"
 
 
 def card_for(family: str | None) -> dict | None:
+    """Живая карточка; если магазин недоступен (стенд за рубежом, магазин режет зарубежные IP) — снимок из РФ с датой."""
     url = CARDS.get(family or "")
-    return read_card(url) if url else None
+    if not url:
+        return None
+    card = read_card(url)
+    if card["ok"]:
+        return card
+    p = _snapshot_path(family)
+    if p.exists():
+        snap = json.loads(p.read_text("utf-8"))
+        return {**snap, "source": f"снимок карточки store.softline.ru от {snap.get('fetched_at', '')[:10]} "
+                                  f"(живая страница недоступна: {card.get('error')})", "live": False}
+    return card
+
+
+def save_snapshot(family: str) -> dict:
+    """Снять карточку из РФ и сохранить в data/curated (python -m backend.app.storefront KES)."""
+    card = read_card(CARDS[family])
+    if card["ok"]:
+        _snapshot_path(family).write_text(json.dumps(card, ensure_ascii=False, indent=1), "utf-8")
+    return card
+
+
+if __name__ == "__main__":
+    import sys
+    print(save_snapshot(sys.argv[1] if len(sys.argv) > 1 else "KES"))
