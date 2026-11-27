@@ -56,8 +56,10 @@ def collect_facts(product: str) -> dict:
     from . import websearch
     if websearch.configured():
         web = websearch.search(f"{name} купить лицензия цена", 4).get("results", [])
+    from . import storefront
     return {
         "product": name, "family": fam,
+        "store_card": storefront.card_for(fam),
         "analyst_quotes": _quotes(analyst, "competitor") + _quotes(analyst, "interview"),
         "analyst_verdict": analyst.get("verdict") if analyst else None,
         "competitors": competitors[:14], "interviews": interviews[:12],
@@ -71,7 +73,10 @@ SYSTEM = """Ты — «мини ПМ», ИИ-помощник продакт-м�
 Правила:
 1. Только факты из переданных данных. Каждый тезис и ответ — со ссылкой на источник: id цитаты аналитика (E-01…),
    id фрагмента базы, id релиза или URL. Без источника тезис не пиши.
-2. Цены — только сопоставимые лицензии (тот же SKU и срок); продления и несравнимые позиции не сравнивай.
+2. store_card — живая карточка (приоритет над остальными источниками по составу редакций, срокам и цене магазина);
+   store_card.issues — проблемы карточки, вынеси их в internal_note для ПМа.
+   store_card — живая карточка товара на store.softline.ru сейчас: текущая цена магазина и редакции; ссылайся на её URL.
+   Цены конкурентов — только сопоставимые лицензии (тот же SKU и срок); продления и несравнимые позиции не сравнивай.
 3. Если данных нет — так и пиши «нет данных», и вынеси это в dont_say (что продавцу нельзя обещать).
 4. Язык простой, для продавца: коротко, без внутренней кухни (метрики, индексы, сигналы — только в internal_note).
 5. Типовые вопросы бери из интервью клиентов (что спрашивают, что важно, что мешает купить), ответы — из данных.

@@ -354,6 +354,13 @@ def get_sales_brief(brief_id: str):
     return b
 
 
+@app.get("/api/storefront/card")
+def storefront_card(family: str = "KES"):
+    """Живая карточка товара store.softline.ru: название, цены, текст."""
+    from . import storefront
+    return storefront.card_for(family) or {"ok": False, "error": f"Нет ссылки на карточку для {family}"}
+
+
 # ------------------------------------------------------------------ поиск в интернете (Yandex Search API)
 @app.get("/api/web/search")
 def web_search(q: str, k: int = 5):
