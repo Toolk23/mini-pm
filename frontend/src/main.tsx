@@ -19,7 +19,7 @@ import SettingsPage from './pages/Settings'
 import NotFound from './pages/NotFound'
 
 // Метка сборки: видно в DevTools, какая версия фронта открыта (помогает ловить старый кэш).
-document.documentElement.dataset.build = '2026-11-27-v2'
+document.documentElement.dataset.build = '2026-11-27-v3'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

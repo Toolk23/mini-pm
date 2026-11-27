@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import { setUseMocks, useMocks, api } from '../api/client'
 import { Icons, useApi } from './ui'
 import { useTheme } from './theme'
+import BgField from './BgField'
 
 // Верхнее меню в духе Resend / Raycast: логотип — разделы по центру — действия справа.
 const NAV = [
@@ -96,6 +97,7 @@ export default function Layout() {
       <div className="backdrop" aria-hidden>
         <div className="aurora aurora-1" /><div className="aurora aurora-2" /><div className="aurora aurora-3" />
         <div className="noise" />
+        <BgField />
       </div>
 
       <div className="app">
