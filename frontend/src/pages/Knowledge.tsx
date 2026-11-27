@@ -95,8 +95,8 @@ export default function Knowledge() {
                 </span>
                 {!u.error && (
                   <span className="row" style={{ gap: 6 }}>
-                    <button className="btn btn-sm" onClick={() => { setSrc('upload'); setQ('корзина конфигуратор'); search('корзина конфигуратор', 'upload') }}>Найти в файле</button>
-                    <button className="btn btn-sm btn-primary" onClick={() => nav('/chat', { state: { ask: 'Что говорят клиенты про добавление KES в корзину из конфигуратора?' } })}>Спросить в чате</button>
+                    <button className="btn btn-sm" onClick={() => { setSrc('upload'); setQ('продление счёт менеджер'); search('продление счёт менеджер', 'upload') }}>Найти в файле</button>
+                    <button className="btn btn-sm btn-primary" onClick={() => nav('/chat', { state: { ask: 'Как клиенты продлевают Kaspersky?' } })}>Спросить в чате</button>
                   </span>
                 )}
               </div>
