@@ -5,7 +5,7 @@ import { LineChart } from 'echarts/charts'
 import { GridComponent, LegendComponent, MarkAreaComponent, MarkLineComponent, MarkPointComponent, TooltipComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import type { Annotation, DataGap, SeriesPoint } from '../api/types'
-import { cssVar, useThemeValue } from './theme'
+import { cssVar, useThemeValue, withAlpha } from './theme'
 
 echarts.use([LineChart, GridComponent, TooltipComponent, LegendComponent, MarkLineComponent, MarkAreaComponent, MarkPointComponent, CanvasRenderer])
 
@@ -125,7 +125,7 @@ export default function MetricChart({ points, name, control, annotations = [], g
         data: solidRolling.map((p) => [p.week_start, p.rolling]),
         lineStyle: { color: c.main, width: 2 },
         itemStyle: { color: c.main },
-        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: c.main + '55' }, { offset: 1, color: c.main + '00' }]) },
+        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: withAlpha(c.main, .33) }, { offset: 1, color: withAlpha(c.main, 0) }]) },
         animationDuration: 2200, animationEasing: 'cubicOut',
       },
     ]

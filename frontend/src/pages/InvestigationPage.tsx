@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { api, pollInvestigation } from '../api/client'
 import type { ApplyResult, CuratedQuote, Investigation, InvestigationReport, InvestigationStep, KnowledgeHit, ReleaseCandidate } from '../api/types'
 import { MailStatusLine } from '../components/MailStatus'
+import { signalTitle, useMetricNames } from '../components/SignalRow'
 import MetricChart from '../components/MetricChart'
 import { Radar } from '../components/live'
 import { Hl, KIcons, Kicker, Rich } from '../components/highlight'
@@ -71,6 +72,7 @@ function Report({ inv, rep }: { inv: Investigation; rep: InvestigationReport }) 
   const sig = rep.evidence.signal
   const signals = useApi(() => api.signals())
   const full = signals.data?.find((s) => s.id === inv.signal_id)
+  const metricNames = useMetricNames()
   const salesMeta = useApi(() => api.series('family_orders_idx', 'Конфигуратор Kaspersky'))
   const pct = Math.abs(Math.round(sig.change?.change_pct ?? 0))
   const hot = rep.evidence.releases[0] ? [rep.evidence.releases[0].release_id] : []
@@ -86,11 +88,17 @@ function Report({ inv, rep }: { inv: Investigation; rep: InvestigationReport }) 
             {rep.mode.startsWith('llm') ? 'отчёт: LLM' : 'отчёт: шаблон'}
           </span>
         </div>
-        <h1 className="inv-title">
-          <span className="grad-silver">Почему заказы {sig.family}</span><br />
-          <span className="grad-silver">упали на </span><Hl tone="red">{pct}%</Hl>
-        </h1>
-        {rep.summary && <p className="hero-sub" style={{ margin: '16px auto 0' }}><Rich text={rep.summary} hot={hot} /></p>}
+        {/* Старые/не-продажные расследования приходят без family и change — тогда не пишем «упали на 0%»,
+            а показываем название сигнала. Сводку с «None» (недозаполненный шаблон бэкенда) не показываем. */}
+        {sig.family && sig.change ? (
+          <h1 className="inv-title">
+            <span className="grad-silver">Почему заказы {sig.family}</span><br />
+            <span className="grad-silver">упали на </span><Hl tone="red">{pct}%</Hl>
+          </h1>
+        ) : (
+          <h1 className="inv-title"><span className="grad-silver">{full ? signalTitle(full, metricNames) : `Сигнал ${inv.signal_id}`}</span></h1>
+        )}
+        {rep.summary && !/\bNone\b/.test(rep.summary) && <p className="hero-sub" style={{ margin: '16px auto 0' }}><Rich text={rep.summary} hot={hot} /></p>}
       </header>
 
       {full?.series && (
