@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%234f46e5'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'>ПМ</text></svg>" />
     <title>мини ПМ</title>
+    <!-- Защита от белого экрана после деплоя: если браузер взял из кэша старый index.html,
+         он ссылается на уже удалённые /assets/*. Ловим ошибку загрузки такого файла
+         и один раз перезагружаем страницу в обход кэша (метка в sessionStorage не даёт зациклиться). -->
+    <script>
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        var src = t && (t.src || t.href);
+        if (!src || String(src).indexOf('/assets/') === -1) return;
+        try {
+          if (sessionStorage.getItem('minipm.reloaded')) return;
+          sessionStorage.setItem('minipm.reloaded', '1');
+        } catch (_) { return; }
+        var u = new URL(location.href);
+        u.searchParams.set('v', String(Date.now()));
+        location.replace(u.toString());
+      }, true);
+      window.addEventListener('load', function () {
+        setTimeout(function () { try { sessionStorage.removeItem('minipm.reloaded'); } catch (_) {} }, 3000);
+      });
+    </script>
     <!-- Яндекс.Метрика: тестовый счётчик команды 114706969 (номер не секрет; токен API — только на сервере) -->
     <script type="text/javascript">
       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};

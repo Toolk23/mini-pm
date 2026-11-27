@@ -64,11 +64,13 @@ export default function MetricChart({ points, name, control, annotations = [], g
     const solidRolling = pts.filter((p, i) => p.rolling != null && !(lastIncomplete && i === pts.length - 1))
     const tailRolling = lastIncomplete && pts.length > 1 ? pts.slice(-2).filter((p) => p.rolling != null) : []
 
+    const narrow = typeof window !== 'undefined' && window.innerWidth < 600
     const releaseLines = annotations
       .filter((a) => a.type === 'release' && inRange(a.date))
       .map((a) => {
         const hot = a.id === highlightRelease || (!highlightRelease && a.affects_metric)
-        const labeled = hot || !labelReleases || labelReleases.includes(a.id)
+        // на телефоне подписываем только главный релиз — остальные подписи налезают друг на друга
+        const labeled = hot || (!narrow && (!labelReleases || labelReleases.includes(a.id)))
         const li = labelReleases ? labelReleases.indexOf(a.id) : 0
         return {
           xAxis: a.date, name: a.id,
@@ -99,7 +101,7 @@ export default function MetricChart({ points, name, control, annotations = [], g
 
     const windowAreas = windows.map((w) => [
       { xAxis: w.from, name: w.label, itemStyle: { color: w.tone === 'post' ? cssVar('--danger-soft') : cssVar('--surface-2') },
-        label: { color: w.tone === 'post' ? c.danger : c.text3, fontFamily: c.mono, fontSize: 10.5, position: 'insideTop', distance: 8 } },
+        label: { show: !narrow, color: w.tone === 'post' ? c.danger : c.text3, fontFamily: c.mono, fontSize: 10.5, position: 'insideTop', distance: 8 } },
       { xAxis: new Date(new Date(w.to).getTime() + 6 * DAY).toISOString().slice(0, 10) },
     ])
 

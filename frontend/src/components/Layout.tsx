@@ -53,6 +53,18 @@ export default function Layout() {
   }, [loc.pathname])
   useEffect(() => { window.scrollTo(0, 0) }, [loc.pathname])
 
+  // Высота шапки в CSS-переменной --nav-h: липкие элементы (степпер, боковые колонки) встают ровно под неё
+  // при любой ширине, без щели, в которой просвечивает текст.
+  useEffect(() => {
+    const el = document.querySelector('.navbar')
+    if (!el) return
+    const set = () => document.documentElement.style.setProperty('--nav-h', `${Math.ceil(el.getBoundingClientRect().height)}px`)
+    set()
+    const ro = new ResizeObserver(set)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   // Появление при прокрутке: CSS-анимации .reveal / .line-mask / .hairline-draw стоят на паузе,
   // пока элемент не попал в экран (один раз). Новые элементы после загрузки данных ловит MutationObserver.
   useEffect(() => {

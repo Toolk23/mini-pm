@@ -405,3 +405,24 @@ input[type='range']::-webkit-slider-thumb { border-radius: 0; background: var(--
 .sig-tag.st-error { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 55%, transparent); }
 @media (hover: hover) and (pointer: fine) { .inv-idx:hover .inv-idx-date, .inv-idx:hover .sig-idx { color: var(--text); } }
 @media (max-width: 760px) { .inv-idx { grid-template-columns: 1fr auto; } .inv-idx .sig-idx { grid-column: 1 / -1; } .inv-idx-date { grid-column: 1 / -1; text-align: left; } }
+
+/* ---------- мобильная версия: исправления после проверки на 375 px ---------- */
+@media (max-width: 1100px) {
+  /* меню в две строки: высота по содержимому и сплошной фон, чтобы текст страницы не просвечивал */
+  .navbar-inner { height: auto; min-height: 56px; padding: 8px 16px 0; background: var(--bg) !important; border-bottom: var(--hair) !important; }
+  .nav { padding-bottom: 6px; }
+  .stepper { background: var(--bg); }
+}
+/* статус отправки письма переносится, а не уезжает за край */
+.status { white-space: normal; align-items: flex-start; line-height: 1.4; }
+.status i { margin-top: .35em; flex: none; }
+@media (max-width: 760px) {
+  /* бэклог: колонки друг под другом вместо горизонтальной прокрутки */
+  .board { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: 1fr; overflow: visible; }
+  .board-col { min-height: 0; }
+  .stepper, .inv-aside, .mail-list, .sales-list { top: 92px; }
+}
+
+/* липкие элементы — ровно под шапкой (высота меряется в Layout → --nav-h) */
+.stepper { top: var(--nav-h, 64px) !important; }
+.inv-aside, .mail-list, .sales-list { top: calc(var(--nav-h, 64px) + 12px) !important; }
