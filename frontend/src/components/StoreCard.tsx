@@ -2,9 +2,13 @@ import type { StorefrontCard } from '../api/types'
 
 const rub = (n: number) => `${n.toLocaleString('ru-RU')} ₽`
 const host = (u?: string) => { try { return u ? new URL(u).host : '' } catch { return u ?? '' } }
+const time = (iso?: string) => (iso ? new Date(iso).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '')
 
-/** Живая карточка товара store.softline.ru: название, цена, ссылка и найденные агентом проблемы витрины. */
-export default function StoreCard({ card, compact = false }: { card: StorefrontCard; compact?: boolean }) {
+/**
+ * Живая карточка товара store.softline.ru в виде «экрана-терминала» (приём HackFirst «They said you were secure»):
+ * тёмно-синее окно с помехами, находка агента — синим моноширинным капсом.
+ */
+export default function StoreCard({ card }: { card: StorefrontCard; compact?: boolean }) {
   if (!card.ok) {
     return (
       <div className="nodata">
@@ -14,24 +18,22 @@ export default function StoreCard({ card, compact = false }: { card: StorefrontC
     )
   }
   const issues = card.issues ?? []
+  const alert = issues.length > 0
   return (
-    <div className="store-card">
-      <div className="store-head">
-        <span className="store-favicon" aria-hidden>S</span>
-        <div className="stack" style={{ gap: 2, minWidth: 0, flex: 1 }}>
-          <b className="store-title">{card.title}</b>
-          <a className="faint mono store-url" href={card.url} target="_blank" rel="noreferrer">{host(card.url)}{card.live === false ? ' · снимок' : ''}</a>
-        </div>
-        {card.prices_rub?.length ? <span className="store-price">{rub(card.prices_rub[0])}</span> : null}
+    <div className={`term${alert ? ' alert' : ''}`}>
+      <span className="term-glitch g1" aria-hidden /><span className="term-glitch g2" aria-hidden /><span className="term-glitch g3" aria-hidden />
+      <div className="term-top">
+        <span><i className="term-dot" aria-hidden />{alert ? 'агент нашёл проблему' : 'витрина проверена'}</span>
+        <a href={card.url} target="_blank" rel="noreferrer">{host(card.url)}{card.live === false ? ' · снимок' : ''} ↗</a>
       </div>
-      {issues.length > 0 && (
-        <div className="store-issues">
-          <div className="store-issues-title">Агент нашёл проблему на витрине</div>
-          <ul>{issues.map((i) => <li key={i}>{i}</li>)}</ul>
-        </div>
-      )}
-      {!compact && issues.length === 0 && <div className="faint">Проблем на карточке не найдено.</div>}
-      {card.fetched_at && <div className="faint">проверено {new Date(card.fetched_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}{card.source ? ` · ${card.source}` : ''}</div>}
+      {alert
+        ? issues.map((i) => <p key={i} className="term-alert">{i}</p>)
+        : <p className="term-alert calm">проблем на карточке не найдено</p>}
+      <div className="term-bottom">
+        <span className="term-title">{card.title}</span>
+        {card.prices_rub?.length ? <span className="term-price">{rub(card.prices_rub[0])}</span> : null}
+      </div>
+      {card.fetched_at && <div className="term-foot">проверено {time(card.fetched_at)}{card.source ? ` · ${card.source}` : ''}</div>}
     </div>
   )
 }

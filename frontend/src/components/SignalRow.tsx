@@ -45,19 +45,25 @@ const KIND_ICON: Record<string, ReactNode> = {
 }
 
 /** Строка сигнала в стиле списков Raycast: иконка-плитка · название · подпись; действие справа при наведении. */
-export function SignalRow({ s, names, action, as = 'div', onClick, href, isNew, style }: {
+const PRIO_RU: Record<string, string> = { Critical: 'критичный', High: 'высокий', Medium: 'средний', Low: 'низкий' }
+
+/** Индекс-строка в стиле HackFirst: «S / 01» · название · подпись · тег приоритета в рамке. */
+export function SignalRow({ s, names, action, as = 'div', onClick, href, isNew, style, index }: {
   s: Signal; names: Record<string, MetricInfo>; action?: ReactNode; as?: 'div' | 'button' | 'a'
-  onClick?: () => void; href?: string; isNew?: boolean; style?: React.CSSProperties
+  onClick?: () => void; href?: string; isNew?: boolean; style?: React.CSSProperties; index?: number
 }) {
   const prio = s.priority.toLowerCase()
   const meta = [PRODUCT_SHORT[s.product] ?? s.product, s.change?.post_period?.replace(/\.2026/g, '')].filter(Boolean).join(' · ')
   const inner = (
     <>
-      <span className={`sig-icon prio-${prio}`}>{KIND_ICON[s.kind] ?? KIND_ICON.metric_change}</span>
+      {index != null
+        ? <span className="sig-idx">S / {String(index).padStart(2, '0')}</span>
+        : <span className={`sig-icon prio-${prio}`}>{KIND_ICON[s.kind] ?? KIND_ICON.metric_change}</span>}
       <span className="sig-main">
         <span className="sig-title"><Rich text={signalTitle(s, names)} /></span>
-        <span className="sig-meta"><PriorityBadge p={s.priority} /><span className="sig-dot-sep" />{meta}</span>
+        <span className="sig-meta">{index == null && <><PriorityBadge p={s.priority} /><span className="sig-dot-sep" /></>}{meta}</span>
       </span>
+      {index != null && <span className={`sig-tag prio-${prio}`}>{PRIO_RU[s.priority] ?? s.priority}</span>}
       {action && <span className="sig-action">{action}</span>}
     </>
   )

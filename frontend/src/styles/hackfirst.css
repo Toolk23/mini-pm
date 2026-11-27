@@ -337,3 +337,71 @@ input[type='range']::-webkit-slider-thumb { border-radius: 0; background: var(--
 :root[data-theme='light'] .hl { color: var(--text); }
 :root[data-theme='light'] .hl-red { color: var(--danger); }
 .btn, .btn-primary.btn-lg, .btn-cta, .btn-sm, .btn-lg, .pill-warm { border-radius: 0 !important; }
+
+/* ---------- вариант A: индекс-список (как раздел услуг HackFirst) ---------- */
+.index-block { display: flex; flex-direction: column; min-width: 0; }
+.index-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 14px; }
+.index-head h2 { font-size: 28px; font-weight: 300; letter-spacing: -.035em; }
+.index-sub { display: inline-flex; align-items: center; gap: 8px; font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+.index-list { display: flex; flex-direction: column; border-bottom: var(--hair); }
+.index-foot { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 10px; }
+.index-cross { font: 300 16px var(--mono); color: var(--text-3); line-height: 1; }
+.index-num { font-size: 44px; font-weight: 300; letter-spacing: -.05em; line-height: 1; }
+
+.index-list .sig-row { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 4px 14px; padding: 16px 0;
+  border: 0; border-top: var(--hair); background: none !important; }
+.index-list .sig-row + .sig-row { margin-top: 0; }
+.sig-idx { font: 500 10.5px var(--mono); letter-spacing: .08em; color: var(--text-3); white-space: nowrap; }
+.index-list .sig-title { font-size: 15px; font-weight: 400; letter-spacing: -.01em; }
+.index-list .sig-meta { font-size: 10px; color: var(--text-3); }
+.sig-tag { font: 500 9.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 3px 7px; border: 1px solid var(--border-strong);
+  color: var(--text-2); white-space: nowrap; justify-self: end; }
+.sig-tag.prio-critical { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 55%, transparent); }
+.index-list .sig-action { grid-column: 2 / -1; opacity: 0; height: 0; overflow: hidden; transition: opacity 180ms var(--ease-out); }
+.index-go { font: 500 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--text); }
+@media (hover: hover) and (pointer: fine) {
+  .index-list .sig-row.clickable:hover .sig-action { opacity: 1; height: auto; margin-top: 4px; }
+  .index-list .sig-row.clickable:hover .sig-idx { color: var(--text); }
+}
+
+/* ---------- вариант B: витрина — экран-терминал на тёмном ---------- */
+.term { --tb: #4d5cff; --tb2: #7f8bff; position: relative; overflow: hidden; padding: 22px 22px 18px;
+  background: #020a3a; color: var(--tb); font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em;
+  display: flex; flex-direction: column; gap: 14px; }
+.term::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px); }
+.term-top, .term-bottom, .term-foot { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 10px; color: var(--tb2); }
+.term-top a { color: var(--tb2); }
+.term-top a:hover { color: #fff; text-decoration: none; }
+.term-dot { display: inline-block; width: 6px; height: 6px; background: var(--tb2); margin-right: 8px; vertical-align: 1px; }
+.term.alert .term-dot { background: #ff4b3e; animation: term-blink 1.2s steps(1) infinite; }
+@keyframes term-blink { 50% { opacity: 0; } }
+.term-alert { position: relative; z-index: 1; margin: 6px 0; text-align: center; font-size: clamp(16px, 1.6vw, 20px); line-height: 1.25; color: var(--tb); letter-spacing: .03em; }
+.term-alert.calm { color: var(--tb2); font-size: 14px; }
+.term-title { color: var(--tb2); max-width: 70%; }
+.term-price { color: #c7ccff; font-size: 13px; white-space: nowrap; }
+.term-foot { font-size: 9.5px; color: rgba(127, 139, 255, .6); }
+.term-glitch { position: absolute; z-index: 0; background: #2f3dff; opacity: .55; }
+.term-glitch.g1 { width: 22%; height: 6px; left: 8%; top: 18%; }
+.term-glitch.g2 { width: 9%; height: 10px; right: 12%; top: 52%; opacity: .4; }
+.term-glitch.g3 { width: 14%; height: 4px; left: 30%; bottom: 22%; opacity: .35; }
+/* редкие «помехи»: полосы прыгают раз в несколько секунд; только transform/opacity */
+.term.alert .term-glitch { animation: term-jitter 5s steps(1) infinite; }
+.term.alert .term-glitch.g2 { animation-delay: -1.7s; }
+.term.alert .term-glitch.g3 { animation-delay: -3.1s; }
+@keyframes term-jitter { 0%, 88%, 100% { transform: none; } 90% { transform: translateX(18px); opacity: .8; } 94% { transform: translateX(-10px) scaleY(1.6); } }
+@media (prefers-reduced-motion: reduce) { .term .term-glitch, .term-dot { animation: none !important; } }
+/* в светлой теме терминал остаётся тёмным — это «экран» */
+
+/* история расследований — индекс-строки */
+.inv-idx { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto 120px; align-items: center; gap: 14px; padding: 16px 0;
+  border-top: var(--hair); color: var(--text); }
+.inv-idx:hover { text-decoration: none; }
+.inv-idx-title { font-size: 15px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.inv-idx-sub { font: 500 10px var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); }
+.inv-idx-date { font: 500 10.5px var(--mono); letter-spacing: .06em; color: var(--text-3); text-align: right; white-space: nowrap; transition: color 180ms var(--ease-out); }
+.sig-tag.st-done { color: var(--success); border-color: color-mix(in srgb, var(--success) 45%, transparent); }
+.sig-tag.st-running { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 45%, transparent); }
+.sig-tag.st-error { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 55%, transparent); }
+@media (hover: hover) and (pointer: fine) { .inv-idx:hover .inv-idx-date, .inv-idx:hover .sig-idx { color: var(--text); } }
+@media (max-width: 760px) { .inv-idx { grid-template-columns: 1fr auto; } .inv-idx .sig-idx { grid-column: 1 / -1; } .inv-idx-date { grid-column: 1 / -1; text-align: left; } }

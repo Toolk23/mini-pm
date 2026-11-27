@@ -50,39 +50,37 @@ export default function Investigations() {
       />
       {error && <ErrorBox error={error} />}
 
-      <section className="stack" style={{ gap: 10 }}>
-        <div className="eyebrow">запустить по сигналу</div>
+      <section className="index-block reveal">
+        <header className="index-head"><h2>Сигналы</h2><span className="index-sub">выберите, что расследовать</span></header>
         {signals.loading && <Loading />}
         {signals.error && <ErrorBox error={signals.error} onRetry={signals.reload} />}
-        <div className="card sig-list" style={{ padding: 6 }}>
+        <div className="index-list">
           {signals.data?.map((s, i) => (
-            <SignalRow key={s.id} s={s} names={names} as="button" onClick={() => !starting && start(s.id)} style={{ ['--i' as string]: i + 1 }}
-              action={starting === s.id ? <span className="row faint"><span className="spinner" /> Запускаю…</span> : <span className="btn btn-sm">Расследовать</span>} />
+            <SignalRow key={s.id} s={s} names={names} index={i + 1} as="button" onClick={() => !starting && start(s.id)} style={{ ['--i' as string]: i + 1 }}
+              action={starting === s.id ? <span className="index-go"><span className="spinner" /> запускаю…</span> : <span className="index-go">расследовать →</span>} />
           ))}
         </div>
       </section>
 
-      <section className="stack" style={{ gap: 10 }}>
-        <div className="eyebrow">история · {list.data?.length ?? 0}</div>
+      <section className="index-block reveal" style={{ marginTop: 32 }}>
+        <header className="index-head"><h2>История</h2><span className="index-sub">{list.data?.length ?? 0} расследований</span></header>
         {list.loading && <Loading />}
         {list.data?.length === 0 && <div className="board-empty">Расследований пока нет — выберите сигнал выше</div>}
-        <div className="stack" style={{ gap: 8 }}>
+        <div className="index-list">
           {list.data?.map((inv) => {
             const [label, cls] = STATUS[inv.status] ?? [inv.status, '']
             return (
-              <Link key={inv.id} to={`/investigations/${inv.id}`} className="inv-row reveal">
-                <code className="inv-id">{inv.id}</code>
-                <span className="inv-row-title"><Rich text={titleOf(inv.signal_id)} /></span>
-                <span className="row" style={{ gap: 12 }}>
-                  {inv.applied && <span className="faint">письмо и задача {inv.applied.task.task_id}</span>}
-                  <span className={`status status-${cls}`}><i aria-hidden />{label}</span>
-                  <span className="faint">{fmtDate(inv.created_at)} {new Date(inv.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
-                  <span className="inv-row-arrow">→</span>
-                </span>
+              <Link key={inv.id} to={`/investigations/${inv.id}`} className="inv-idx reveal">
+                <span className="sig-idx">{inv.id}</span>
+                <span className="inv-idx-title"><span><Rich text={titleOf(inv.signal_id)} /></span>
+                  {inv.applied && <span className="inv-idx-sub">письмо ПМу · задача {inv.applied.task.task_id}</span>}</span>
+                <span className={`sig-tag st-${cls}`}>{label}</span>
+                <span className="inv-idx-date">{fmtDate(inv.created_at).slice(0, 5)} {new Date(inv.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })} →</span>
               </Link>
             )
           })}
         </div>
+        <div className="index-foot"><span className="index-cross">+</span><span className="index-num">{String(list.data?.length ?? 0).padStart(2, '0')}</span></div>
       </section>
     </>
   )

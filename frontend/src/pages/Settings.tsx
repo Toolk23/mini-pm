@@ -186,8 +186,8 @@ function LivePreview({ signals, loading, prev }: { signals: Signal[]; loading: b
       </div>
       <div className="live-count"><CountUp value={signals.length} duration={600} /><span>активных</span></div>
       {gone.length > 0 && <div className="callout callout-warning faint" style={{ marginBottom: 10 }}>Пропал сигнал: {gone.map((g) => signalTitle(g, names)).join('; ')}</div>}
-      <div className="sig-list">
-        {signals.map((s) => <SignalRow key={s.id} s={s} names={names} isNew={prevIds.length > 0 && !prevIds.includes(s.id)} />)}
+      <div className="index-list">
+        {signals.map((s, i) => <SignalRow key={s.id} s={s} names={names} index={i + 1} isNew={prevIds.length > 0 && !prevIds.includes(s.id)} />)}
         {!loading && signals.length === 0 && <div className="board-empty">Ни одного сигнала при текущих порогах</div>}
       </div>
     </section>

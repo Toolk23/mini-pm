@@ -230,16 +230,21 @@ function SignalFeed({ signals, loading }: { signals: Signal[]; loading: boolean 
   const nav = useNavigate()
   const names = useMetricNames()
   return (
-    <Card className="reveal feed" title={<h2>Лента сигналов</h2>} extra={<span className="row faint"><span className="live-dot" /> {signals.length} активных</span>}>
+    <section className="index-block reveal">
+      <header className="index-head">
+        <h2>Сигналы</h2>
+        <span className="index-sub"><span className="live-dot" /> {signals.length} активных · live</span>
+      </header>
       {loading && !signals.length && <Loading />}
-      <div className="sig-list">
+      <div className="index-list">
         {signals.map((s, i) => (
-          <SignalRow key={s.id} s={s} names={names} as="a" href={`/investigations?signal=${encodeURIComponent(s.id)}`}
+          <SignalRow key={s.id} s={s} names={names} index={i + 1} as="a" href={`/investigations?signal=${encodeURIComponent(s.id)}`}
             onClick={() => nav(`/investigations?signal=${encodeURIComponent(s.id)}`)} style={{ ['--i' as string]: i + 2 }}
-            action={<span className="kbd">↵</span>} />
+            action={<span className="index-go">расследовать →</span>} />
         ))}
       </div>
-    </Card>
+      <div className="index-foot"><span className="index-cross">+</span><span className="index-num">{String(signals.length).padStart(2, '0')}</span></div>
+    </section>
   )
 }
 
@@ -247,10 +252,14 @@ function SignalFeed({ signals, loading }: { signals: Signal[]; loading: boolean 
 function StorefrontPanel() {
   const card = useApi(() => api.storefrontCard('KES'))
   return (
-    <Card className="reveal" title={<h2>Витрина магазина</h2>} extra={<span className="row faint"><span className="live-dot" /> живая карточка</span>}>
+    <section className="index-block reveal">
+      <header className="index-head">
+        <h2>Витрина</h2>
+        <span className="index-sub"><span className="live-dot" /> живая карточка</span>
+      </header>
       {card.loading && !card.data && <Loading label="Открываю store.softline.ru…" />}
       {card.error && <ErrorBox error={card.error} onRetry={card.reload} />}
-      {card.data && <StoreCard card={card.data} compact />}
-    </Card>
+      {card.data && <StoreCard card={card.data} />}
+    </section>
   )
 }
