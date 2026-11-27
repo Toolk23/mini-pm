@@ -77,7 +77,7 @@ export default function MetricChart({ points, name, control, annotations = [], g
             show: labeled,
             formatter: a.id, color: hot ? c.danger : c.text2, fontFamily: c.mono, fontSize: 11, fontWeight: hot ? 700 : 500,
             position: 'insideEndTop', distance: li % 2 ? 18 : 4,
-            backgroundColor: hot ? 'rgba(255,95,109,.14)' : 'transparent', padding: hot ? [2, 6] : 0, borderRadius: 4,
+            backgroundColor: 'transparent', padding: 0, borderRadius: 0,
           },
           emphasis: { label: { formatter: `${a.id}: ${a.description.slice(0, 70)}…` } },
         }
@@ -98,7 +98,7 @@ export default function MetricChart({ points, name, control, annotations = [], g
       .filter(Boolean)
 
     const windowAreas = windows.map((w) => [
-      { xAxis: w.from, name: w.label, itemStyle: { color: w.tone === 'post' ? 'rgba(255,95,109,.07)' : 'rgba(143,125,255,.06)' },
+      { xAxis: w.from, name: w.label, itemStyle: { color: w.tone === 'post' ? cssVar('--danger-soft') : cssVar('--surface-2') },
         label: { color: w.tone === 'post' ? c.danger : c.text3, fontFamily: c.mono, fontSize: 10.5, position: 'insideTop', distance: 8 } },
       { xAxis: new Date(new Date(w.to).getTime() + 6 * DAY).toISOString().slice(0, 10) },
     ])
@@ -121,7 +121,7 @@ export default function MetricChart({ points, name, control, annotations = [], g
       {
         name: `${name}, скользящее 4 нед.`, type: 'line', smooth: .35, showSymbol: false, z: 5,
         data: solidRolling.map((p) => [p.week_start, p.rolling]),
-        lineStyle: { color: c.main, width: 3, shadowColor: c.main, shadowBlur: 18 },
+        lineStyle: { color: c.main, width: 2 },
         itemStyle: { color: c.main },
         areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: c.main + '55' }, { offset: 1, color: c.main + '00' }]) },
         animationDuration: 2200, animationEasing: 'cubicOut',
@@ -141,7 +141,7 @@ export default function MetricChart({ points, name, control, annotations = [], g
       series.push({
         name: `${control.name} (контроль), скользящее`, type: 'line', smooth: .35, showSymbol: false, z: 4,
         data: control.points.filter((p) => p.rolling != null).map((p) => [p.week_start, p.rolling]),
-        lineStyle: { color: c.control, width: 2, type: [6, 4], shadowColor: c.control, shadowBlur: 8 }, itemStyle: { color: c.control },
+        lineStyle: { color: c.control, width: 1.5, type: [6, 4] }, itemStyle: { color: c.control },
         animationDuration: 2200, animationDelay: 300,
       })
     }
@@ -155,7 +155,7 @@ export default function MetricChart({ points, name, control, annotations = [], g
         data: series.map((s) => s.name as string).filter((n) => n !== 'неполная неделя') },
       tooltip: {
         trigger: 'axis', backgroundColor: c.surface, borderColor: c.border, textStyle: { color: c.text, fontSize: 12.5 },
-        extraCssText: 'border-radius:12px;backdrop-filter:blur(12px);box-shadow:0 12px 40px -8px rgba(0,0,0,.5);',
+        extraCssText: 'border-radius:0;box-shadow:none;',
         axisPointer: { type: 'line', lineStyle: { color: c.border } },
         formatter: (items: { axisValue: number; seriesName: string; value: [string, number]; color: string }[]) => {
           const d = items[0] ? new Date(items[0].axisValue) : null

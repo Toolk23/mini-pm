@@ -35,25 +35,42 @@ export default function Layout() {
   const health = useApi(() => api.health(), [mock])
   const [scrolled, setScrolled] = useState(false)
 
+  const [progress, setProgress] = useState(0)
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 8)
+    let raf = 0
+    const on = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 8)
+        const max = document.documentElement.scrollHeight - window.innerHeight
+        setProgress(max > 0 ? Math.round((window.scrollY / max) * 100) : 0)
+      })
+    }
     on()
     window.addEventListener('scroll', on, { passive: true })
-    return () => window.removeEventListener('scroll', on)
-  }, [])
+    window.addEventListener('resize', on)
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('scroll', on); window.removeEventListener('resize', on) }
+  }, [loc.pathname])
   useEffect(() => { window.scrollTo(0, 0) }, [loc.pathname])
 
-  // Spotlight: карточка под курсором подсвечивается мягким пятном (как у Raycast).
+  // Появление при прокрутке: CSS-анимации .reveal / .line-mask / .hairline-draw стоят на паузе,
+  // пока элемент не попал в экран (один раз). Новые элементы после загрузки данных ловит MutationObserver.
   useEffect(() => {
-    const on = (e: PointerEvent) => {
-      const card = (e.target as Element | null)?.closest?.('.card') as HTMLElement | null
-      if (!card) return
-      const r = card.getBoundingClientRect()
-      card.style.setProperty('--mx', `${e.clientX - r.left}px`)
-      card.style.setProperty('--my', `${e.clientY - r.top}px`)
+    const SEL = '.reveal, .line-mask, .hairline-draw'
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll(SEL).forEach((el) => el.setAttribute('data-inview', ''))
+      return
     }
-    document.addEventListener('pointermove', on, { passive: true })
-    return () => document.removeEventListener('pointermove', on)
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { e.target.setAttribute('data-inview', ''); io.unobserve(e.target) } })
+    }, { rootMargin: '0px 0px -8% 0px' })
+    const watch = (root: ParentNode) => root.querySelectorAll(SEL).forEach((el) => { if (!el.hasAttribute('data-inview')) io.observe(el) })
+    watch(document)
+    const mo = new MutationObserver((muts) => muts.forEach((m) => m.addedNodes.forEach((n) => {
+      if (n instanceof Element) { if (n.matches(SEL)) io.observe(n); watch(n) }
+    })))
+    mo.observe(document.body, { childList: true, subtree: true })
+    return () => { io.disconnect(); mo.disconnect() }
   }, [])
 
   const toggleMock = () => {
@@ -109,6 +126,9 @@ export default function Layout() {
           <Outlet />
         </main>
 
+        <div className="scroll-progress" aria-hidden>
+          <span className="sp-bars">{[0, 1, 2].map((i) => <i key={i} className={progress >= (i + 1) * 33 ? 'on' : ''} />)}</span>{progress}%
+        </div>
         <footer className="footer">
           <span className="row"><span className="live-dot" /> агент следит за метриками store.softline.ru</span>
           <span className="row">

@@ -1,9 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import '@fontsource-variable/inter'
+import '@fontsource-variable/inter-tight'
 import '@fontsource-variable/jetbrains-mono'
 import './styles/global.css'
+import './styles/hackfirst.css' // дизайн v2; убрать строку — вернётся v1
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Story from './pages/Story'
