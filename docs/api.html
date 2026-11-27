@@ -939,8 +939,14 @@ Search API)</h2>
 <span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;video_script&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;sec&quot;</span><span class="fu">:</span> <span class="st">&quot;0–10&quot;</span><span class="fu">,</span> <span class="dt">&quot;screen&quot;</span><span class="fu">:</span> <span class="st">&quot;что показать на карточке товара&quot;</span><span class="fu">,</span> <span class="dt">&quot;voice&quot;</span><span class="fu">:</span> <span class="st">&quot;текст для озвучки&quot;</span><span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;evidence&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;analyst_quotes&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;competitors&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;interviews&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;signals&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;releases&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;web&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">}}</span></span></code></pre></div>
 <p><code>product</code> — <code>KES</code>, <code>Astra</code> или любое
-название (поиск по базе знаний). <code>GET /api/sales-briefs</code> —
-список (без <code>evidence</code>),
+название (поиск по базе знаний).
+<code>GET /api/sales-faq?family=KES</code> — типовые вопросы с ответами
+от аналитика (<code>data/curated/sales_faq.json</code>, как есть); они
+же идут в справку (<code>evidence.analyst_faq</code>) и в чат
+(<code>facts.analyst_faq</code>). Сводка аналитика по Astra —
+<code>data/curated/evidence_astra.json</code> (тот же формат, что по
+Kaspersky) — подхватывается автоматически.
+<code>GET /api/sales-briefs</code> — список (без <code>evidence</code>),
 <code>GET /api/sales-briefs/{id}</code> — целиком. Чат подхватывает
 последнюю справку по упомянутому продукту
 (<code>facts.sales_brief</code>) — типовые вопросы отвечаются по ней.

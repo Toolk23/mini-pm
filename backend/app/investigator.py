@@ -26,7 +26,7 @@ def _search(query: str, k: int = 4, source: str | None = None) -> list[dict]:
 
 # ------------------------------------------------------------------ шаги расследования
 def _rank_releases(sig: dict) -> list[dict]:
-    fam = sig.get("family", "KES")
+    fam = (family_of(sig) or "KES")
     kw = FAMILY_KEYWORDS.get(fam, [])
     control_stable = sig.get("control", {}).get("stable")
     out = []
@@ -51,7 +51,7 @@ def _rank_releases(sig: dict) -> list[dict]:
 
 
 def _funnel(sig: dict) -> dict:
-    product = detector.FAMILY_PRODUCT.get(sig.get("family", "KES"))
+    product = detector.FAMILY_PRODUCT.get((family_of(sig) or "KES"))
     split = pd.Timestamp(pd.to_datetime(sig["split_week"], dayfirst=True))
     md = ingest.metrics_data()
     res = {}
@@ -74,7 +74,7 @@ def _funnel(sig: dict) -> dict:
 
 
 def _backlog_links(sig: dict) -> list[dict]:
-    fam_kw = FAMILY_KEYWORDS.get(sig.get("family", "KES"), [])
+    fam_kw = FAMILY_KEYWORDS.get((family_of(sig) or "KES"), [])
     out = []
     for t in store.backlog():
         text = f"{t['title']} {t.get('description') or ''}".lower()
@@ -85,9 +85,17 @@ def _backlog_links(sig: dict) -> list[dict]:
     return out
 
 
+def family_of(sig: dict) -> str | None:
+    """Семейство сигнала: у сигналов продаж — поле family, у метрик — по продукту (Конфигуратор Астра → Astra)."""
+    if sig.get("family"):
+        return sig["family"]
+    rev = {v: k for k, v in detector.FAMILY_PRODUCT.items()}
+    return rev.get(sig.get("product") or "")
+
+
 def collect_evidence(sig: dict) -> dict:
-    fam = sig.get("family", "KES")
-    name = sig.get("product", fam)
+    fam = family_of(sig) or "KES"
+    name = sig.get("product") or fam
     gaps = detector.gaps_for("family_orders_idx") + detector.gaps_for("cfg_add_to_cart_rate", detector.FAMILY_PRODUCT.get(fam))
     gaps += detector.gaps_for("cfg_family_views")
     seen, uniq = set(), []
@@ -177,6 +185,8 @@ SCHEMA_HINT = """{
 
 def _template_report(ev: dict) -> dict:
     """Отчёт без LLM — по шаблону эталонного кейса, из детерминированных фактов."""
+    if ev["signal"].get("kind") != "sales_drop":
+        return _template_metric_report(ev)
     s = ev["signal"]
     ch, ctrl = s.get("change", {}), s.get("control", {})
     rel = ev["releases"]
@@ -236,6 +246,53 @@ def _template_report(ev: dict) -> dict:
                   "body": f"Сигнал: {s.get('title')}.\nКонтроль: {ctrl.get('conclusion')}.\nГлавный кандидат: {main['release_id'] if main else '—'}.\n"
                           "Предлагаю: задачу на проверку пути «конфигуратор → корзина» и поднять приоритет задачи по событиям e-commerce.\n"
                           "Подробности — в отчёте расследования."},
+    }
+
+
+def _template_metric_report(ev: dict) -> dict:
+    """Шаблон для сигналов по метрикам (не продажи): без «заказов None на 0%»."""
+    s = ev["signal"]
+    f = s.get("facts") or {}
+    title, metric, product = s.get("title", "Сигнал"), s.get("metric_id"), s.get("product") or "—"
+    zero = s.get("kind") == "zero_weeks"
+    what = (f"Недели без событий: {', '.join(f.get('zero_weeks', [])[:6])}" if zero
+            else f"Среднее за {f.get('window_weeks')} нед.: база {f.get('baseline')} → сейчас {f.get('current')}")
+    title = title.rstrip(".")
+    rel = ingest.releases()
+    near = [r for r in rel.itertuples() if metric in r.affected_metrics]
+    links = ev.get("backlog") or []
+    steps = [
+        {"n": 1, "title": "Что изменилось", "sources": ["Метрики_данные"], "finding": f"{title}: {what}."},
+        {"n": 2, "title": "Это сбой учёта или поведение?", "sources": ["Метрики_справочник", "Реестр разрывов"],
+         "finding": ("Недели с нулём событий — сначала проверить передачу событий: «нет данных» ≠ ноль. " if zero else
+                     "Изменение посчитано по средним за окна, а не по отдельной неделе. ") + " ".join(s.get("caveats", []))},
+        {"n": 3, "title": "Релизы, затрагивающие метрику", "sources": ["Релизы"],
+         "finding": ("; ".join(f"{r.release_id} ({r.release_date:%d.%m}) — {r.description}" for r in near[:4]) or
+                     "Релизов, затрагивающих эту метрику, нет.")},
+        {"n": 4, "title": "Связанные задачи бэклога", "sources": ["Бэклог_задачи"],
+         "finding": "; ".join(f"{t['task_id']} «{t['title']}» ({t['status']}, {t['priority']})" for t in links[:4]) or "Связанных задач нет."},
+        {"n": 5, "title": "Пробелы в данных", "sources": ["Реестр разрывов"],
+         "finding": "; ".join(g["text"] for g in ev.get("data_gaps", [])[:3]) or "Известных разрывов нет."},
+    ]
+    return {
+        "summary": f"{title}. {what}. Нужна проверка: сбой учёта или реальное изменение поведения ({product}).",
+        "steps": steps,
+        "hypotheses": [
+            {"text": f"Сбой передачи событий метрики {metric}", "status": "не проверена",
+             "check": "Сверить сырые события Метрики за недели сигнала с логами сайта"},
+            {"text": "Реальное изменение поведения пользователей после релиза", "status": "не проверена",
+             "check": "Сравнить с контрольным продуктом за те же недели"},
+        ],
+        "sources_check": {"metrika": "подтверждает сигнал", "backlog": "есть связанные задачи" if links else "нет связанных задач",
+                          "interviews": "нет данных", "competitors": "нет данных",
+                          "comment": "Режим без LLM: отчёт собран по шаблону из детерминированных фактов."},
+        "recommendation": f"Проверить учёт метрики {metric} ({product}); если учёт исправен — разобрать связанный релиз.",
+        "task": {"title": f"Проверить учёт и динамику {metric} ({product})", "priority": s.get("priority", "High"),
+                 "description": f"Сигнал: {title}. {what}."},
+        "raise_tasks": [],
+        "success_criterion": f"Метрика {metric} ({product}) без недель с нулём и в пределах порога к базе.",
+        "closing_rule": "Учёт исправен и метрика в норме — задача закрыта; иначе — пересмотр гипотезы.",
+        "email": {"subject": f"[мини ПМ] {title}", "body": f"Сигнал: {title}.\n{what}.\nПроверить учёт, затем связанный релиз."},
     }
 
 
@@ -332,7 +389,10 @@ def answer(message: str, history: list[dict]) -> dict:
     briefs = {f: {k: b.get(k) for k in ("id", "pitch", "key_points", "vs_competitors", "faq", "objections", "dont_say")}
               for f, b in briefs.items() if b}
     if briefs:
-        facts["sales_brief"] = briefs  # готовые ответы на типовые вопросы — до 50% вопросов повторяются
+        facts["sales_brief"] = briefs
+    faq = sales_brief.analyst_faq()
+    if faq:
+        facts["analyst_faq"] = faq[:30]  # типовые вопросы с проверенными ответами аналитика  # готовые ответы на типовые вопросы — до 50% вопросов повторяются
     ctx = "\n".join(f"[{i + 1}] {h['title']} ({h['file']}, лист {h['sheet']}, строка {h['row']}): {h['text']}" for i, h in enumerate(hits))
     if not llm.available():
         return {"answer": ("Режим без LLM. Нашёл в базе:\n" + ctx) if hits else "В базе нет данных по этому вопросу.",

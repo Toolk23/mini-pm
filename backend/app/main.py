@@ -346,6 +346,13 @@ def send_sales_brief(brief_id: str):
     return mailer.send(f"[мини ПМ] Справка для отдела продаж: {b.get('product')}", sales_brief.to_text(b))
 
 
+@app.get("/api/sales-faq")
+def sales_faq(family: str | None = None):
+    """Типовые вопросы продавцов и клиентов с ответами от аналитика (data/curated/sales_faq.json)."""
+    from . import sales_brief
+    return sales_brief.analyst_faq(family)
+
+
 @app.get("/api/sales-briefs")
 def sales_briefs():
     from . import sales_brief
@@ -394,7 +401,10 @@ if (config.FRONTEND_DIST / "index.html").is_file():
     @app.get("/{path:path}", include_in_schema=False)
     def spa(path: str):
         f = config.FRONTEND_DIST / path
-        return FileResponse(f if path and f.is_file() else config.FRONTEND_DIST / "index.html")
+        if path and f.is_file():
+            return FileResponse(f)
+        # index.html без кэша: после деплоя браузер сразу берёт новую сборку (ассеты с хэшем в имени кэшируются)
+        return FileResponse(config.FRONTEND_DIST / "index.html", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 else:
     @app.get("/", include_in_schema=False)
     def placeholder():

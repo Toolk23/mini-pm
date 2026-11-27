@@ -835,6 +835,9 @@
  "evidence": {"analyst_quotes": [], "competitors": [], "interviews": [], "signals": [], "releases": [], "web": []}}
 ```
 `product` — `KES`, `Astra` или любое название (поиск по базе знаний).
+`GET /api/sales-faq?family=KES` — типовые вопросы с ответами от аналитика (`data/curated/sales_faq.json`, как есть);
+они же идут в справку (`evidence.analyst_faq`) и в чат (`facts.analyst_faq`).
+Сводка аналитика по Astra — `data/curated/evidence_astra.json` (тот же формат, что по Kaspersky) — подхватывается автоматически.
 `GET /api/sales-briefs` — список (без `evidence`), `GET /api/sales-briefs/{id}` — целиком.
 Чат подхватывает последнюю справку по упомянутому продукту (`facts.sales_brief`) — типовые вопросы отвечаются по ней.
 Токены — шаг `sales_brief` в `/api/usage/tokens`.

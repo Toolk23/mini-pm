@@ -27,6 +27,18 @@ def _search(query: str, k: int, source: str | None) -> list[dict]:
     return s(query, k, source)
 
 
+def analyst_faq(family: str | None = None) -> list[dict]:
+    """Типовые вопросы с ответами, собранные аналитиком (data/curated/sales_faq.json): список или {"items": [...]}."""
+    p = config.DATA_DIR / "curated" / "sales_faq.json"
+    if not p.exists():
+        return []
+    data = json.loads(p.read_text("utf-8"))
+    items = data if isinstance(data, list) else (data.get("items") or data.get("faq") or data.get("questions") or [])
+    if family:
+        items = [x for x in items if not isinstance(x, dict) or not x.get("family") or x.get("family") in (family, "all", "ALL")]
+    return items
+
+
 def collect_facts(product: str) -> dict:
     fam = _family(product)
     name = FAMILIES.get(fam, product)
@@ -60,6 +72,7 @@ def collect_facts(product: str) -> dict:
     return {
         "product": name, "family": fam,
         "store_card": storefront.card_for(fam),
+        "analyst_faq": analyst_faq(fam),
         "analyst_quotes": _quotes(analyst, "competitor") + _quotes(analyst, "interview"),
         "analyst_verdict": analyst.get("verdict") if analyst else None,
         "competitors": competitors[:14], "interviews": interviews[:12],
@@ -79,7 +92,8 @@ SYSTEM = """Ты — «мини ПМ», ИИ-помощник продакт-м�
    Цены конкурентов — только сопоставимые лицензии (тот же SKU и срок); продления и несравнимые позиции не сравнивай.
 3. Если данных нет — так и пиши «нет данных», и вынеси это в dont_say (что продавцу нельзя обещать).
 4. Язык простой, для продавца: коротко, без внутренней кухни (метрики, индексы, сигналы — только в internal_note).
-5. Типовые вопросы бери из интервью клиентов (что спрашивают, что важно, что мешает купить), ответы — из данных.
+5. analyst_faq — типовые вопросы с ответами, проверенные аналитиком: бери их в faq в первую очередь, с их источником.
+   Остальные типовые вопросы бери из интервью клиентов (что спрашивают, что важно, что мешает купить), ответы — из данных.
 6. Даты релизов и цифры переписывай из данных дословно, не пересчитывай.
 7. message — только для продавцов: аргументы и ссылка на справку, без внутренних метрик и падений продаж.
 Верни строго JSON."""

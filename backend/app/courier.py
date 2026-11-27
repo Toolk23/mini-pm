@@ -57,7 +57,7 @@ def apply(rep: dict) -> dict:
     hs = store.read("hypotheses", [])
     main_h = (rep.get("hypotheses") or [{"text": "Гипотеза расследования"}])[0]
     h = {"id": f"H-{len(hs) + 1:02d}", "status": "open", "created_at": store.now(), "investigation_id": rep.get("id"),
-         "text": main_h["text"], "metric_id": sig.get("metric_id", "family_orders_idx"), "family": sig.get("family", "KES"),
+         "text": main_h["text"], "metric_id": sig.get("metric_id", "family_orders_idx"), "family": sig.get("family") or sig.get("product"),
          "control_family": (sig.get("control") or {}).get("family", "Astra"), "target": rep.get("success_criterion"),
          "success_threshold_pct": -10, "task_id": task["task_id"]}
     hs.append(h)
