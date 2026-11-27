@@ -240,7 +240,9 @@ select, input[type='text'], input[type='number'], textarea, .board-empty, .inv-r
 .v2-row-label span { color: var(--text-3); }
 @media (max-width: 900px) {
   .v2-hero-grid { grid-template-columns: 1fr; }
-  .v2-hero-media { display: none; }
+  /* Радар остаётся и на узких экранах — под кнопками, по размеру экрана. */
+  .v2-hero-media { align-items: flex-start; }
+  .v2-hero-media .radar { width: min(300px, 78vw) !important; height: min(300px, 78vw) !important; }
   .v2-row { grid-template-columns: 70px minmax(0, 1fr); gap: 12px; }
   .v2-row-label { grid-column: 2; }
 }
