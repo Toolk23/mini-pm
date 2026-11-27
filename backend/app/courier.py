@@ -4,6 +4,10 @@ from __future__ import annotations
 from . import config, mailer, store
 
 
+SOURCE_NAMES = {"metrika": "Метрика", "backlog": "Бэклог", "interviews": "Интервью", "competitors": "Конкуренты",
+                "web": "Поиск Яндекса", "analyst": "Сводка аналитика"}
+
+
 def _render_email(rep: dict, task: dict, raised: list[dict]) -> dict:
     ev = rep.get("evidence", {})
     sig = ev.get("signal", {})
@@ -11,7 +15,7 @@ def _render_email(rep: dict, task: dict, raised: list[dict]) -> dict:
         rep.get("email", {}).get("body") or rep.get("summary", ""),
         "",
         "Проверка по источникам:",
-        *[f"  • {k}: {v}" for k, v in (rep.get("sources_check") or {}).items() if k != "comment"],
+        *[f"  • {SOURCE_NAMES.get(k, k)}: {v}" for k, v in (rep.get("sources_check") or {}).items() if k != "comment"],
         "",
         "Гипотезы:",
         *[f"  {i + 1}. {h['text']} — проверка: {h['check']}" for i, h in enumerate(rep.get("hypotheses", []))],
