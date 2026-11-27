@@ -796,6 +796,30 @@
 Тег задачи «изменена ИИ-помощником» ставится только при изменениях от агента (курьер поднял приоритет, замер закрыл задачу).
 `PATCH /api/backlog/tasks/{id}` от человека тег не ставит; в `history[].by` — `pm` или `ai`.
 
+## Справка для отдела продаж
+Бизнес-проблема задачи — ПМ тратит часы на одни и те же объяснения продавцам. Агент собирает шпаргалку по продукту
+из конкурентного анализа, интервью, сводки аналитика, сигналов, релизов и поиска Яндекса; каждый тезис со ссылкой на источник.
+
+`POST /api/sales-briefs` `{"product": "KES"}` — синхронно, ~30–50 с с LLM (без ключа — шаблон из цитат аналитика). Ответ:
+```json
+{"id": "SB-1A2B3C", "created_at": "…", "mode": "llm", "family": "KES", "tag": "сгенерирована ИИ-помощником",
+ "product": "Kaspersky Endpoint Security для бизнеса",
+ "pitch": "2–3 предложения для клиента",
+ "who_buys": ["…"],
+ "key_points": [{"text": "…", "source": "E-01 | <id фрагмента> | URL"}],
+ "vs_competitors": [{"competitor": "allsoft.ru", "point": "…", "source": "…"}],
+ "faq": [{"q": "…", "a": "…", "source": "…"}],
+ "objections": [{"objection": "…", "answer": "…", "source": "…"}],
+ "dont_say": ["чего нельзя обещать — нет данных"],
+ "internal_note": "для ПМа: сигналы и релизы по продукту",
+ "message": "сообщение в канал продаж (Dion)",
+ "evidence": {"analyst_quotes": [], "competitors": [], "interviews": [], "signals": [], "releases": [], "web": []}}
+```
+`product` — `KES`, `Astra` или любое название (поиск по базе знаний).
+`GET /api/sales-briefs` — список (без `evidence`), `GET /api/sales-briefs/{id}` — целиком.
+Чат подхватывает последнюю справку по упомянутому продукту (`facts.sales_brief`) — типовые вопросы отвечаются по ней.
+Токены — шаг `sales_brief` в `/api/usage/tokens`.
+
 ## Живой счётчик Яндекс.Метрики
 `GET /api/metrika/live?date1=7daysAgo&date2=today`
 

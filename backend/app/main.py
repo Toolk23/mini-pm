@@ -288,6 +288,33 @@ def chat(body: ChatIn):
     return investigator.answer(body.message, body.history)
 
 
+# ------------------------------------------------------------------ справка для отдела продаж
+class SalesBriefIn(BaseModel):
+    product: str = "KES"
+
+
+@app.post("/api/sales-briefs")
+def create_sales_brief(body: SalesBriefIn):
+    """Синхронно (~20–40 с с LLM): шпаргалка по продукту и ответы на типовые вопросы для продавцов."""
+    from . import sales_brief
+    return sales_brief.generate(body.product)
+
+
+@app.get("/api/sales-briefs")
+def sales_briefs():
+    from . import sales_brief
+    return sales_brief.list_briefs()
+
+
+@app.get("/api/sales-briefs/{brief_id}")
+def get_sales_brief(brief_id: str):
+    from . import sales_brief
+    b = sales_brief.get(brief_id)
+    if not b:
+        raise HTTPException(404)
+    return b
+
+
 # ------------------------------------------------------------------ поиск в интернете (Yandex Search API)
 @app.get("/api/web/search")
 def web_search(q: str, k: int = 5):

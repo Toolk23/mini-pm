@@ -327,6 +327,12 @@ def answer(message: str, history: list[dict]) -> dict:
     from . import websearch
     if websearch.configured() and any(t in message.lower() for t in WEB_TRIGGERS):
         facts["web"] = websearch.search(message, 5)
+    from . import sales_brief
+    briefs = {f: sales_brief.latest_for(f) for f in _mentioned_families(message)}
+    briefs = {f: {k: b.get(k) for k in ("id", "pitch", "key_points", "vs_competitors", "faq", "objections", "dont_say")}
+              for f, b in briefs.items() if b}
+    if briefs:
+        facts["sales_brief"] = briefs  # готовые ответы на типовые вопросы — до 50% вопросов повторяются
     ctx = "\n".join(f"[{i + 1}] {h['title']} ({h['file']}, лист {h['sheet']}, строка {h['row']}): {h['text']}" for i, h in enumerate(hits))
     if not llm.available():
         return {"answer": ("Режим без LLM. Нашёл в базе:\n" + ctx) if hits else "В базе нет данных по этому вопросу.",

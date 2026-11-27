@@ -58,6 +58,9 @@ def chat(messages: list[dict], step: str, *, temperature: float = 0.2, max_token
 
 def chat_json(messages: list[dict], step: str, **kw) -> dict:
     text = chat(messages, step, json_mode=True, **kw)
+    if text.strip() in ("{}", ""):
+        # Yandex/Qwen с response_format=json_object иногда отдаёт пустой «{}» — повторяем без режима JSON
+        text = chat(messages, step, json_mode=False, **kw)
     m = re.search(r"\{.*\}", text, re.S)
     if not m:
         raise LLMError(f"Модель вернула не JSON: {text[:200]}")
