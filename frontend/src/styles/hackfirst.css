@@ -367,8 +367,8 @@ input[type='range']::-webkit-slider-thumb { border-radius: 0; background: var(--
 }
 
 /* ---------- вариант B: витрина — экран-терминал на тёмном ---------- */
-.term { --tb: #4d5cff; --tb2: #7f8bff; position: relative; overflow: hidden; padding: 22px 22px 18px;
-  background: #020a3a; color: var(--tb); font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em;
+.term { --tb: #3a48e6; --tb2: #6a75ee; position: relative; overflow: hidden; padding: 22px 22px 18px;
+  background: #010521; color: var(--tb); font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em;
   display: flex; flex-direction: column; gap: 14px; }
 .term::after { content: ''; position: absolute; inset: 0; pointer-events: none;
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px); }
@@ -381,9 +381,9 @@ input[type='range']::-webkit-slider-thumb { border-radius: 0; background: var(--
 .term-alert { position: relative; z-index: 1; margin: 6px 0; text-align: center; font-size: clamp(16px, 1.6vw, 20px); line-height: 1.25; color: var(--tb); letter-spacing: .03em; }
 .term-alert.calm { color: var(--tb2); font-size: 14px; }
 .term-title { color: var(--tb2); max-width: 70%; }
-.term-price { color: #c7ccff; font-size: 13px; white-space: nowrap; }
-.term-foot { font-size: 9.5px; color: rgba(127, 139, 255, .6); }
-.term-glitch { position: absolute; z-index: 0; background: #2f3dff; opacity: .55; }
+.term-price { color: #aab1f2; font-size: 13px; white-space: nowrap; }
+.term-foot { font-size: 9.5px; color: rgba(106, 117, 238, .6); }
+.term-glitch { position: absolute; z-index: 0; background: #1d29b8; opacity: .55; }
 .term-glitch.g1 { width: 22%; height: 6px; left: 8%; top: 18%; }
 .term-glitch.g2 { width: 9%; height: 10px; right: 12%; top: 52%; opacity: .4; }
 .term-glitch.g3 { width: 14%; height: 4px; left: 30%; bottom: 22%; opacity: .35; }
