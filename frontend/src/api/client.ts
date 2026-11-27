@@ -1,6 +1,6 @@
 import type {
   ApplyResult, ChatMessage, ChatResponse, Health, HypothesisRecord, Investigation, KnowledgeHit,
-  Measurement, MetricInfo, MetricRule, MetricSeries, MetrikaLive, Release, Settings, Signal, Task, DataGap, UploadResult, IndexStats,
+  Measurement, MetricInfo, MetricRule, MetricSeries, MetrikaLive, Release, Settings, Signal, Task, DataGap, UploadResult, IndexStats, MailSent, StorefrontCard, SalesBrief,
 } from './types'
 import { mockRequest } from '../mocks/mockServer'
 
@@ -104,7 +104,18 @@ export const api = {
 
   chat: (message: string, history: ChatMessage[]) => request<ChatResponse>('POST', '/chat', { message, history }),
   metrikaLive: (date1 = '7daysAgo', date2 = 'today') => request<MetrikaLive>('GET', `/metrika/live${qs({ date1, date2 })}`),
+
+  resendEmail: (invId: string) => request<MailSent>('POST', `/investigations/${invId}/send-email`),
+  storefrontCard: (family = 'KES') => request<StorefrontCard>('GET', `/storefront/card${qs({ family })}`),
+
+  salesBriefs: () => request<SalesBrief[]>('GET', '/sales-briefs'),
+  salesBrief: (id: string) => request<SalesBrief>('GET', `/sales-briefs/${id}`),
+  createSalesBrief: (product: string) => request<SalesBrief>('POST', '/sales-briefs', { product }),
+  sendSalesBrief: (id: string) => request<MailSent>('POST', `/sales-briefs/${id}/send`),
 }
+
+/** Прямая ссылка на CSV для импорта в Redmine (скачивается браузером, в режиме моков — недоступна). */
+export const redmineCsvUrl = (aiOnly = true) => `/api/backlog/redmine.csv${aiOnly ? '?ai_only=true' : ''}`
 
 /** Опрос расследования раз в 2 с, пока status = running. */
 export async function pollInvestigation(id: string, onTick?: (inv: Investigation) => void, signal?: AbortSignal) {

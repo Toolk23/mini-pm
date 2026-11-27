@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
 import type { MetricInfo, Signal } from '../api/types'
@@ -8,6 +8,7 @@ import { CountUp, Radar } from '../components/live'
 import { Card, ErrorBox, Loading, NoData, NoDataBadge, useApi } from '../components/ui'
 import { Hl, KIcons, Kicker, SectionHead } from '../components/highlight'
 import { SignalRow, useMetricNames } from '../components/SignalRow'
+import StoreCard from '../components/StoreCard'
 
 type Mode = 'sales' | 'metric' | 'live'
 const PRODUCTS = ['Конфигуратор Kaspersky', 'Конфигуратор Астра', 'ЛК'] as const
@@ -35,7 +36,10 @@ export default function Dashboard() {
 
       <div className="grid grid-main-side">
         <ChartCard main={main} />
-        <SignalFeed signals={signals.data ?? []} loading={signals.loading} />
+        <div className="stack" style={{ gap: 16, minWidth: 0 }}>
+          <SignalFeed signals={signals.data ?? []} loading={signals.loading} />
+          <StorefrontPanel />
+        </div>
       </div>
     </>
   )
@@ -48,39 +52,57 @@ function Hero({ s, all, onInvestigate }: { s: Signal; all: Signal[]; onInvestiga
   // Короткие пометки — в плашки; длинные методические оговорки остаются в подсказке.
   const chips = s.caveats.filter((c) => /всплеск|неполн/i.test(c))
   return (
-    <section className="hero reveal">
-      <div className="hero-orbit" aria-hidden><Radar signals={all} size={640} /></div>
-      <div className="hero-glow" aria-hidden />
-
-      <button className="pill-warm" onClick={onInvestigate}>
-        <span className="live-dot red" /> Критичный сигнал · {s.change?.post_period} <span className="pill-arrow">›</span>
-      </button>
-      <h1 className="hero-title">
-        <span className="grad-silver">Заказы {s.family}</span><br />
-        <span className="grad-silver">упали на </span><Hl tone="red">{pct}%</Hl>
-      </h1>
-      <p className="hero-sub lead">
-        Устойчиво — по <b>скользящему среднему</b>, а не по отдельной неделе.
-        {ctrl && <> Контроль <b>{ctrl.family} {ctrl.change_pct > 0 ? '+' : ''}{ctrl.change_pct}%</b> — {ctrl.stable ? <>падение <b>специфично для {s.family}</b></> : 'контроль тоже изменился'}.</>}
-      </p>
-      <div className="row hero-actions">
-        <button className="btn btn-primary btn-lg" onClick={onInvestigate}>Запустить расследование</button>
-        <Link className="btn btn-lg" to="/story">Вся история</Link>
+    <section className="v2-hero">
+      <div className="v2-meta hairline-draw">
+        <span className="row" style={{ gap: 10 }}><span className="live-dot red" /> Сигнал [01] · критичный</span>
+        <span>{s.change?.post_period?.replace(/\.2026/g, '')}</span>
+        <LiveClock />
       </div>
+
+      <div className="v2-hero-grid">
+        <div className="stack" style={{ gap: 0, minWidth: 0 }}>
+          <h1 className="v2-title" data-depth="14">
+            <span className="line-mask"><span style={{ ['--d' as string]: 80 }}>Заказы {s.family}</span></span>
+            <span className="line-mask"><span style={{ ['--d' as string]: 200 }}>упали на <span className="v2-red">{pct}%</span></span></span>
+          </h1>
+          <p className="v2-lead reveal" style={{ ['--i' as string]: 5 }}>
+            Устойчиво — по скользящему среднему, а не по отдельной неделе.
+            {ctrl && <> Контроль {ctrl.family} {ctrl.change_pct > 0 ? '+' : ''}{ctrl.change_pct}% — {ctrl.stable ? `падение специфично для ${s.family}` : 'контроль тоже изменился'}.</>}
+          </p>
+          <div className="row reveal" style={{ gap: 10, marginTop: 28, ['--i' as string]: 7 }}>
+            <button className="btn btn-primary btn-lg" onClick={onInvestigate}>Запустить расследование</button>
+            <Link className="btn btn-lg" to="/story">Вся история</Link>
+          </div>
+        </div>
+        <div className="v2-hero-media reveal" style={{ ['--i' as string]: 3 }} aria-hidden>
+          {/* радар «в глубине»: уезжает против курсора и наклоняется в перспективе */}
+          <div data-depth="-10"><div data-tilt><Radar signals={all} size={340} /></div></div>
+          <span className="v2-media-cap">радар · {all.length} сигнал(а)</span>
+        </div>
+      </div>
+
       {chips.length > 0 && (
-        <div className="row hero-chips">
-          {chips.map((c) => <span key={c} className="chip" title={c}>{shortCaveat(c)}</span>)}
-          <span className="chip" title={s.caveats.filter((c) => !chips.includes(c)).join('\n')}>ещё {s.caveats.length - chips.length} оговорки</span>
+        <div className="v2-caveats reveal" style={{ ['--i' as string]: 9 }}>
+          <span className="eyebrow">оговорки детектора</span>
+          {chips.map((c) => <span key={c} title={c}>{shortCaveat(c)}</span>)}
+          <span title={s.caveats.filter((c) => !chips.includes(c)).join('\n')}>+ ещё {s.caveats.length - chips.length}</span>
         </div>
       )}
     </section>
   )
 }
 
+/** Живые часы МСК — как UTC-часы на HackFirst: показывают, что система «в эфире». */
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t) }, [])
+  return <span className="mono">МСК {now.toLocaleTimeString('ru-RU', { timeZone: 'Europe/Moscow' })}</span>
+}
+
 function shortCaveat(c: string) {
   const spike = c.match(/Неделя (\d{2}\.\d{2})\.\d{4}.*всплеск \(([\d.]+)\)/)
-  if (spike) return `⚡ ${spike[1]}: всплеск ${Math.round(Number(spike[2]))} исключён`
-  if (/неполн/i.test(c)) return '◌ последняя неделя неполная'
+  if (spike) return `${spike[1]} — всплеск ${Math.round(Number(spike[2]))} исключён`
+  if (/неполн/i.test(c)) return 'последняя неделя неполная'
   return c.length > 60 ? c.slice(0, 58) + '…' : c
 }
 
@@ -89,28 +111,22 @@ function Kpis({ s }: { s: Signal }) {
   const ch = s.change!
   const ctrl = s.control
   const top = s.release_candidates?.find((r) => r.release_id === 'R-09') ?? s.release_candidates?.[0]
+  // Строки как у HackFirst: [номер] · огромная тонкая цифра · подпись моноширинным капсом.
+  const rows = [
+    { n: '00-01', value: <span className="v2-red"><CountUp value={ch.change_pct} digits={0} suffix="%" /></span>, label: `Заказы ${s.family} к базе`, sub: `по среднему за ${ch.post_weeks} нед.` },
+    { n: '00-02', value: <><CountUp value={ch.baseline_mean} /> <span className="v2-arrow">→</span> <CountUp value={ch.post_mean} /></>, label: 'Индекс: база → после', sub: `${ch.baseline_period.replace(/\.2026/g, '')} → ${ch.post_period.replace(/\.2026/g, '')}` },
+    { n: '00-03', value: <CountUp value={ctrl?.change_pct ?? 0} digits={0} suffix="%" signed />, label: `Контроль · ${ctrl?.family ?? ''}`, sub: ctrl?.stable ? 'стабилен — падение специфично' : 'изменился вместе с продуктом' },
+    { n: '00-04', value: <>{top?.release_id ?? '—'}</>, label: 'Главный кандидат', sub: top ? `${top.date} · ${top.description.slice(0, 48)}…` : 'релизов в окне нет' },
+  ]
   return (
-    <div className="grid grid-4">
-      <Card className="reveal kpi" >
-        <div className="stat-label">Заказы {s.family} к базе</div>
-        <div className="stat-value down"><CountUp value={ch.change_pct} digits={0} suffix="%" /></div>
-        <div className="faint">по среднему за {ch.post_weeks} нед.</div>
-      </Card>
-      <Card className="reveal kpi">
-        <div className="stat-label">Индекс: база → после</div>
-        <div className="stat-value"><CountUp value={ch.baseline_mean} /> <span className="arrow">→</span> <CountUp value={ch.post_mean} /></div>
-        <div className="faint">{ch.baseline_period} → {ch.post_period}</div>
-      </Card>
-      <Card className="reveal kpi">
-        <div className="stat-label">Контроль · {ctrl?.family}</div>
-        <div className="stat-value" style={{ color: 'var(--chart-control)' }}><CountUp value={ctrl?.change_pct ?? 0} digits={0} suffix="%" signed /></div>
-        <div className="faint">{ctrl?.stable ? 'стабилен — падение специфично' : 'изменился вместе с продуктом'}</div>
-      </Card>
-      <Card className="reveal kpi">
-        <div className="stat-label">Главный кандидат</div>
-        <div className="stat-value">{top?.release_id ?? '—'}</div>
-        <div className="faint" title={top?.description}>{top ? `${top.date} · ${top.description.slice(0, 42)}…` : 'релизов в окне нет'}</div>
-      </Card>
+    <div className="v2-rows">
+      {rows.map((r, i) => (
+        <div key={r.n} className="v2-row hairline-draw" style={{ ['--d' as string]: 150 + i * 120 }}>
+          <span className="v2-row-n">шаг<br />[{r.n}]</span>
+          <span className="v2-row-value reveal" style={{ ['--i' as string]: i + 2 }}>{r.value}</span>
+          <span className="v2-row-label">{r.label}<br /><span>{r.sub}</span></span>
+        </div>
+      ))}
     </div>
   )
 }
@@ -215,15 +231,36 @@ function SignalFeed({ signals, loading }: { signals: Signal[]; loading: boolean 
   const nav = useNavigate()
   const names = useMetricNames()
   return (
-    <Card className="reveal feed" title={<h2>Лента сигналов</h2>} extra={<span className="row faint"><span className="live-dot" /> {signals.length} активных</span>}>
+    <section className="index-block reveal">
+      <header className="index-head">
+        <h2>Сигналы</h2>
+        <span className="index-sub"><span className="live-dot" /> {signals.length} активных · live</span>
+      </header>
       {loading && !signals.length && <Loading />}
-      <div className="sig-list">
+      <div className="index-list">
         {signals.map((s, i) => (
-          <SignalRow key={s.id} s={s} names={names} as="a" href={`/investigations?signal=${encodeURIComponent(s.id)}`}
+          <SignalRow key={s.id} s={s} names={names} index={i + 1} as="a" href={`/investigations?signal=${encodeURIComponent(s.id)}`}
             onClick={() => nav(`/investigations?signal=${encodeURIComponent(s.id)}`)} style={{ ['--i' as string]: i + 2 }}
-            action={<span className="kbd">↵</span>} />
+            action={<span className="index-go">расследовать →</span>} />
         ))}
       </div>
-    </Card>
+      <div className="index-foot"><span className="index-cross">+</span><span className="index-num">{String(signals.length).padStart(2, '0')}</span></div>
+    </section>
+  )
+}
+
+/* ---------------- живая витрина ---------------- */
+function StorefrontPanel() {
+  const card = useApi(() => api.storefrontCard('KES'))
+  return (
+    <section className="index-block reveal">
+      <header className="index-head">
+        <h2>Витрина</h2>
+        <span className="index-sub"><span className="live-dot" /> живая карточка</span>
+      </header>
+      {card.loading && !card.data && <Loading label="Открываю store.softline.ru…" />}
+      {card.error && <ErrorBox error={card.error} onRetry={card.reload} />}
+      {card.data && <StoreCard card={card.data} />}
+    </section>
   )
 }

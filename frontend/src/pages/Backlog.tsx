@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { api } from '../api/client'
+import { api, redmineCsvUrl, useMocks } from '../api/client'
 import type { Task } from '../api/types'
 import { Hl, KIcons, Kicker, Rich, SectionHead } from '../components/highlight'
 import { AI_TAG, AiBadge, ErrorBox, Loading, PriorityBadge, fmtDate, useApi } from '../components/ui'
@@ -64,6 +64,9 @@ export default function Backlog() {
         {aiCount === 0 && tasks.data && <span className="faint">Пока ни одной задачи от агента — запусти расследование и нажми «Отправить ПМу».</span>}
         <span style={{ flex: 1 }} />
         <button className="btn btn-sm btn-ghost" onClick={tasks.reload}>Обновить</button>
+        {useMocks
+          ? <span className="faint" title="CSV отдаёт сервер — в режиме моков недоступно">CSV для Redmine — только с API</span>
+          : <a className="btn btn-sm" href={redmineCsvUrl(true)} download="redmine_import.csv" title="Задачи агента в CSV (;) для импорта в Redmine">Скачать CSV для Redmine</a>}
       </div>
 
       {err && <ErrorBox error={err} />}
@@ -185,6 +188,7 @@ function TaskDrawer({ task, onClose, onPatch }: { task: Task; onClose: () => voi
               <div key={i} className="row faint" style={{ flexWrap: 'nowrap', alignItems: 'flex-start' }}>
                 <span className="mono" style={{ flex: 'none' }}>{h.at ? new Date(String(h.at)).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''}</span>
                 <span>{String(h.event ?? `${h.field}: ${h.from} → ${h.to}`)}</span>
+                {h.by ? <span className={`hist-by ${h.by === 'ai' ? 'ai' : ''}`}>{h.by === 'ai' ? 'агент' : h.by === 'pm' ? 'ПМ' : String(h.by)}</span> : null}
               </div>
             ))}
           </div>

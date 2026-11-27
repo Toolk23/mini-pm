@@ -122,6 +122,8 @@ export interface InvestigationStep {
   n: number
   title?: string
   finding: string
+  /** Шаг «Внешние источники»: проверенные цитаты аналитика */
+  quotes?: CuratedQuote[]
   sources: (string | { type?: string; sheet?: string; file?: string; quote?: string })[]
 }
 
@@ -131,7 +133,25 @@ export interface Hypothesis {
   status?: string
 }
 
+export interface CuratedQuote {
+  id: string
+  source_type?: string
+  file: string
+  sheet?: string
+  row?: number
+  title?: string
+  text: string
+  finding?: string
+  supports_hypothesis?: boolean
+  curated?: boolean
+  score?: number | null
+}
+
 export interface KnowledgeHit {
+  /** true — цитата проверена аналитиком (data/curated), есть finding */
+  curated?: boolean
+  finding?: string
+  supports_hypothesis?: boolean
   id: string
   source_type: 'interview' | 'competitor' | 'upload' | string
   file: string
@@ -207,6 +227,7 @@ export interface ApplyResult {
     eml_path?: string
     to?: string
     dion?: { channel: string; text: string }
+    sent?: MailSent
   }
 }
 
@@ -292,3 +313,43 @@ export interface MetrikaLive {
 
 export interface UploadResult { file: string; chunks_added: number; error?: string }
 export interface IndexStats { chunks: number; by_source: Record<string, number>; seconds?: number; errors?: string[] }
+
+export interface MailSent { ok: boolean; to?: string; at?: string; error?: string }
+
+export interface StorefrontCard {
+  ok: boolean
+  url?: string
+  title?: string
+  prices_rub?: number[]
+  excerpt?: string
+  issues?: string[]
+  fetched_at?: string
+  source?: string
+  live?: boolean
+  error?: string
+}
+
+export interface SalesBrief {
+  id: string
+  created_at: string
+  mode: string
+  family?: string
+  tag?: string
+  product: string
+  pitch?: string
+  who_buys?: string[]
+  key_points?: { text: string; source?: string }[]
+  vs_competitors?: { competitor: string; point: string; source?: string }[]
+  faq?: { q: string; a: string; source?: string }[]
+  objections?: { objection: string; answer: string; source?: string }[]
+  dont_say?: string[]
+  internal_note?: string
+  message?: string
+  video_script?: { sec: string; screen: string; voice: string }[]
+  evidence?: {
+    store_card?: StorefrontCard
+    analyst_quotes?: CuratedQuote[]
+    [k: string]: unknown
+  }
+  sent?: MailSent
+}

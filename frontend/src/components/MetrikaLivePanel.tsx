@@ -5,7 +5,7 @@ import { BarChart, LineChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import { api } from '../api/client'
-import { cssVar, useThemeValue } from './theme'
+import { cssVar, useThemeValue, withAlpha } from './theme'
 import { ErrorBox, Loading, NoData, useApi } from './ui'
 import { CountUp } from './live'
 
@@ -28,7 +28,7 @@ export default function MetrikaLivePanel() {
       yAxis: { type: 'value', axisLabel: { color: c.t3, fontSize: 10 }, splitLine: { lineStyle: { color: c.grid } } },
       series: [
         { name: 'Визиты', type: 'bar', data: d.rows.map((r) => r.visits ?? 0), barMaxWidth: 18,
-          itemStyle: { borderRadius: [6, 6, 0, 0], color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: c.main }, { offset: 1, color: c.main + '33' }]) },
+          itemStyle: { borderRadius: [6, 6, 0, 0], color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: c.main }, { offset: 1, color: withAlpha(c.main, .2) }]) },
           animationDelay: (i: number) => i * 40 },
         { name: 'Посетители', type: 'line', smooth: true, data: d.rows.map((r) => r.users ?? 0), symbol: 'none',
           lineStyle: { color: c.ctrl, width: 2 }, itemStyle: { color: c.ctrl } },

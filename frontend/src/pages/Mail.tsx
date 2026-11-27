@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import type { ApplyResult, Investigation } from '../api/types'
 import { Hl, KIcons, Kicker, Rich, SectionHead } from '../components/highlight'
 import { AiBadge, Card, ErrorBox, Loading, useApi } from '../components/ui'
+import { MailStatusLine } from '../components/MailStatus'
 
 const FROM = 'мини ПМ <mini-pm@store.local>'
 const TO = 'Продакт-менеджер <pm@store.local>'
@@ -98,7 +99,8 @@ function EmailWindow({ inv, a }: { inv: Investigation; a: ApplyResult }) {
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <b>мини ПМ</b><span className="faint">{time(inv.created_at)}</span>
           </div>
-          <div className="faint">кому: {TO}</div>
+          <div className="faint">кому: {a.email.to ?? TO}</div>
+          <div style={{ marginTop: 6 }}><MailStatusLine invId={inv.id} initial={a.email.sent} /></div>
         </div>
       </div>
       <h2 className="mail-subject"><Rich text={a.email.subject} /></h2>

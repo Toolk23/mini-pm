@@ -17,6 +17,8 @@ import chat from './data/chat.json'
 import search from './data/search.json'
 import redmine from './data/redmine.json'
 import metrikaLive from './data/metrika-live.json'
+import salesBrief from './data/sales-brief.json'
+import storefrontCard from './data/storefront-card.json'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x))
@@ -27,6 +29,7 @@ const state = {
   settings: clone(settings) as any,
   investigations: {} as Record<string, any>,
   uploads: 0,
+  briefs: [] as any[],
 }
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
@@ -138,11 +141,21 @@ function route(method: string, path: string, body: any): any {
   if (method === 'POST' && p === '/knowledge/reindex') return { chunks: 1180 + state.uploads, by_source: { interview: 742, competitor: 438, ...(state.uploads ? { upload: state.uploads } : {}) }, seconds: 1.2 }
   if (method === 'POST' && p === '/chat') return chat
   if (method === 'GET' && p === '/metrika/live') return metrikaLive
+  if (method === 'GET' && p === '/storefront/card') return storefrontCard
+  if (method === 'POST' && (r = m(/^\/investigations\/([^/]+)\/send-email$/))) return { ok: false, error: 'SMTP не настроен (режим моков)' }
+  if (method === 'GET' && p === '/sales-briefs') return state.briefs.map(({ evidence: _e, ...b }) => b)
+  if (method === 'GET' && (r = m(/^\/sales-briefs\/([^/]+)$/))) return state.briefs.find((b) => b.id === r![1]) ?? salesBrief
+  if (method === 'POST' && p === '/sales-briefs') {
+    const b = { ...clone(salesBrief), id: 'SB-MOCK' + (state.briefs.length + 1), family: body?.product ?? 'KES', created_at: new Date().toISOString() }
+    state.briefs.unshift(b)
+    return b
+  }
+  if (method === 'POST' && (r = m(/^\/sales-briefs\/([^/]+)\/send$/))) return { ok: false, error: 'SMTP не настроен (режим моков)' }
 
   throw new Error(`Мок не знает ${method} ${path}`)
 }
 
 export async function mockRequest<T>(method: string, path: string, body?: unknown): Promise<T> {
-  await delay(path.startsWith('/chat') ? 900 : 150)
+  await delay(path.startsWith('/chat') ? 900 : method === 'POST' && path === '/sales-briefs' ? 6000 : 150)
   return clone(route(method, path, body)) as T
 }
