@@ -15,6 +15,13 @@ from pydantic import BaseModel
 from . import config, detector, ingest, llm, mailer, metrika, settings_store, store, websearch
 
 app = FastAPI(title="мини ПМ", version="0.1.0")
+
+
+@app.on_event("startup")
+def _warm_data():
+    ingest.warmup()  # датасет в память до первого запроса
+
+
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 

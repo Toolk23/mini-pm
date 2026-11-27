@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import json
+import threading
 from functools import lru_cache
 
+import openpyxl  # noqa: F401 — импорт заранее: параллельный ленивый импорт из потоков падал (circular import → 500)
 import pandas as pd
 
 from . import config
@@ -147,7 +149,15 @@ DATA_GAPS = [
 ]
 
 
+_WARM = threading.Lock()
+
+
 def warmup() -> dict:
+    with _WARM:  # первые параллельные запросы после пробуждения стенда не читают Excel наперегонки
+        return _warm()
+
+
+def _warm() -> dict:
     return {
         "metrics_catalog": len(metrics_catalog()),
         "metrics_data": len(metrics_data()),
