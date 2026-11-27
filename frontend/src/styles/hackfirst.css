@@ -437,3 +437,5 @@ input[type='range']::-webkit-slider-thumb { border-radius: 0; background: var(--
 
 /* ---------- v3: живой фон — точечное поле с волнами и пингами (components/BgField.tsx) ---------- */
 .bg-field { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* Мягкий дым: размытие прячет сетку шума — получаются гладкие клубы без пикселей. */
+.bg-field { filter: blur(14px); transform: scale(1.04); }

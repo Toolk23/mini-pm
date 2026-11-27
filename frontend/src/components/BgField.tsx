@@ -2,11 +2,11 @@ import { useEffect, useRef } from 'react'
 
 /**
  * Живой фон v3 в духе hackfirst.io, но целиком кодом (без чужих видео):
- * *  - «смерч» из дыма — шум с завихрением, нарисованный в маленьком canvas и растянутый без сглаживания;
- *  - редкие вспышки глитча — горизонтальные полосы сдвигаются, по экрану пробегают штрихи;
+ *  - «смерч» из мягкого дыма — шум с завихрением в маленьком canvas, растянутый со сглаживанием
+ *    и размытый CSS-фильтром (.bg-field), поэтому без пиксельных ступенек;
  *  - дым тянется к курсору и бледнеет при прокрутке, чтобы не мешать читать.
  * Цвет — из --text (в тёмной теме светлый дым, в светлой — тёмный).
- * ~30 кадров/с, пауза на скрытой вкладке, при prefers-reduced-motion — один статичный кадр без глитча.
+ * ~30 кадров/с, пауза на скрытой вкладке, при prefers-reduced-motion — один статичный кадр.
  */
 
 // Быстрый value-noise на таблице перестановок.
@@ -43,15 +43,12 @@ export default function BgField() {
 
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     const finePointer = window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
-    const CELL = 7 // размер «пикселя» дыма в CSS-пикселях
+    const CELL = 6 // шаг сетки шума в CSS-пикселях (после размытия не виден)
     let w = 0, h = 0, gw = 0, gh = 0, raf = 0, last = 0
     let ink: [number, number, number] = [233, 247, 252]
     let light = false
     let img: ImageData | null = null
     const mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5, on: 0, ton: 0 }
-    let glitchUntil = 0, nextGlitch = performance.now() + 2500
-    let bands: { y: number; hh: number; dx: number }[] = []
-    let streaks: { x: number; y: number; len: number; a: number }[] = []
 
     const readColor = () => {
       const probe = document.createElement('span')
@@ -119,32 +116,10 @@ export default function BgField() {
       }
       sctx.putImageData(img, 0, 0)
       ctx.clearRect(0, 0, w, h)
-      ctx.imageSmoothingEnabled = false
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
       ctx.drawImage(small, 0, 0, gw * CELL, gh * CELL)
 
-      // глитч: раз в несколько секунд на 200–350 мс полосы сдвигаются и пробегают штрихи
-      if (!reduce) {
-        if (now > nextGlitch) {
-          glitchUntil = now + 200 + Math.random() * 150
-          nextGlitch = now + 4500 + Math.random() * 4500
-          bands = Array.from({ length: 3 + Math.floor(Math.random() * 4) }, () => ({
-            y: Math.random() * h, hh: 4 + Math.random() * 26, dx: (Math.random() - 0.5) * 220,
-          }))
-          streaks = Array.from({ length: 14 + Math.floor(Math.random() * 16) }, () => ({
-            x: Math.random() * w, y: Math.random() * h, len: 20 + Math.random() * 180, a: 0.15 + Math.random() * 0.45,
-          }))
-        }
-        if (now < glitchUntil) {
-          const sx = canvas.width / w
-          for (const bd of bands) {
-            ctx.drawImage(canvas, 0, bd.y * sx, canvas.width, bd.hh * sx, bd.dx, bd.y, w, bd.hh)
-          }
-          for (const s of streaks) {
-            ctx.fillStyle = `rgba(${r},${g},${b},${(s.a * scrollFade).toFixed(3)})`
-            ctx.fillRect(s.x + (Math.random() - 0.5) * 30, s.y, s.len, 1 + (Math.random() < 0.3 ? 1 : 0))
-          }
-        }
-      }
     }
 
     const loop = (now: number) => {
