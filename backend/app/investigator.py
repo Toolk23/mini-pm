@@ -134,8 +134,15 @@ def _quotes(analyst: dict | None, kind: str) -> list[dict]:
     out = []
     for it in analyst.get("items", []):
         src = it.get("source", {})
-        is_interview = "интервью" in (src.get("file", "") + src.get("inner", "")).lower()
-        if is_interview != (kind == "interview"):
+        fname = (src.get("file", "") + " " + src.get("inner", "")).lower()
+        interview_files = [f.name.lower() for f in (config.RAW_DIR / "interviews").glob("*.xlsx")]
+        if "интервью" in fname or "транскриб" in fname or any(f in fname for f in interview_files):
+            src_kind = "interview"
+        elif "конкурент" in fname:
+            src_kind = "competitor"
+        else:
+            continue  # датасет и прочее — только в сводке analyst_evidence
+        if src_kind != kind:
             continue
         out.append({"id": it["id"], "source_type": kind, "file": src.get("inner") or src.get("file"),
                     "sheet": src.get("sheet"), "row": src.get("row"), "title": it.get("topic"),
