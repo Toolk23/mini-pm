@@ -1,9 +1,7 @@
 """«Курьер»: превращает отчёт расследования в действия — задача, приоритеты, гипотеза, письмо."""
 from __future__ import annotations
 
-from email.message import EmailMessage
-
-from . import config, store
+from . import config, mailer, store
 
 
 def _render_email(rep: dict, task: dict, raised: list[dict]) -> dict:
@@ -32,15 +30,14 @@ def _render_email(rep: dict, task: dict, raised: list[dict]) -> dict:
     ]
     subject = rep.get("email", {}).get("subject") or f"[мини ПМ] {sig.get('title', 'Сигнал')}"
     body = "\n".join(lines)
-    msg = EmailMessage()
-    msg["Subject"], msg["From"], msg["To"] = subject, "mini-pm@store.local", "pm@store.local"
-    msg.set_content(body)
+    msg = mailer.build(subject, body)
     path = config.STATE_DIR / "outbox" / f"{rep.get('id')}.eml"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(bytes(msg))
     # мессенджер заказчика — Dion; в прототипе — мок сообщения в том же формате
     dion = {"channel": "Dion · мини ПМ", "text": f"🔔 {subject}\n{rep.get('summary', '')}\nЗадача: {task['task_id']}"}
-    return {"subject": subject, "body": body, "eml_path": f"outbox/{path.name}", "dion": dion}
+    sent = mailer.send(subject, body) if mailer.configured() else {"ok": False, "error": "SMTP не настроен — письмо сохранено в outbox"}
+    return {"subject": subject, "body": body, "to": msg["To"], "eml_path": f"outbox/{path.name}", "dion": dion, "sent": sent}
 
 
 def apply(rep: dict) -> dict:

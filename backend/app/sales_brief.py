@@ -89,8 +89,11 @@ SCHEMA_HINT = """{
  "objections": [{"objection": "возражение клиента", "answer": "что ответить", "source": "..."}],
  "dont_say": ["чего нельзя обещать — нет данных или не подтверждено"],
  "internal_note": "для ПМа: что сейчас происходит с продуктом (сигналы, релизы) и что из этого важно продажам",
- "message": "короткое сообщение в канал отдела продаж (Dion), 3–5 строк"
-}"""
+ "message": "короткое сообщение в канал отдела продаж (Dion), 3–5 строк",
+ "video_script": [{"sec": "0–10", "screen": "что показать на карточке товара store.softline.ru", "voice": "текст для озвучки"}]
+}
+video_script — сценарий видеообзора карточки товара на 45–60 секунд (5–7 сцен): что за продукт, как выбрать
+редакцию и срок в конфигураторе, цена и чем Store удобнее, как оформить заказ/счёт. Только факты из данных."""
 
 
 def _template(f: dict) -> dict:
@@ -109,6 +112,7 @@ def _template(f: dict) -> dict:
         "objections": [],
         "dont_say": ["Не сравнивать цены по продлениям и несопоставимым лицензиям"],
         "internal_note": "; ".join(s["title"] for s in f["signals"]) or "Сигналов по продукту нет.",
+        "video_script": [],
         "message": f"Коллеги, обновили справку по {f['product']}: аргументы, сравнение с конкурентами и ответы на типовые вопросы.",
     }
 
@@ -148,3 +152,22 @@ def get(brief_id: str) -> dict | None:
 def latest_for(family: str) -> dict | None:
     bs = [b for b in store.read("sales_briefs", {}).values() if b.get("family") == family]
     return max(bs, key=lambda b: b["created_at"]) if bs else None
+
+
+def to_text(b: dict) -> str:
+    """Справка обычным текстом — для письма отделу продаж."""
+    L = [b.get("product", ""), "", b.get("pitch", "") or "", ""]
+    if b.get("key_points"):
+        L += ["Аргументы:"] + [f"  • {x.get('text')} [{x.get('source')}]" for x in b["key_points"]] + [""]
+    if b.get("vs_competitors"):
+        L += ["Сравнение с конкурентами:"] + [f"  • {x.get('competitor')}: {x.get('point')} [{x.get('source')}]"
+                                           for x in b["vs_competitors"]] + [""]
+    if b.get("faq"):
+        L += ["Типовые вопросы:"] + [f"  — {x.get('q')}\n    {x.get('a')} [{x.get('source')}]" for x in b["faq"]] + [""]
+    if b.get("objections"):
+        L += ["Возражения:"] + [f"  — {x.get('objection')}\n    {x.get('answer')} [{x.get('source')}]"
+                               for x in b["objections"]] + [""]
+    if b.get("dont_say"):
+        L += ["Не обещать:"] + [f"  • {x}" for x in b["dont_say"]] + [""]
+    L += [f"— мини ПМ · {b.get('id')} · {b.get('tag', config.AI_TAG)}"]
+    return "\n".join(L)

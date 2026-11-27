@@ -796,6 +796,18 @@
 Тег задачи «изменена ИИ-помощником» ставится только при изменениях от агента (курьер поднял приоритет, замер закрыл задачу).
 `PATCH /api/backlog/tasks/{id}` от человека тег не ставит; в `history[].by` — `pm` или `ai`.
 
+## Почта (отправка на тестовый ящик)
+При `POST /api/investigations/{id}/apply` письмо ПМу сохраняется в `outbox/*.eml` и, если настроен SMTP
+(`SMTP_USER`, `SMTP_PASSWORD`, `MAIL_TO`), отправляется. В ответе `email.sent`: `{"ok": true, "to": "…", "at": "…"}`
+или `{"ok": false, "error": "…"}`. `email.to` — адресат.
+- `POST /api/investigations/{id}/send-email` — отправить ещё раз;
+- `POST /api/sales-briefs/{id}/send` — разослать справку отделу продаж;
+- `GET /api/mail/log` — журнал отправленных писем; в `/api/health` — `mail.configured`, `mail.to`.
+
+## Экспорт бэклога в Redmine
+- `GET /api/backlog/tasks/{id}/redmine` — JSON для `POST /issues.json` (Redmine REST API);
+- `GET /api/backlog/redmine.csv?ai_only=true` — CSV (`;`, UTF-8) для импорта задач в Redmine; `ai_only` — только задачи агента.
+
 ## Справка для отдела продаж
 Бизнес-проблема задачи — ПМ тратит часы на одни и те же объяснения продавцам. Агент собирает шпаргалку по продукту
 из конкурентного анализа, интервью, сводки аналитика, сигналов, релизов и поиска Яндекса; каждый тезис со ссылкой на источник.
@@ -813,6 +825,7 @@
  "dont_say": ["чего нельзя обещать — нет данных"],
  "internal_note": "для ПМа: сигналы и релизы по продукту",
  "message": "сообщение в канал продаж (Dion)",
+ "video_script": [{"sec": "0–10", "screen": "что показать на карточке товара", "voice": "текст для озвучки"}],
  "evidence": {"analyst_quotes": [], "competitors": [], "interviews": [], "signals": [], "releases": [], "web": []}}
 ```
 `product` — `KES`, `Astra` или любое название (поиск по базе знаний).

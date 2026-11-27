@@ -117,6 +117,20 @@ def redmine_export(task: dict) -> dict:
     }
 
 
+def redmine_csv(tasks: list[dict]) -> str:
+    """Бэклог в CSV для импорта в Redmine (Задачи → Импорт)."""
+    import csv
+    import io
+    buf = io.StringIO()
+    w = csv.writer(buf, delimiter=";")
+    w.writerow(["Трекер", "Тема", "Описание", "Приоритет", "Статус", "Метки", "Источник"])
+    for t in tasks:
+        w.writerow(["Feature" if t.get("type") != "Баг" else "Bug", t["title"], t.get("description", ""),
+                    t.get("priority", ""), t.get("status", ""), ", ".join(t.get("tags", [])),
+                    "сгенерирована ИИ-помощником" if config.AI_TAG in t.get("tags", []) else "ПМ"])
+    return buf.getvalue()
+
+
 # ------------------------------------------------------------------ лог токенов (для калькулятора)
 def log_tokens(step: str, model: str, prompt_tokens: int, completion_tokens: int, request_id: str | None = None):
     log = read("token_log", [])

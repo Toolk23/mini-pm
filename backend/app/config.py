@@ -48,4 +48,12 @@ SEARCH_FOLDER_ID = os.getenv("SEARCH_FOLDER_ID", LLM_FOLDER_ID)
 METRIKA_TOKEN = os.getenv("METRIKA_TOKEN", "")
 METRIKA_COUNTER_ID = os.getenv("METRIKA_COUNTER_ID", "")
 
+# Почта: отправка писем ПМу на тестовый ящик (Яндекс Почта — пароль приложения)
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.yandex.ru")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
+SMTP_USER = os.getenv("SMTP_USER", "")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+MAIL_FROM = os.getenv("MAIL_FROM", SMTP_USER)
+MAIL_TO = os.getenv("MAIL_TO", SMTP_USER)  # по умолчанию — себе на тот же тестовый ящик
+
 AI_TAG = "сгенерирована ИИ-помощником"

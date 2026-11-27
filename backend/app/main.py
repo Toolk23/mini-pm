@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import config, detector, ingest, llm, metrika, settings_store, store, websearch
+from . import config, detector, ingest, llm, mailer, metrika, settings_store, store, websearch
 
 app = FastAPI(title="мини ПМ", version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -29,7 +29,8 @@ def health():
     return {"ok": True, "data": ingest.warmup(), "llm": {"configured": llm.available(), "provider": config.LLM_PROVIDER,
                                                           "model": config.LLM_MODEL,
                                                           "models_by_step": {s: config.model_for(s) for s in ("investigation", "chat")}},
-            "metrika": {"configured": metrika.configured()}, "web_search": {"configured": websearch.configured()}}
+            "metrika": {"configured": metrika.configured()}, "web_search": {"configured": websearch.configured()},
+            "mail": {"configured": mailer.configured(), "to": config.MAIL_TO if mailer.configured() else None}}
 
 
 # ------------------------------------------------------------------ метрики и данные
@@ -149,6 +150,25 @@ def apply_investigation(inv_id: str):
     return applied
 
 
+@app.post("/api/investigations/{inv_id}/send-email")
+def resend_email(inv_id: str):
+    """Повторная отправка письма ПМу (если при «Применить» SMTP не был настроен или почта не ответила)."""
+    job = _JOBS.get(inv_id) or store.read("investigations", {}).get(inv_id)
+    if not job or not job.get("applied"):
+        raise HTTPException(409, "Сначала примените расследование")
+    em = job["applied"]["email"]
+    em["sent"] = mailer.send(em["subject"], em["body"])
+    saved = store.read("investigations", {})
+    saved[inv_id] = job
+    store.write("investigations", saved)
+    return em["sent"]
+
+
+@app.get("/api/mail/log")
+def mail_log():
+    return store.read("mail_log", [])
+
+
 # ------------------------------------------------------------------ бэклог
 class TaskIn(BaseModel):
     title: str
@@ -180,6 +200,15 @@ def patch_task(task_id: str, body: TaskPatch):
         return store.update_task(task_id, **body.model_dump())
     except KeyError:
         raise HTTPException(404) from None
+
+
+@app.get("/api/backlog/redmine.csv")
+def backlog_redmine_csv(ai_only: bool = False):
+    """CSV для импорта в Redmine; ai_only=true — только задачи с тегом «сгенерирована ИИ-помощником»."""
+    from fastapi.responses import Response
+    ts = [t for t in store.backlog() if not ai_only or config.AI_TAG in t.get("tags", [])]
+    return Response("\ufeff" + store.redmine_csv(ts), media_type="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": "attachment; filename=redmine_import.csv"})
 
 
 @app.get("/api/backlog/tasks/{task_id}/redmine")
@@ -298,6 +327,16 @@ def create_sales_brief(body: SalesBriefIn):
     """Синхронно (~20–40 с с LLM): шпаргалка по продукту и ответы на типовые вопросы для продавцов."""
     from . import sales_brief
     return sales_brief.generate(body.product)
+
+
+@app.post("/api/sales-briefs/{brief_id}/send")
+def send_sales_brief(brief_id: str):
+    """Разослать справку отделу продаж на тестовую почту."""
+    from . import sales_brief
+    b = sales_brief.get(brief_id)
+    if not b:
+        raise HTTPException(404)
+    return mailer.send(f"[мини ПМ] Справка для отдела продаж: {b.get('product')}", sales_brief.to_text(b))
 
 
 @app.get("/api/sales-briefs")
