@@ -61,7 +61,7 @@ function Hero({ s, all, onInvestigate }: { s: Signal; all: Signal[]; onInvestiga
 
       <div className="v2-hero-grid">
         <div className="stack" style={{ gap: 0, minWidth: 0 }}>
-          <h1 className="v2-title">
+          <h1 className="v2-title" data-depth="14">
             <span className="line-mask"><span style={{ ['--d' as string]: 80 }}>Заказы {s.family}</span></span>
             <span className="line-mask"><span style={{ ['--d' as string]: 200 }}>упали на <span className="v2-red">{pct}%</span></span></span>
           </h1>
@@ -75,7 +75,8 @@ function Hero({ s, all, onInvestigate }: { s: Signal; all: Signal[]; onInvestiga
           </div>
         </div>
         <div className="v2-hero-media reveal" style={{ ['--i' as string]: 3 }} aria-hidden>
-          <Radar signals={all} size={340} />
+          {/* радар «в глубине»: уезжает против курсора и наклоняется в перспективе */}
+          <div data-depth="-10"><div data-tilt><Radar signals={all} size={340} /></div></div>
           <span className="v2-media-cap">радар · {all.length} сигнал(а)</span>
         </div>
       </div>

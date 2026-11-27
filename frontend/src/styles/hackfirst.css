@@ -439,3 +439,9 @@ input[type='range']::-webkit-slider-thumb { border-radius: 0; background: var(--
 .bg-field { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 /* Мягкий дым: размытие прячет сетку шума — получаются гладкие клубы без пикселей. */
 .bg-field { filter: blur(14px); transform: scale(1.04); }
+/* v3: передний слой дыма — углы поверх контента (под шапкой, z 20), клики проходят сквозь */
+.bg-front { position: fixed; inset: 0; z-index: 10; pointer-events: none; overflow: hidden; }
+.bg-field-front { filter: blur(22px); }
+[data-depth], [data-tilt] { will-change: transform; }
+[data-tilt] { transform-style: preserve-3d; }
+@media (max-width: 760px) { .bg-field-front { opacity: .7; } }

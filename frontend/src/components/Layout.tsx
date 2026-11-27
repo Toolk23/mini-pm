@@ -86,6 +86,34 @@ export default function Layout() {
     return () => { io.disconnect(); mo.disconnect() }
   }, [])
 
+  // 3D-глубина: элементы с data-depth чуть сдвигаются за курсором (чем больше depth — тем «ближе»),
+  // data-tilt наклоняется в перспективе. Только мышь, не при «уменьшить движение».
+  // Transform ставим прямо на элемент, а не через CSS-переменную на родителе — без пересчёта стилей детей.
+  useEffect(() => {
+    const fine = window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (!fine || reduce) return
+    let tx = 0, ty = 0, x = 0, y = 0, raf = 0
+    const tick = () => {
+      x += (tx - x) * 0.08; y += (ty - y) * 0.08
+      document.querySelectorAll<HTMLElement>('[data-depth]').forEach((el) => {
+        const d = Number(el.dataset.depth) || 0
+        el.style.transform = `translate3d(${(x * d).toFixed(2)}px, ${(y * d).toFixed(2)}px, 0)`
+      })
+      document.querySelectorAll<HTMLElement>('[data-tilt]').forEach((el) => {
+        el.style.transform = `perspective(900px) rotateX(${(-y * 10).toFixed(2)}deg) rotateY(${(x * 14).toFixed(2)}deg)`
+      })
+      if (Math.abs(tx - x) > 0.001 || Math.abs(ty - y) > 0.001) raf = requestAnimationFrame(tick)
+      else raf = 0
+    }
+    const on = (e: PointerEvent) => {
+      tx = e.clientX / window.innerWidth - 0.5; ty = e.clientY / window.innerHeight - 0.5
+      if (!raf) raf = requestAnimationFrame(tick)
+    }
+    window.addEventListener('pointermove', on, { passive: true })
+    return () => { window.removeEventListener('pointermove', on); cancelAnimationFrame(raf) }
+  }, [])
+
   const toggleMock = () => {
     setUseMocks(!mock)
     setMock(!mock)
@@ -143,6 +171,9 @@ export default function Layout() {
         <main className="content" key={loc.pathname}>
           <Outlet />
         </main>
+
+        {/* Передний слой дыма — только углы, поверх контента, но под шапкой: даёт глубину. */}
+        <div className="bg-front" aria-hidden><BgField layer="front" /></div>
 
         <div className="scroll-progress" aria-hidden>
           <span className="sp-bars">{[0, 1, 2].map((i) => <i key={i} className={progress >= (i + 1) * 33 ? 'on' : ''} />)}</span>{progress}%
