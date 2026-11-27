@@ -31,7 +31,7 @@ def text_lower(raw: str) -> str:
 
 def read_card(url: str) -> dict:
     try:
-        r = httpx.get(url, headers={"User-Agent": _UA}, timeout=20, follow_redirects=True)
+        r = httpx.get(url, headers={"User-Agent": _UA}, timeout=8, follow_redirects=True)
         r.raise_for_status()
     except httpx.HTTPError as e:
         return {"ok": False, "url": url, "error": str(e)[:200]}
