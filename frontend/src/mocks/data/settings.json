@@ -1,0 +1,90 @@
+{
+ "detector": {
+  "rolling_window_weeks": 4,
+  "baseline_weeks": 13,
+  "min_post_weeks": 3,
+  "spike_ratio": 1.35,
+  "release_window_days": 14,
+  "control_max_change_pct": 10
+ },
+ "sources_weights": {
+  "metrika": 0.4,
+  "backlog": 0.25,
+  "interviews": 0.2,
+  "competitors": 0.15
+ },
+ "metrics": {
+  "family_orders_idx": {
+   "enabled": true,
+   "rule": "pct_drop",
+   "threshold": 20,
+   "priority": "Critical"
+  },
+  "cfg_family_views": {
+   "enabled": true,
+   "rule": "pct_drop",
+   "threshold": 20,
+   "priority": "Medium"
+  },
+  "cfg_open": {
+   "enabled": true,
+   "rule": "pct_drop",
+   "threshold": 20,
+   "priority": "High"
+  },
+  "cfg_reach_rate": {
+   "enabled": true,
+   "rule": "pp_drop",
+   "threshold": 5,
+   "priority": "High"
+  },
+  "cfg_completion_rate": {
+   "enabled": true,
+   "rule": "pp_drop",
+   "threshold": 5,
+   "priority": "High"
+  },
+  "cfg_back_reset_rate": {
+   "enabled": true,
+   "rule": "pct_rise",
+   "threshold": 30,
+   "priority": "Medium"
+  },
+  "cfg_add_to_cart_rate": {
+   "enabled": true,
+   "rule": "pp_drop",
+   "threshold": 3,
+   "priority": "Critical"
+  },
+  "lk_home_views": {
+   "enabled": true,
+   "rule": "pct_drop",
+   "threshold": 30,
+   "priority": "Medium"
+  },
+  "lk_reco_status_visits": {
+   "enabled": true,
+   "rule": "pct_drop",
+   "threshold": 30,
+   "priority": "Medium"
+  },
+  "lk_reco_shown_share": {
+   "enabled": true,
+   "rule": "pp_drop",
+   "threshold": 10,
+   "priority": "High"
+  },
+  "lk_reco_click_visits": {
+   "enabled": true,
+   "rule": "zero_week",
+   "threshold": 0,
+   "priority": "High"
+  },
+  "lk_reco_ctr": {
+   "enabled": true,
+   "rule": "pct_drop",
+   "threshold": 30,
+   "priority": "High"
+  }
+ }
+}

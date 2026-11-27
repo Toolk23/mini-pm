@@ -1,0 +1,26 @@
+{
+ "ok": true,
+ "data": {
+  "metrics_catalog": 16,
+  "metrics_data": 3698,
+  "releases": 11,
+  "backlog": 8,
+  "sales": 58,
+  "reference_steps": 8
+ },
+ "llm": {
+  "configured": false,
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "models_by_step": {
+   "investigation": "deepseek-flash",
+   "chat": "deepseek-flash"
+  }
+ },
+ "metrika": {
+  "configured": false
+ },
+ "web_search": {
+  "configured": false
+ }
+}

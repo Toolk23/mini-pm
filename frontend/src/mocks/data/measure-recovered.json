@@ -1,0 +1,49 @@
+{
+ "synthetic": true,
+ "scenario": "recovered",
+ "weeks": [
+  {
+   "week_start": "2026-11-23",
+   "value": 148,
+   "control": 105
+  },
+  {
+   "week_start": "2026-11-30",
+   "value": 171,
+   "control": 84
+  },
+  {
+   "week_start": "2026-12-07",
+   "value": 159,
+   "control": 126
+  },
+  {
+   "week_start": "2026-12-14",
+   "value": 182,
+   "control": 105
+  },
+  {
+   "week_start": "2026-12-21",
+   "value": 166,
+   "control": 98
+  },
+  {
+   "week_start": "2026-12-28",
+   "value": 175,
+   "control": 112
+  }
+ ],
+ "baseline_mean": 165.8,
+ "before_fix_mean": 111.6,
+ "after_rolling_4w": 170.5,
+ "change_vs_baseline_pct": 2.8,
+ "control": {
+  "family": "Astra",
+  "baseline_mean": 98.5,
+  "after_rolling_4w": 110.2,
+  "change_pct": 11.9,
+  "stable": true
+ },
+ "verdict": "confirmed",
+ "decision": "Гипотеза подтверждена: скользящий индекс вернулся к уровню базы, контроль стабилен. Задача закрыта."
+}

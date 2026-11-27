@@ -1,0 +1,176 @@
+[
+ {
+  "task_id": "T-01",
+  "title": "Конфигуратор для семейства Astra Linux",
+  "type": "Фича",
+  "status": "Done",
+  "priority": "Low",
+  "created_date": "2026-01-12",
+  "closed_date": "2026-04-06",
+  "release_id": [
+   "R-01"
+  ],
+  "description": "На странице семейства невозможно было вывести все 3 000+ позиций, выбрать нужную было очень сложно. Теперь выбор делается в конфигураторе по шагам",
+  "linked_metric_ids": [
+   "cfg_family_views"
+  ],
+  "source": [
+   "Исследование",
+   "Жалобы"
+  ],
+  "tags": [],
+  "history": []
+ },
+ {
+  "task_id": "T-02",
+  "title": "Доработки конфигуратора Astra Linux: шаги, «цена от», кратность",
+  "type": "Улучшение",
+  "status": "Done",
+  "priority": "Medium",
+  "created_date": "2026-04-16",
+  "closed_date": "2026-05-12",
+  "release_id": [
+   "R-02"
+  ],
+  "description": "По итогам демо: пропуск шагов без вариантов выбора, блокировка следующих шагов при смене ответа, цена «от» у каждого варианта, количество в итоге для позиций, которые продаются по несколько штук",
+  "linked_metric_ids": [
+   "cfg_family_views"
+  ],
+  "source": [
+   "Гипотеза"
+  ],
+  "tags": [],
+  "history": []
+ },
+ {
+  "task_id": "T-03",
+  "title": "Изменение аналитики конфигураторов",
+  "type": "Аналитика",
+  "status": "Done",
+  "priority": "Medium",
+  "created_date": "2026-05-27",
+  "closed_date": "2026-06-04",
+  "release_id": [
+   "R-03"
+  ],
+  "description": "Отдельные цели на каждый шаг конфигуратора заменены одним событием с параметрами: меньше целей в Метрике и детальнее анализ",
+  "linked_metric_ids": [
+   "cfg_open",
+   "cfg_completion_rate",
+   "cfg_step_dropoff"
+  ],
+  "source": [
+   "Метрика"
+  ],
+  "tags": [],
+  "history": []
+ },
+ {
+  "task_id": "T-04",
+  "title": "API рекомендаций интернет-магазина для ЛК",
+  "type": "Фича",
+  "status": "Done",
+  "priority": "High",
+  "created_date": "2026-06-24",
+  "closed_date": "2026-07-13",
+  "release_id": [
+   "R-04"
+  ],
+  "description": "Интернет-магазин отдает ЛК список рекомендаций к купленным клиентом продуктам по ручным связкам кросс-сейла, порядок задает магазин. Выпущено 13.07, используется с релиза блока в ЛК",
+  "linked_metric_ids": [
+   "lk_reco_shown_share"
+  ],
+  "source": [
+   "Гипотеза"
+  ],
+  "tags": [],
+  "history": []
+ },
+ {
+  "task_id": "T-05",
+  "title": "Блок рекомендаций на главной ЛК",
+  "type": "Фича",
+  "status": "Done",
+  "priority": "High",
+  "created_date": "2026-06-08",
+  "closed_date": "2026-10-21",
+  "release_id": [
+   "R-04",
+   "R-05",
+   "R-11"
+  ],
+  "description": "Блок до 36 товаров на главной ЛК, клик ведет на страницу товара в магазине. Если рекомендаций нет, блок не показывается, общие рекомендации-заглушки не выводятся",
+  "linked_metric_ids": [
+   "lk_reco_shown_share",
+   "lk_reco_ctr",
+   "lk_reco_click_visits"
+  ],
+  "source": [
+   "Гипотеза"
+  ],
+  "tags": [],
+  "history": []
+ },
+ {
+  "task_id": "T-06",
+  "title": "Новая шапка ЛК с поиском интернет-магазина и обновленное боковое меню",
+  "type": "Фича",
+  "status": "Done",
+  "priority": "High",
+  "created_date": "2026-06-19",
+  "closed_date": "2026-10-14",
+  "release_id": [
+   "R-07"
+  ],
+  "description": "Клиент ищет товары магазина прямо из ЛК, не переходя на сайт магазина. В шапке также каталог, корзина и избранное магазина",
+  "linked_metric_ids": [
+   "lk_search_to_store"
+  ],
+  "source": [
+   "Исследование"
+  ],
+  "tags": [],
+  "history": []
+ },
+ {
+  "task_id": "T-07",
+  "title": "Конфигураторы для семейств Kaspersky Endpoint Security",
+  "type": "Фича",
+  "status": "Done",
+  "priority": "High",
+  "created_date": "2026-08-18",
+  "closed_date": "2026-10-01",
+  "release_id": [
+   "R-09"
+  ],
+  "description": "Фильтры на странице семейства: можно выбрать только комбинации, для которых есть товар, выбор сохраняется в адресе страницы",
+  "linked_metric_ids": [
+   "cfg_open",
+   "cfg_option_share",
+   "family_orders_idx"
+  ],
+  "source": [
+   "Исследование",
+   "Жалобы"
+  ],
+  "tags": [],
+  "history": []
+ },
+ {
+  "task_id": "T-08",
+  "title": "Недочеты в передаче событий электронной торговли",
+  "type": "Ошибка",
+  "status": "New",
+  "priority": "Не указан",
+  "created_date": "2026-10-22",
+  "closed_date": null,
+  "release_id": [],
+  "description": "Ошибки в передаче в Метрику событий электронной торговли. Связана с конфигуратором Kaspersky",
+  "linked_metric_ids": [
+   "cfg_add_to_cart_rate"
+  ],
+  "source": [],
+  "tags": [],
+  "history": []
+ }
+]
