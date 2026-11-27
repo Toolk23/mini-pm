@@ -13,6 +13,7 @@ import Mail from './pages/Mail'
 import Backlog from './pages/Backlog'
 import Chat from './pages/Chat'
 import Knowledge from './pages/Knowledge'
+import Sales from './pages/Sales'
 import SettingsPage from './pages/Settings'
 import NotFound from './pages/NotFound'
 
@@ -29,6 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="mail/:id" element={<Mail />} />
           <Route path="backlog" element={<Backlog />} />
           <Route path="chat" element={<Chat />} />
+          <Route path="sales" element={<Sales />} />
           <Route path="knowledge" element={<Knowledge />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFound />} />

@@ -8,6 +8,7 @@ import { CountUp, Radar } from '../components/live'
 import { Card, ErrorBox, Loading, NoData, NoDataBadge, useApi } from '../components/ui'
 import { Hl, KIcons, Kicker, SectionHead } from '../components/highlight'
 import { SignalRow, useMetricNames } from '../components/SignalRow'
+import StoreCard from '../components/StoreCard'
 
 type Mode = 'sales' | 'metric' | 'live'
 const PRODUCTS = ['Конфигуратор Kaspersky', 'Конфигуратор Астра', 'ЛК'] as const
@@ -35,7 +36,10 @@ export default function Dashboard() {
 
       <div className="grid grid-main-side">
         <ChartCard main={main} />
-        <SignalFeed signals={signals.data ?? []} loading={signals.loading} />
+        <div className="stack" style={{ gap: 16, minWidth: 0 }}>
+          <SignalFeed signals={signals.data ?? []} loading={signals.loading} />
+          <StorefrontPanel />
+        </div>
       </div>
     </>
   )
@@ -224,6 +228,18 @@ function SignalFeed({ signals, loading }: { signals: Signal[]; loading: boolean 
             action={<span className="kbd">↵</span>} />
         ))}
       </div>
+    </Card>
+  )
+}
+
+/* ---------------- живая витрина ---------------- */
+function StorefrontPanel() {
+  const card = useApi(() => api.storefrontCard('KES'))
+  return (
+    <Card className="reveal" title={<h2>Витрина магазина</h2>} extra={<span className="row faint"><span className="live-dot" /> живая карточка</span>}>
+      {card.loading && !card.data && <Loading label="Открываю store.softline.ru…" />}
+      {card.error && <ErrorBox error={card.error} onRetry={card.reload} />}
+      {card.data && <StoreCard card={card.data} compact />}
     </Card>
   )
 }

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api, pollInvestigation } from '../api/client'
-import type { ApplyResult, Investigation, InvestigationReport, InvestigationStep, KnowledgeHit, ReleaseCandidate } from '../api/types'
+import type { ApplyResult, CuratedQuote, Investigation, InvestigationReport, InvestigationStep, KnowledgeHit, ReleaseCandidate } from '../api/types'
+import { MailStatusLine } from '../components/MailStatus'
 import MetricChart from '../components/MetricChart'
 import { Radar } from '../components/live'
 import { Hl, KIcons, Kicker, Rich } from '../components/highlight'
@@ -246,7 +247,7 @@ function StepBody({ s, rep, kind }: { s: InvestigationStep; rep: InvestigationRe
       ) : <p className="step-finding"><Rich text={s.finding} hot={hot} /></p>}
       {kind === 'funnel' && <Funnel rep={rep} />}
       {kind === 'gap' && <LinkedTasks rep={rep} />}
-      {kind === 'external' && <Quotes rep={rep} />}
+      {kind === 'external' && <Quotes rep={rep} stepQuotes={s.quotes} />}
     </div>
   )
 }
@@ -312,22 +313,27 @@ function LinkedTasks({ rep }: { rep: InvestigationReport }) {
   )
 }
 
-function Quotes({ rep }: { rep: InvestigationReport }) {
+function Quotes({ rep, stepQuotes }: { rep: InvestigationReport; stepQuotes?: CuratedQuote[] }) {
   const ae = rep.evidence.analyst_evidence
   const web = rep.evidence.web ?? []
-  const [tab, setTab] = useState<'analyst' | 'interview' | 'competitor' | 'web'>(ae?.items?.length ? 'analyst' : 'interview')
+  // Цитаты аналитика: из шага отчёта (steps[n=6].quotes), иначе из сводки evidence.analyst_evidence.
+  const curated: CuratedQuote[] = stepQuotes?.length ? stepQuotes : (ae?.items ?? []).map((it) => ({
+    id: it.id, title: it.topic, text: it.quote, finding: it.finding, supports_hypothesis: it.supports_hypothesis,
+    file: it.source.inner ? `${it.source.inner} (${it.source.file})` : it.source.file, sheet: it.source.sheet, row: it.source.row, curated: true,
+  }))
+  const [tab, setTab] = useState<'analyst' | 'interview' | 'competitor' | 'web'>(curated.length ? 'analyst' : 'interview')
   const all = tab === 'interview' ? rep.evidence.interviews : tab === 'competitor' ? rep.evidence.competitors : []
-  const hits = useMemo(() => dedupe(all).slice(0, 4), [all])
+  const hits = useMemo(() => dedupe(all).slice(0, 6), [all])
   return (
     <div className="stack" style={{ gap: 10 }}>
       <div className="segmented" style={{ alignSelf: 'flex-start', flexWrap: 'wrap' }}>
-        {ae?.items?.length ? <button className={tab === 'analyst' ? 'on' : ''} onClick={() => setTab('analyst')}>✓ Проверено аналитиком · {ae.items.length}</button> : null}
+        {curated.length ? <button className={tab === 'analyst' ? 'on' : ''} onClick={() => setTab('analyst')}>Проверено аналитиком · {curated.length}</button> : null}
         <button className={tab === 'interview' ? 'on' : ''} onClick={() => setTab('interview')}>Интервью · {dedupe(rep.evidence.interviews).length}</button>
         <button className={tab === 'competitor' ? 'on' : ''} onClick={() => setTab('competitor')}>Конкуренты · {dedupe(rep.evidence.competitors).length}</button>
         {web.length > 0 && <button className={tab === 'web' ? 'on' : ''} onClick={() => setTab('web')}>Интернет · {web.length}</button>}
       </div>
 
-      {tab === 'analyst' && ae && <AnalystEvidenceView ae={ae} />}
+      {tab === 'analyst' && <AnalystEvidenceView verdict={ae?.verdict} items={curated} />}
       {tab === 'web' && web.map((w) => (
         <figure key={w.url} className="quote">
           <blockquote><b>{w.title}</b>{w.snippet ? <><br />{w.snippet}</> : null}</blockquote>
@@ -343,29 +349,38 @@ function Quotes({ rep }: { rep: InvestigationReport }) {
 }
 
 /** Сводка аналитика: вердикт + цитаты с источником; «нет данных» — отдельным стилем. */
-function AnalystEvidenceView({ ae }: { ae: NonNullable<InvestigationReport['evidence']['analyst_evidence']> }) {
+function AnalystEvidenceView({ verdict, items }: { verdict?: string; items: CuratedQuote[] }) {
   return (
     <div className="stack" style={{ gap: 10 }}>
-      <div className="verdict">
-        <span className="eyebrow">вывод по внешним источникам</span>
-        <p><Rich text={ae.verdict} /></p>
-      </div>
-      {ae.items.map((it) => {
-        const noData = /^нет данных/i.test(it.finding)
-        return (
-          <figure key={it.id} className={`quote ev${noData ? ' ev-nodata' : ''}`}>
-            <div className="row" style={{ justifyContent: 'space-between', marginLeft: 10, marginBottom: 6 }}>
-              <span className="row" style={{ gap: 6 }}><code className="tok-id">{it.id}</code><b>{it.topic}</b></span>
-              {noData ? <NoDataBadge label="нет данных" /> : it.supports_hypothesis
-                ? <span className="badge badge-high">подтверждает</span> : <span className="badge">не подтверждает падение</span>}
-            </div>
-            <blockquote>{it.quote}</blockquote>
-            <div className="ev-finding"><Rich text={it.finding} /></div>
-            <figcaption className="faint mono">{it.source.inner ? `${it.source.inner} (${it.source.file})` : it.source.file}{it.source.sheet ? ` · ${it.source.sheet}` : ''}{it.source.row ? ` · строка ${it.source.row}` : ''}</figcaption>
-          </figure>
-        )
-      })}
+      {verdict && (
+        <div className="verdict">
+          <span className="eyebrow">вывод по внешним источникам</span>
+          <p><Rich text={verdict} /></p>
+        </div>
+      )}
+      {items.map((it) => <CuratedCard key={it.id} it={it} />)}
     </div>
+  )
+}
+
+/** Карточка проверенной цитаты: цитата → вывод аналитика → источник (файл, лист, строка). */
+function CuratedCard({ it }: { it: CuratedQuote }) {
+  const finding = it.finding ?? ''
+  const noData = /^нет данных/i.test(finding)
+  return (
+    <figure className={`quote ev${noData ? ' ev-nodata' : ''}`}>
+      <div className="row" style={{ justifyContent: 'space-between', marginLeft: 10, marginBottom: 6 }}>
+        <span className="row" style={{ gap: 6 }}><code className="tok-id">{it.id}</code>{it.title && <b>{it.title}</b>}</span>
+        <span className="row" style={{ gap: 6 }}>
+          <span className="badge badge-success">проверено аналитиком</span>
+          {noData ? <NoDataBadge label="нет данных" /> : it.supports_hypothesis
+            ? <span className="badge badge-high">подтверждает</span> : <span className="badge">не подтверждает падение</span>}
+        </span>
+      </div>
+      <blockquote>{it.text}</blockquote>
+      {finding && <div className="ev-finding"><Rich text={finding} /></div>}
+      <figcaption className="faint mono">{it.file}{it.sheet ? ` · ${it.sheet}` : ''}{it.row ? ` · строка ${it.row}` : ''}</figcaption>
+    </figure>
   )
 }
 
@@ -375,6 +390,7 @@ function dedupe(list: KnowledgeHit[]) {
 }
 
 function Quote({ h }: { h: KnowledgeHit }) {
+  if (h.curated) return <CuratedCard it={{ ...h, title: h.title, curated: true }} />
   const text = h.text.replace(/^\[[^\]]+\]\s*/, '')
   return (
     <figure className="quote">
@@ -471,7 +487,8 @@ function Decision({ inv, rep }: { inv: Investigation; rep: InvestigationReport }
         <div className="applied reveal">
           <div className="row" style={{ gap: 8 }}><span className="applied-check">✓</span><b>Готово — «мини ПМ» сделал за ПМа:</b></div>
           <ul>
-            <li>Письмо ПМу: «{applied.email.subject}»{applied.email.dion ? ' + сообщение в Dion' : ''}</li>
+            <li>Письмо ПМу{applied.email.to ? ` (${applied.email.to})` : ''}: «{applied.email.subject}»{applied.email.dion ? ' + сообщение в Dion' : ''}
+              <div style={{ marginTop: 4 }}><MailStatusLine invId={inv.id} initial={applied.email.sent} /></div></li>
             <li>Задача <code>{applied.task.task_id}</code> «{applied.task.title}» <AiBadge /></li>
             {applied.raised.map((r) => <li key={r.task_id}>Приоритет <code>{r.task_id}</code> → {r.new_priority}</li>)}
             <li>Гипотеза <code>{applied.hypothesis.id}</code> с критерием успеха — ждёт замера после релиза</li>
