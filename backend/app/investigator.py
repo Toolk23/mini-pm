@@ -96,6 +96,7 @@ def collect_evidence(sig: dict) -> dict:
             seen.add(g["id"])
             uniq.append(g)
     interview_q = [f"{name.split()[0]} лицензия подбор покупка", "сложно выбрать лицензию конфигуратор", "оформление заказа корзина счёт"]
+    analyst = _analyst_evidence(fam)
     competitor_q = [f"{name.split()[0]} цена", "конфигуратор подбор лицензии", "оформление заказа шаги"]
     return {
         "signal": {k: v for k, v in sig.items() if k not in ("series", "control_series", "release_candidates")},
@@ -103,9 +104,9 @@ def collect_evidence(sig: dict) -> dict:
         "funnel": _funnel(sig) if sig.get("kind") == "sales_drop" else {},
         "backlog": _backlog_links(sig),
         "data_gaps": uniq,
-        "interviews": [h for q in interview_q for h in _search(q, 3, "interview")],
-        "competitors": [h for q in competitor_q for h in _search(q, 3, "competitor")],
-        "analyst_evidence": _analyst_evidence(fam),
+        "interviews": _quotes(analyst, "interview") + [h for q in interview_q for h in _search(q, 3, "interview")],
+        "competitors": _quotes(analyst, "competitor") + [h for q in competitor_q for h in _search(q, 3, "competitor")],
+        "analyst_evidence": analyst,
         "web": _web(sig),
         "reference_case_traps": ingest.reference_case()["traps"],
     }
@@ -115,6 +116,24 @@ def _analyst_evidence(fam: str) -> dict | None:
     """Проверенная аналитиком сводка внешних источников (data/curated/evidence_<семейство>.json)."""
     p = config.DATA_DIR / "curated" / f"evidence_{ {'KES': 'kaspersky', 'Astra': 'astra'}.get(fam, fam.lower()) }.json"
     return json.loads(p.read_text("utf-8")) if p.exists() else None
+
+
+def _quotes(analyst: dict | None, kind: str) -> list[dict]:
+    """Точные цитаты из сводки аналитика — в том же формате, что фрагменты поиска, но первыми в списке.
+    Поиск по интервью находит в основном профили респондентов, а здесь — высказывания по сути с выводом."""
+    if not analyst:
+        return []
+    out = []
+    for it in analyst.get("items", []):
+        src = it.get("source", {})
+        is_interview = "интервью" in (src.get("file", "") + src.get("inner", "")).lower()
+        if is_interview != (kind == "interview"):
+            continue
+        out.append({"id": it["id"], "source_type": kind, "file": src.get("inner") or src.get("file"),
+                    "sheet": src.get("sheet"), "row": src.get("row"), "title": it.get("topic"),
+                    "text": it.get("quote"), "finding": it.get("finding"),
+                    "supports_hypothesis": it.get("supports_hypothesis"), "score": None, "curated": True})
+    return out
 
 
 def _web(sig: dict) -> list[dict]:
@@ -184,7 +203,9 @@ def _template_report(ev: dict) -> dict:
          "finding": "Добавление в корзину из конфигуратора для этого семейства не измеряется — это пометка, а не «конверсия равна нулю». "
                     + (f"Открыта задача {t08['task_id']} «{t08['title']}» (приоритет: {t08['priority']})." if t08 else "")},
         {"n": 6, "title": "Внешние источники", "sources": ["Интервью", "Конкурентный анализ"],
-         "finding": (f"Интервью: найдено {len(ev['interviews'])} фрагментов по теме подбора и покупки лицензий. " if ev["interviews"] else
+         "quotes": [q for q in ev["interviews"] + ev["competitors"] if q.get("curated")],
+         "finding": (f"Интервью: найдено {len(ev['interviews'])} фрагментов по теме подбора и покупки лицензий, "
+                     f"из них {sum(1 for q in ev['interviews'] if q.get('curated'))} — проверенные цитаты аналитика. " if ev["interviews"] else
                      "Интервью: прямых упоминаний не найдено — не подтверждено внешними источниками. ")
                     + (f"Конкуренты: {len(ev['competitors'])} фрагментов. " if ev["competitors"] else "Конкуренты: данных нет. ")
                     + (f"Вывод аналитика по внешним источникам: {ev['analyst_evidence']['verdict']} " if ev.get("analyst_evidence") else "")
@@ -232,6 +253,10 @@ def investigate(sig: dict, inv_id: str) -> dict:
             rep, mode = _template_report(ev), f"template (LLM error: {e})"
     else:
         rep, mode = _template_report(ev), "template"
+    quotes = [q for q in ev["interviews"] + ev["competitors"] if q.get("curated")]
+    for st in rep.get("steps", []) or []:  # цитаты аналитика — в шаг «Внешние источники» и в LLM-, и в шаблонном режиме
+        if isinstance(st, dict) and (st.get("n") == 6 or "внешн" in str(st.get("title", "")).lower()):
+            st["quotes"] = quotes
     return {"id": inv_id, "mode": mode, "created_at": store.now(), "evidence": ev, **rep}
 
 

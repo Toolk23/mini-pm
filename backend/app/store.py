@@ -84,15 +84,17 @@ def create_task(title: str, description: str, priority: str = "High", linked_met
     return task
 
 
-def update_task(task_id: str, **changes) -> dict:
+def update_task(task_id: str, by: str = "pm", **changes) -> dict:
+    """by="ai" — изменение от агента (тег «изменена ИИ-помощником»); by="pm" — человек двигает карточку, тег не ставится."""
     tasks = backlog()
     for t in tasks:
         if t["task_id"] == task_id:
             for k, v in changes.items():
                 if v is not None:
-                    t["history"].append({"at": now(), "event": f"{k}: {t.get(k)} → {v}"})
+                    t["history"].append({"at": now(), "event": f"{k}: {t.get(k)} → {v}", "by": by})
                     t[k] = v
-            if config.AI_TAG not in t["tags"] and changes:
+            if by == "ai" and config.AI_TAG not in t["tags"] and "изменена ИИ-помощником" not in t["tags"] \
+                    and any(v is not None for v in changes.values()):
                 t["tags"].append("изменена ИИ-помощником")
             write("backlog", tasks)
             return t

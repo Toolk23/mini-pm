@@ -53,7 +53,7 @@ def apply(rep: dict) -> dict:
     raised = []
     for r in rep.get("raise_tasks") or []:
         try:
-            store.update_task(r["task_id"], priority=r["new_priority"])
+            store.update_task(r["task_id"], by="ai", priority=r["new_priority"])
             raised.append(r)
         except KeyError:
             pass

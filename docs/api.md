@@ -790,6 +790,11 @@
 Без ключа: `{"ok": false, "results": [], "error": "Yandex Search API не настроен …"}`. В `/api/health` — `web_search.configured`.
 Результаты также попадают в отчёт расследования (`evidence.web`) и в чат (`facts.web`, если в вопросе «поищи в интернете», «конкуренты», «рынок» и т.п.).
 Сводка аналитика по внешним источникам — `evidence.analyst_evidence`.
+Её точные цитаты идут первыми в `evidence.interviews` / `evidence.competitors` (тот же формат фрагмента плюс `curated: true`,
+`finding` — вывод аналитика, `supports_hypothesis`) и в `steps[n=6].quotes` отчёта.
+
+Тег задачи «изменена ИИ-помощником» ставится только при изменениях от агента (курьер поднял приоритет, замер закрыл задачу).
+`PATCH /api/backlog/tasks/{id}` от человека тег не ставит; в `history[].by` — `pm` или `ai`.
 
 ## Живой счётчик Яндекс.Метрики
 `GET /api/metrika/live?date1=7daysAgo&date2=today`

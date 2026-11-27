@@ -231,7 +231,7 @@ def measure(hid: str, body: MeasureIn):
     h.update(status=result["verdict"], measurement=result)
     store.write("hypotheses", hs)
     if h.get("task_id"):
-        store.update_task(h["task_id"], status="Done" if result["verdict"] == "confirmed" else "Reopened")
+        store.update_task(h["task_id"], by="ai", status="Done" if result["verdict"] == "confirmed" else "Reopened")
     return result
 
 
