@@ -127,6 +127,10 @@ export default function Layout() {
               <NavLink to="/settings" className={({ isActive }) => `icon-btn${isActive ? ' on' : ''}`} title="Настройки порогов" aria-label="Настройки">
                 <Icons.settings />
               </NavLink>
+              {/* На узких экранах большая кнопка не помещается — вместо неё иконка чата. */}
+              <NavLink to="/chat" className={({ isActive }) => `icon-btn chat-mini${isActive ? ' on' : ''}`} title="Спросить мини ПМ" aria-label="Чат с мини ПМ">
+                <Icons.chat />
+              </NavLink>
               <NavLink to="/chat" className="btn btn-primary btn-cta" title="Ctrl+K — с любой страницы">
                 Спросить мини ПМ <span className="kbd kbd-on-light">Ctrl K</span>
               </NavLink>

@@ -426,3 +426,9 @@ input[type='range']::-webkit-slider-thumb { border-radius: 0; background: var(--
 /* липкие элементы — ровно под шапкой (высота меряется в Layout → --nav-h) */
 .stepper { top: var(--nav-h, 64px) !important; }
 .inv-aside, .mail-list, .sales-list { top: calc(var(--nav-h, 64px) + 12px) !important; }
+
+/* Чат на узких экранах: большая кнопка «Спросить мини ПМ» скрыта, показываем иконку в шапке. */
+.chat-mini { display: none; }
+@media (max-width: 760px) {
+  .chat-mini { display: inline-flex; }
+}
