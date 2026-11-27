@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>API мини ПМ</title>
+  <style>
+
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+  <style type="text/css">body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:980px;margin:0 auto;padding:24px 16px;line-height:1.55;color:#1f2328;background:#fff}
+h1{border-bottom:2px solid #4f46e5;padding-bottom:8px}h2{margin-top:2.2em;border-bottom:1px solid #d0d7de;padding-bottom:4px;color:#3730a3}
+code{background:#f3f4f6;padding:1px 5px;border-radius:4px;font-size:.92em}
+pre{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:8px;overflow-x:auto;font-size:.85em}pre code{background:none;color:inherit;padding:0}
+table{border-collapse:collapse}td,th{border:1px solid #d0d7de;padding:4px 8px}
+#TOC{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 18px;columns:2;font-size:.92em}#TOC ul{margin:4px 0}
+@media (prefers-color-scheme:dark){body{background:#0d1117;color:#e6edf3}code{background:#1f2937}#TOC{background:#161b22;border-color:#30363d}h2{color:#a5b4fc}td,th{border-color:#30363d}}
+</style>
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#api-мини-пм--контракт-для-фронтенда" id="toc-api-мини-пм--контракт-для-фронтенда">API «мини ПМ» — контракт
+для фронтенда</a>
+<ul>
+<li><a href="#состояние" id="toc-состояние">Состояние</a></li>
+<li><a href="#сигналы-детектора-лента" id="toc-сигналы-детектора-лента">Сигналы детектора (лента)</a></li>
+<li><a href="#ряд-метрики--аннотации-релизов--разрывы" id="toc-ряд-метрики--аннотации-релизов--разрывы">Ряд метрики + аннотации
+релизов + разрывы</a></li>
+<li><a href="#справочник-метрик--правила" id="toc-справочник-метрик--правила">Справочник метрик + правила</a></li>
+<li><a href="#продажи-оба-семейства" id="toc-продажи-оба-семейства">Продажи (оба семейства)</a></li>
+<li><a href="#релизы" id="toc-релизы">Релизы</a></li>
+<li><a href="#реестр-разрывов-учёта" id="toc-реестр-разрывов-учёта">Реестр разрывов учёта</a></li>
+<li><a href="#эталонный-кейс-8-шагов--ловушки" id="toc-эталонный-кейс-8-шагов--ловушки">Эталонный кейс (8 шагов +
+ловушки)</a></li>
+<li><a href="#запустить-расследование" id="toc-запустить-расследование">Запустить расследование</a></li>
+<li><a href="#список-расследований" id="toc-список-расследований">Список
+расследований</a></li>
+<li><a href="#применить-задача-с-тегом--приоритеты--гипотеза--письмо" id="toc-применить-задача-с-тегом--приоритеты--гипотеза--письмо">Применить:
+задача с тегом + приоритеты + гипотеза + письмо</a></li>
+<li><a href="#бэклог" id="toc-бэклог">Бэклог</a></li>
+<li><a href="#создать-задачу-тег-ставит-сервер" id="toc-создать-задачу-тег-ставит-сервер">Создать задачу (тег ставит
+сервер)</a></li>
+<li><a href="#изменить-задачу" id="toc-изменить-задачу">Изменить
+задачу</a></li>
+<li><a href="#экспорт-задачи-в-redmine" id="toc-экспорт-задачи-в-redmine">Экспорт задачи в Redmine</a></li>
+<li><a href="#гипотезы" id="toc-гипотезы">Гипотезы</a></li>
+<li><a href="#замер-эффекта-синтетика-после-хотфикса" id="toc-замер-эффекта-синтетика-после-хотфикса">Замер эффекта (синтетика
+после хотфикса)</a></li>
+<li><a href="#настройки-детектора" id="toc-настройки-детектора">Настройки детектора</a></li>
+<li><a href="#изменить-правило-метрики" id="toc-изменить-правило-метрики">Изменить правило метрики</a></li>
+<li><a href="#сбросить-настройки" id="toc-сбросить-настройки">Сбросить
+настройки</a></li>
+<li><a href="#поиск-по-базе-знаний" id="toc-поиск-по-базе-знаний">Поиск
+по базе знаний</a></li>
+<li><a href="#загрузить-новое-исследование" id="toc-загрузить-новое-исследование">Загрузить новое
+исследование</a></li>
+<li><a href="#чат" id="toc-чат">Чат</a></li>
+<li><a href="#поиск-в-интернете-yandex-search-api" id="toc-поиск-в-интернете-yandex-search-api">Поиск в интернете (Yandex
+Search API)</a></li>
+<li><a href="#почта-отправка-на-тестовый-ящик" id="toc-почта-отправка-на-тестовый-ящик">Почта (отправка на тестовый
+ящик)</a></li>
+<li><a href="#экспорт-бэклога-в-redmine" id="toc-экспорт-бэклога-в-redmine">Экспорт бэклога в Redmine</a></li>
+<li><a href="#живая-карточка-товара-storesoftlineru" id="toc-живая-карточка-товара-storesoftlineru">Живая карточка товара
+(store.softline.ru)</a></li>
+<li><a href="#справка-для-отдела-продаж" id="toc-справка-для-отдела-продаж">Справка для отдела продаж</a></li>
+<li><a href="#живой-счётчик-яндексметрики" id="toc-живой-счётчик-яндексметрики">Живой счётчик
+Яндекс.Метрики</a></li>
+<li><a href="#токены-по-шагам-для-калькулятора" id="toc-токены-по-шагам-для-калькулятора">Токены по шагам (для
+калькулятора)</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="api-мини-пм--контракт-для-фронтенда">API «мини ПМ» — контракт
+для фронтенда</h1>
+<p>Базовый адрес локально: <code>http://127.0.0.1:8000/api</code>. На
+стенде — тот же домен, <code>/api</code>. Все ответы — JSON. Примеры
+ниже — реальные ответы сервера (сокращены: списки до 2 элементов,
+длинные строки обрезаны).</p>
+<h2 id="состояние">Состояние</h2>
+<p><code>GET /api/health</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;ok&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;data&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;metrics_catalog&quot;</span><span class="fu">:</span> <span class="dv">16</span><span class="fu">,</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;metrics_data&quot;</span><span class="fu">:</span> <span class="dv">3698</span><span class="fu">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;releases&quot;</span><span class="fu">:</span> <span class="dv">11</span><span class="fu">,</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;backlog&quot;</span><span class="fu">:</span> <span class="dv">8</span><span class="fu">,</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;sales&quot;</span><span class="fu">:</span> <span class="dv">58</span><span class="fu">,</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;reference_steps&quot;</span><span class="fu">:</span> <span class="dv">8</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;llm&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;configured&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;provider&quot;</span><span class="fu">:</span> <span class="st">&quot;deepseek&quot;</span><span class="fu">,</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;model&quot;</span><span class="fu">:</span> <span class="st">&quot;deepseek-chat&quot;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;metrika&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;configured&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="сигналы-детектора-лента">Сигналы детектора (лента)</h2>
+<p><code>GET /api/signals</code> — sales_drop — главный кейс KES;
+series/control_series — точки для графика</p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;SIG-SALES-KES&quot;</span><span class="fu">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;kind&quot;</span><span class="fu">:</span> <span class="st">&quot;sales_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;metric_id&quot;</span><span class="fu">:</span> <span class="st">&quot;family_orders_idx&quot;</span><span class="fu">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;product&quot;</span><span class="fu">:</span> <span class="st">&quot;Kaspersky Endpoint Security&quot;</span><span class="fu">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;family&quot;</span><span class="fu">:</span> <span class="st">&quot;KES&quot;</span><span class="fu">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Critical&quot;</span><span class="fu">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;Падение самостоятельных заказов KES: -33.9% к базе&quot;</span><span class="fu">,</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;change&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;baseline_mean&quot;</span><span class="fu">:</span> <span class="fl">165.8</span><span class="fu">,</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;post_mean&quot;</span><span class="fu">:</span> <span class="fl">109.7</span><span class="fu">,</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;change_pct&quot;</span><span class="fu">:</span> <span class="fl">-33.9</span><span class="fu">,</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;baseline_period&quot;</span><span class="fu">:</span> <span class="st">&quot;29.06.2026–21.09.2026&quot;</span><span class="fu">,</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;post_period&quot;</span><span class="fu">:</span> <span class="st">&quot;05.10.2026–09.11.2026&quot;</span><span class="fu">,</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;baseline_weeks&quot;</span><span class="fu">:</span> <span class="dv">13</span><span class="fu">,</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;post_weeks&quot;</span><span class="fu">:</span> <span class="dv">6</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;split_week&quot;</span><span class="fu">:</span> <span class="st">&quot;28.09.2026&quot;</span><span class="fu">,</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;before&quot;</span><span class="fu">:</span> <span class="fl">169.5</span><span class="fu">,</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;after_min&quot;</span><span class="fu">:</span> <span class="fl">97.8</span><span class="fu">,</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;after_last&quot;</span><span class="fu">:</span> <span class="fl">118.2</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;threshold_pct&quot;</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">,</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;control&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;family&quot;</span><span class="fu">:</span> <span class="st">&quot;Astra&quot;</span><span class="fu">,</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;Astra Linux Special Edition&quot;</span><span class="fu">,</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;baseline_mean&quot;</span><span class="fu">:</span> <span class="fl">98.5</span><span class="fu">,</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;post_mean&quot;</span><span class="fu">:</span> <span class="fl">101.5</span><span class="fu">,</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;change_pct&quot;</span><span class="fu">:</span> <span class="fl">3.0</span><span class="fu">,</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;baseline_period&quot;</span><span class="fu">:</span> <span class="st">&quot;29.06.2026–21.09.2026&quot;</span><span class="fu">,</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;post_period&quot;</span><span class="fu">:</span> <span class="st">&quot;05.10.2026–09.11.2026&quot;</span><span class="fu">,</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;baseline_weeks&quot;</span><span class="fu">:</span> <span class="dv">13</span><span class="fu">,</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;post_weeks&quot;</span><span class="fu">:</span> <span class="dv">6</span><span class="fu">,</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;stable&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;conclusion&quot;</span><span class="fu">:</span> <span class="st">&quot;Контроль стабилен — падение специфично для KES&quot;</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_candidates&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;release_id&quot;</span><span class="fu">:</span> <span class="st">&quot;R-07&quot;</span><span class="fu">,</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;date&quot;</span><span class="fu">:</span> <span class="st">&quot;16.09.2026&quot;</span><span class="fu">,</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;major&quot;</span><span class="fu">,</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Новая шапка ЛК с поиском товаров интернет-магазина, каталогом, корзиной и избранным магазина, обновленное боковое меню&quot;</span><span class="fu">,</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;affected_metrics&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;lk_search_to_store&quot;</span><span class="ot">,</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;lk_home_views&quot;</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;related_task_ids&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;T-06&quot;</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        <span class="ot">]</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;release_id&quot;</span><span class="fu">:</span> <span class="st">&quot;R-08&quot;</span><span class="fu">,</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;date&quot;</span><span class="fu">:</span> <span class="st">&quot;29.09.2026&quot;</span><span class="fu">,</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;infrastructure&quot;</span><span class="fu">,</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Изменен механизм входа на сайт интернет-магазина. С 29.09 по 05.10 терялись источники трафика, с 06.10 визитные показатели несопоставимы с п…&quot;</span><span class="fu">,</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;affected_metrics&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;cfg_family_views&quot;</span><span class="ot">,</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>          <span class="st">&quot;cfg_reach_rate&quot;</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;related_task_ids&quot;</span><span class="fu">:</span> <span class="ot">[]</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;…&quot;</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;caveats&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Неделя 08.06.2026 — разовый всплеск (144.0), исключена из расчёта: это не эффект релиза.&quot;</span><span class="ot">,</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Неделя 28.09.2026 — разовый всплеск (246.0), исключена из расчёта: это не эффект релиза.&quot;</span><span class="ot">,</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;…&quot;</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;series&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-04&quot;</span><span class="fu">,</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">62.0</span><span class="fu">,</span></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-11&quot;</span><span class="fu">,</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">123.0</span><span class="fu">,</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;…&quot;</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;control_series&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-04&quot;</span><span class="fu">,</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">42.0</span><span class="fu">,</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-11&quot;</span><span class="fu">,</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">42.0</span><span class="fu">,</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;…&quot;</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;SIG-lk_reco_click_visits-ЛК&quot;</span><span class="fu">,</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;kind&quot;</span><span class="fu">:</span> <span class="st">&quot;zero_weeks&quot;</span><span class="fu">,</span></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;metric_id&quot;</span><span class="fu">:</span> <span class="st">&quot;lk_reco_click_visits&quot;</span><span class="fu">,</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;product&quot;</span><span class="fu">:</span> <span class="st">&quot;ЛК&quot;</span><span class="fu">,</span></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span><span class="fu">,</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;lk_reco_click_visits: 5 нед. без событий из 15&quot;</span><span class="fu">,</span></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;facts&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;zero_weeks&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;17.08.2026&quot;</span><span class="ot">,</span></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;14.09.2026&quot;</span><span class="ot">,</span></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;…&quot;</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>      <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;weeks_total&quot;</span><span class="fu">:</span> <span class="dv">15</span><span class="fu">,</span></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;last_values&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>        <span class="fl">0.0</span><span class="ot">,</span></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>        <span class="fl">2.0</span><span class="ot">,</span></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;…&quot;</span></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>      <span class="ot">]</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;caveats&quot;</span><span class="fu">:</span> <span class="ot">[]</span></span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;…&quot;</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
+<h2 id="ряд-метрики--аннотации-релизов--разрывы">Ряд метрики + аннотации
+релизов + разрывы</h2>
+<p><code>GET /api/metrics/{metric_id}/series?product=</code> — product:
+«Конфигуратор Kaspersky» | «Конфигуратор Астра» | «ЛК»</p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;metric_id&quot;</span><span class="fu">:</span> <span class="st">&quot;family_orders_idx&quot;</span><span class="fu">,</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;product&quot;</span><span class="fu">:</span> <span class="st">&quot;Конфигуратор Kaspersky&quot;</span><span class="fu">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;points&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-04&quot;</span><span class="fu">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">62.0</span><span class="fu">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-11&quot;</span><span class="fu">,</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">123.0</span><span class="fu">,</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;…&quot;</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;annotations&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;release&quot;</span><span class="fu">,</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;R-01&quot;</span><span class="fu">,</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;date&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-04-06&quot;</span><span class="fu">,</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;R-01 (major)&quot;</span><span class="fu">,</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Конфигуратор Astra Linux: на странице семейства вместо полного списка лицензий пошаговый подбор в отдельном окне&quot;</span><span class="fu">,</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;affects_metric&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;release&quot;</span><span class="fu">,</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;R-02&quot;</span><span class="fu">,</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;date&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-12&quot;</span><span class="fu">,</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;label&quot;</span><span class="fu">:</span> <span class="st">&quot;R-02 (minor)&quot;</span><span class="fu">,</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Доработки конфигуратора Astra Linux: автопропуск шагов без выбора, цена «от» у вариантов, количество для позиций, которые продаются по неско…&quot;</span><span class="fu">,</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;affects_metric&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;…&quot;</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;gaps&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;G-01&quot;</span><span class="fu">,</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;scope&quot;</span><span class="fu">:</span> <span class="st">&quot;family_orders_idx&quot;</span><span class="fu">,</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;until&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-04&quot;</span><span class="fu">,</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;Самостоятельные заказы учитываются с 04.05.2026 — раньше данных о продажах нет.&quot;</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;G-09&quot;</span><span class="fu">,</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;scope&quot;</span><span class="fu">:</span> <span class="st">&quot;family_orders_idx&quot;</span><span class="fu">,</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;last_week&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;Последняя неделя в листе «Продажи» может быть неполной.&quot;</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;…&quot;</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="справочник-метрик--правила">Справочник метрик + правила</h2>
+<p><code>GET /api/metrics</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;metric_id&quot;</span><span class="fu">:</span> <span class="st">&quot;cfg_family_views&quot;</span><span class="fu">,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;metric_name&quot;</span><span class="fu">:</span> <span class="st">&quot;Визиты на страницу семейства&quot;</span><span class="fu">,</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;what_it_means&quot;</span><span class="fu">:</span> <span class="st">&quot;Сколько визитов включали страницу семейства, на которой стоит конфигуратор. Вход в воронку подбора&quot;</span><span class="fu">,</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;formula_or_logic&quot;</span><span class="fu">:</span> <span class="st">&quot;Количество визитов, в которых была просмотрена страница семейства&quot;</span><span class="fu">,</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="st">&quot;Яндекс Метрика&quot;</span><span class="fu">,</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;segment&quot;</span><span class="fu">:</span> <span class="st">&quot;семейство (Астра, Kaspersky), устройство&quot;</span><span class="fu">,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;target_value&quot;</span><span class="fu">:</span> <span class="st">&quot;Нет плана. База: среднее за 4 недели до релиза&quot;</span><span class="fu">,</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;bad_signal&quot;</span><span class="fu">:</span> <span class="st">&quot;Падение &gt;20% неделя к неделе&quot;</span><span class="fu">,</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;priority_impact&quot;</span><span class="fu">:</span> <span class="st">&quot;Medium&quot;</span><span class="fu">,</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="st">&quot;Астра и Kaspersky с 01.02.2026. Визитный показатель: после 29.09.2026 визиты могут дробиться, сравнивать с периодом до 29.09 осторожно&quot;</span><span class="fu">,</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pct_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">,</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Medium&quot;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;metric_id&quot;</span><span class="fu">:</span> <span class="st">&quot;cfg_open&quot;</span><span class="fu">,</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;metric_name&quot;</span><span class="fu">:</span> <span class="st">&quot;Открытия конфигуратора&quot;</span><span class="fu">,</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;what_it_means&quot;</span><span class="fu">:</span> <span class="st">&quot;Сколько раз пользователи начали подбор лицензии&quot;</span><span class="fu">,</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;formula_or_logic&quot;</span><span class="fu">:</span> <span class="st">&quot;Количество событий конфигуратора с типом «открытие»&quot;</span><span class="fu">,</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="st">&quot;Яндекс Метрика&quot;</span><span class="fu">,</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;segment&quot;</span><span class="fu">:</span> <span class="st">&quot;конфигуратор, устройство&quot;</span><span class="fu">,</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;target_value&quot;</span><span class="fu">:</span> <span class="st">&quot;Нет плана. База: среднее за 4 недели до релиза&quot;</span><span class="fu">,</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;bad_signal&quot;</span><span class="fu">:</span> <span class="st">&quot;Падение &gt;20% неделя к неделе при неизменных просмотрах страницы семейства&quot;</span><span class="fu">,</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;priority_impact&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span><span class="fu">,</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="st">&quot;События конфигуратора есть с 04.06.2026, для Астры более ранних данных нет. У Kaspersky нет события открытия, вместо него считаются визиты с…&quot;</span><span class="fu">,</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pct_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">,</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;…&quot;</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
+<h2 id="продажи-оба-семейства">Продажи (оба семейства)</h2>
+<p><code>GET /api/sales</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;KES&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-04&quot;</span><span class="fu">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">62.0</span><span class="fu">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-11&quot;</span><span class="fu">,</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">123.0</span><span class="fu">,</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;…&quot;</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;Astra&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-04&quot;</span><span class="fu">,</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">42.0</span><span class="fu">,</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;week_start&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-11&quot;</span><span class="fu">,</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fl">42.0</span><span class="fu">,</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rolling&quot;</span><span class="fu">:</span> <span class="kw">null</span><span class="fu">,</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;spike&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;incomplete&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;comment&quot;</span><span class="fu">:</span> <span class="kw">null</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;…&quot;</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="релизы">Релизы</h2>
+<p><code>GET /api/releases</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_id&quot;</span><span class="fu">:</span> <span class="st">&quot;R-01&quot;</span><span class="fu">,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_date&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-04-06&quot;</span><span class="fu">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_type&quot;</span><span class="fu">:</span> <span class="st">&quot;major&quot;</span><span class="fu">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Конфигуратор Astra Linux: на странице семейства вместо полного списка лицензий пошаговый подбор в отдельном окне&quot;</span><span class="fu">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;related_task_ids&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;T-01&quot;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;affected_metrics&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;cfg_family_views&quot;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;выпущен&quot;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_id&quot;</span><span class="fu">:</span> <span class="st">&quot;R-02&quot;</span><span class="fu">,</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_date&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-12&quot;</span><span class="fu">,</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_type&quot;</span><span class="fu">:</span> <span class="st">&quot;minor&quot;</span><span class="fu">,</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Доработки конфигуратора Astra Linux: автопропуск шагов без выбора, цена «от» у вариантов, количество для позиций, которые продаются по неско…&quot;</span><span class="fu">,</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;related_task_ids&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;T-02&quot;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;affected_metrics&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;cfg_family_views&quot;</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;выпущен&quot;</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;…&quot;</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
+<h2 id="реестр-разрывов-учёта">Реестр разрывов учёта</h2>
+<p><code>GET /api/data-gaps</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;G-01&quot;</span><span class="fu">,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;scope&quot;</span><span class="fu">:</span> <span class="st">&quot;family_orders_idx&quot;</span><span class="fu">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;until&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-04&quot;</span><span class="fu">,</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;Самостоятельные заказы учитываются с 04.05.2026 — раньше данных о продажах нет.&quot;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;G-02&quot;</span><span class="fu">,</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;scope&quot;</span><span class="fu">:</span> <span class="st">&quot;cfg_*&quot;</span><span class="fu">,</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;until&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-06-04&quot;</span><span class="fu">,</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;События конфигураторов переведены на новую схему 04.06.2026 — события раньше этой даты недоступны.&quot;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;…&quot;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
+<h2 id="эталонный-кейс-8-шагов--ловушки">Эталонный кейс (8 шагов +
+ловушки)</h2>
+<p><code>GET /api/reference-case</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;Кейс: падение самостоятельных заказов Kaspersky Endpoint Security после релиза конфигуратора&quot;</span><span class="fu">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;note&quot;</span><span class="fu">:</span> <span class="st">&quot;Причина падения организаторам заранее не известна. Кейс проверяет, как агент находит сигнал, сверяет источники и формулирует проверяемые гип…&quot;</span><span class="fu">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;steps&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;step&quot;</span><span class="fu">:</span> <span class="st">&quot;1&quot;</span><span class="fu">,</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;what_agent_sees&quot;</span><span class="fu">:</span> <span class="st">&quot;Индекс заказов Kaspersky Endpoint Security: среднее недельное значение с 05.10 на треть ниже, чем за 29.06-21.09 (около 112 против 166). Ско…&quot;</span><span class="fu">,</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;expected_action&quot;</span><span class="fu">:</span> <span class="st">&quot;Зафиксировать отклонение и проверить, что это не шум: смотреть скользящее среднее, а не отдельные недели&quot;</span><span class="fu">,</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;expected_result&quot;</span><span class="fu">:</span> <span class="st">&quot;Сигнал: устойчивое падение самостоятельных заказов KES примерно на 33%&quot;</span><span class="fu">,</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;sheets_used&quot;</span><span class="fu">:</span> <span class="st">&quot;Продажи&quot;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;step&quot;</span><span class="fu">:</span> <span class="st">&quot;2&quot;</span><span class="fu">,</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;what_agent_sees&quot;</span><span class="fu">:</span> <span class="st">&quot;Индекс заказов Astra Linux Special Edition за те же недели почти не изменился (около -3%)&quot;</span><span class="fu">,</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;expected_action&quot;</span><span class="fu">:</span> <span class="st">&quot;Сравнить с другим семейством той же витрины как с контрольной группой&quot;</span><span class="fu">,</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;expected_result&quot;</span><span class="fu">:</span> <span class="st">&quot;Падение специфично для KES и не объясняется общей динамикой магазина&quot;</span><span class="fu">,</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;sheets_used&quot;</span><span class="fu">:</span> <span class="st">&quot;Продажи&quot;</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;…&quot;</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;traps&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;R-08 и R-09 разделяют два дня: без контрольной группы их эффекты легко спутать&quot;</span><span class="ot">,</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Неделя с 28.09 дает разовый всплеск индекса KES перед падением: это не эффект релиза&quot;</span><span class="ot">,</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;…&quot;</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="запустить-расследование">Запустить расследование</h2>
+<p><code>POST /api/investigations</code> — фоново; дальше опрашивать GET
+раз в 2 с, пока status != running</p>
+<p>Тело запроса:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;signal_id&quot;</span><span class="fu">:</span> <span class="st">&quot;SIG-SALES-KES&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;INV-XXXXXX&quot;</span><span class="fu">,</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;running&quot;</span><span class="fu">,</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;signal_id&quot;</span><span class="fu">:</span> <span class="st">&quot;SIG-SALES-KES&quot;</span><span class="fu">,</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;created_at&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="список-расследований">Список расследований</h2>
+<p><code>GET /api/investigations</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[]</span></span></code></pre></div>
+<h2 id="применить-задача-с-тегом--приоритеты--гипотеза--письмо">Применить:
+задача с тегом + приоритеты + гипотеза + письмо</h2>
+<p><code>POST /api/investigations/{id}/apply</code> — идемпотентно:
+повторный вызов вернёт тот же результат</p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;task&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;task_id&quot;</span><span class="fu">:</span> <span class="st">&quot;T-09&quot;</span><span class="fu">,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;сгенерирована ИИ-помощником&quot;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;raised&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;task_id&quot;</span><span class="fu">:</span> <span class="st">&quot;T-08&quot;</span><span class="fu">,</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;new_priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;hypothesis&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;H-01&quot;</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;email&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;subject&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;body&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;eml_path&quot;</span><span class="fu">:</span> <span class="st">&quot;state/outbox/INV-….eml&quot;</span><span class="fu">,</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;dion&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;channel&quot;</span><span class="fu">:</span> <span class="st">&quot;Dion · мини ПМ&quot;</span><span class="fu">,</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="бэклог">Бэклог</h2>
+<p><code>GET /api/backlog/tasks</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;task_id&quot;</span><span class="fu">:</span> <span class="st">&quot;T-01&quot;</span><span class="fu">,</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;Конфигуратор для семейства Astra Linux&quot;</span><span class="fu">,</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;Фича&quot;</span><span class="fu">,</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;Done&quot;</span><span class="fu">,</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Low&quot;</span><span class="fu">,</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;created_date&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-01-12&quot;</span><span class="fu">,</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;closed_date&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-04-06&quot;</span><span class="fu">,</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_id&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;R-01&quot;</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;На странице семейства невозможно было вывести все 3 000+ позиций, выбрать нужную было очень сложно. Теперь выбор делается в конфигураторе по…&quot;</span><span class="fu">,</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;linked_metric_ids&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;cfg_family_views&quot;</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Исследование&quot;</span><span class="ot">,</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Жалобы&quot;</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;history&quot;</span><span class="fu">:</span> <span class="ot">[]</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;task_id&quot;</span><span class="fu">:</span> <span class="st">&quot;T-02&quot;</span><span class="fu">,</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;Доработки конфигуратора Astra Linux: шаги, «цена от», кратность&quot;</span><span class="fu">,</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;Улучшение&quot;</span><span class="fu">,</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;Done&quot;</span><span class="fu">,</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Medium&quot;</span><span class="fu">,</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;created_date&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-04-16&quot;</span><span class="fu">,</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;closed_date&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-12&quot;</span><span class="fu">,</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_id&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;R-02&quot;</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;По итогам демо: пропуск шагов без вариантов выбора, блокировка следующих шагов при смене ответа, цена «от» у каждого варианта, количество в …&quot;</span><span class="fu">,</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;linked_metric_ids&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;cfg_family_views&quot;</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Гипотеза&quot;</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;history&quot;</span><span class="fu">:</span> <span class="ot">[]</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;…&quot;</span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
+<h2 id="создать-задачу-тег-ставит-сервер">Создать задачу (тег ставит
+сервер)</h2>
+<p><code>POST /api/backlog/tasks</code></p>
+<p>Тело запроса:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span><span class="fu">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;linked_metric_ids&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;family_orders_idx&quot;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="изменить-задачу">Изменить задачу</h2>
+<p><code>PATCH /api/backlog/tasks/{task_id}</code></p>
+<p>Тело запроса:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;In Progress&quot;</span><span class="fu">,</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="экспорт-задачи-в-redmine">Экспорт задачи в Redmine</h2>
+<p><code>GET /api/backlog/tasks/{task_id}/redmine</code></p>
+<h2 id="гипотезы">Гипотезы</h2>
+<p><code>GET /api/hypotheses</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[]</span></span></code></pre></div>
+<h2 id="замер-эффекта-синтетика-после-хотфикса">Замер эффекта (синтетика
+после хотфикса)</h2>
+<p><code>POST /api/hypotheses/{id}/measure</code> — verdict: confirmed |
+rejected; связанная задача → Done | Reopened</p>
+<p>Тело запроса:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;scenario&quot;</span><span class="fu">:</span> <span class="st">&quot;recovered | not_recovered&quot;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="настройки-детектора">Настройки детектора</h2>
+<p><code>GET /api/settings</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;detector&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;rolling_window_weeks&quot;</span><span class="fu">:</span> <span class="dv">4</span><span class="fu">,</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;baseline_weeks&quot;</span><span class="fu">:</span> <span class="dv">13</span><span class="fu">,</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;min_post_weeks&quot;</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;spike_ratio&quot;</span><span class="fu">:</span> <span class="fl">1.3</span><span class="fu">,</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;release_window_days&quot;</span><span class="fu">:</span> <span class="dv">14</span><span class="fu">,</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;control_max_change_pct&quot;</span><span class="fu">:</span> <span class="dv">10</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sources_weights&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;metrika&quot;</span><span class="fu">:</span> <span class="fl">0.4</span><span class="fu">,</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;backlog&quot;</span><span class="fu">:</span> <span class="fl">0.25</span><span class="fu">,</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;interviews&quot;</span><span class="fu">:</span> <span class="fl">0.2</span><span class="fu">,</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;competitors&quot;</span><span class="fu">:</span> <span class="fl">0.15</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;metrics&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;family_orders_idx&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pct_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">,</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Critical&quot;</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;cfg_family_views&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pct_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">,</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Medium&quot;</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;cfg_open&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pct_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">,</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;cfg_reach_rate&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pp_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">5</span><span class="fu">,</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;cfg_completion_rate&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pp_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">5</span><span class="fu">,</span></span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;cfg_back_reset_rate&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pct_rise&quot;</span><span class="fu">,</span></span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">30</span><span class="fu">,</span></span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Medium&quot;</span></span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;cfg_add_to_cart_rate&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pp_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Critical&quot;</span></span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;lk_home_views&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pct_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">30</span><span class="fu">,</span></span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Medium&quot;</span></span>
+<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;lk_reco_status_visits&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pct_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">30</span><span class="fu">,</span></span>
+<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;Medium&quot;</span></span>
+<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;lk_reco_shown_share&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pp_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">10</span><span class="fu">,</span></span>
+<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;lk_reco_click_visits&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-78"><a href="#cb18-78" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-79"><a href="#cb18-79" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;zero_week&quot;</span><span class="fu">,</span></span>
+<span id="cb18-80"><a href="#cb18-80" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb18-81"><a href="#cb18-81" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb18-82"><a href="#cb18-82" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb18-83"><a href="#cb18-83" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;lk_reco_ctr&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb18-84"><a href="#cb18-84" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb18-85"><a href="#cb18-85" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rule&quot;</span><span class="fu">:</span> <span class="st">&quot;pct_drop&quot;</span><span class="fu">,</span></span>
+<span id="cb18-86"><a href="#cb18-86" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">30</span><span class="fu">,</span></span>
+<span id="cb18-87"><a href="#cb18-87" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb18-88"><a href="#cb18-88" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb18-89"><a href="#cb18-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb18-90"><a href="#cb18-90" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="изменить-правило-метрики">Изменить правило метрики</h2>
+<p><code>PUT /api/settings/metrics/{metric_id}</code> — после изменения
+перезапросить /api/signals</p>
+<p>Тело запроса:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;threshold&quot;</span><span class="fu">:</span> <span class="dv">40</span><span class="fu">,</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;enabled&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="сбросить-настройки">Сбросить настройки</h2>
+<p><code>POST /api/settings/reset</code></p>
+<h2 id="поиск-по-базе-знаний">Поиск по базе знаний</h2>
+<p><code>GET /api/knowledge/search?q=&amp;k=8&amp;source=interview|competitor|upload</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;dd5a79fe8b08&quot;</span><span class="fu">,</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;source_type&quot;</span><span class="fu">:</span> <span class="st">&quot;interview&quot;</span><span class="fu">,</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;file&quot;</span><span class="fu">:</span> <span class="st">&quot;E-com ответы нап впоросы по когортам.xlsx&quot;</span><span class="fu">,</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;sheet&quot;</span><span class="fu">:</span> <span class="st">&quot;Отток&quot;</span><span class="fu">,</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;row&quot;</span><span class="fu">:</span> <span class="dv">9</span><span class="fu">,</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;E-com ответы нап впоросы по когортам / Отток / респондент 7&quot;</span><span class="fu">,</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;[E-com ответы нап впоросы по когортам / Отток] Вопрос: Расскажите про ваш последний заказ в store.softline.ru: что было хорошо и что разочар…&quot;</span><span class="fu">,</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;score&quot;</span><span class="fu">:</span> <span class="fl">14.812</span><span class="fu">,</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;meta&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;study&quot;</span><span class="fu">:</span> <span class="st">&quot;E-com ответы нап впоросы по когортам&quot;</span><span class="fu">,</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;cohort&quot;</span><span class="fu">:</span> <span class="st">&quot;Отток&quot;</span><span class="fu">,</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;role&quot;</span><span class="fu">:</span> <span class="st">&quot;Начальник отдела ИТО (отвечает за всё внутреннее IT).&quot;</span><span class="fu">,</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;respondent_id&quot;</span><span class="fu">:</span> <span class="st">&quot;763bf0dec1&quot;</span><span class="fu">,</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;kind&quot;</span><span class="fu">:</span> <span class="st">&quot;answer&quot;</span><span class="fu">,</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;question&quot;</span><span class="fu">:</span> <span class="st">&quot;Расскажите про ваш последний заказ в store.softline.ru: что было хорошо и что разочаровало?&quot;</span><span class="fu">,</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;question_col&quot;</span><span class="fu">:</span> <span class="dv">4</span><span class="fu">,</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;checkout&quot;</span><span class="ot">,</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;payment&quot;</span><span class="ot">,</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;…&quot;</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>      <span class="ot">]</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;937742354140&quot;</span><span class="fu">,</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;source_type&quot;</span><span class="fu">:</span> <span class="st">&quot;interview&quot;</span><span class="fu">,</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;file&quot;</span><span class="fu">:</span> <span class="st">&quot;E-com ответы нап впоросы по когортам.xlsx&quot;</span><span class="fu">,</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;sheet&quot;</span><span class="fu">:</span> <span class="st">&quot;Отток&quot;</span><span class="fu">,</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;row&quot;</span><span class="fu">:</span> <span class="dv">9</span><span class="fu">,</span></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;E-com ответы нап впоросы по когортам / Отток / респондент 7&quot;</span><span class="fu">,</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;[E-com ответы нап впоросы по когортам / Отток] Вопрос: Опишите идеальный сценарий покупки для вас. Чем он отличается от опыта у нас?</span><span class="ch">\n</span><span class="st">Ответ: …&quot;</span><span class="fu">,</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;score&quot;</span><span class="fu">:</span> <span class="fl">12.2051</span><span class="fu">,</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;meta&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;study&quot;</span><span class="fu">:</span> <span class="st">&quot;E-com ответы нап впоросы по когортам&quot;</span><span class="fu">,</span></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;cohort&quot;</span><span class="fu">:</span> <span class="st">&quot;Отток&quot;</span><span class="fu">,</span></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;role&quot;</span><span class="fu">:</span> <span class="st">&quot;Начальник отдела ИТО (отвечает за всё внутреннее IT).&quot;</span><span class="fu">,</span></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;respondent_id&quot;</span><span class="fu">:</span> <span class="st">&quot;763bf0dec1&quot;</span><span class="fu">,</span></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;kind&quot;</span><span class="fu">:</span> <span class="st">&quot;answer&quot;</span><span class="fu">,</span></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;question&quot;</span><span class="fu">:</span> <span class="st">&quot;Опишите идеальный сценарий покупки для вас. Чем он отличается от опыта у нас?&quot;</span><span class="fu">,</span></span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;question_col&quot;</span><span class="fu">:</span> <span class="dv">9</span><span class="fu">,</span></span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;tags&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;payment&quot;</span><span class="ot">,</span></span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;invoice&quot;</span><span class="ot">,</span></span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;…&quot;</span></span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a>      <span class="ot">]</span></span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
+<h2 id="загрузить-новое-исследование">Загрузить новое исследование</h2>
+<p><code>POST /api/knowledge/upload</code> — multipart/form-data, поле
+file (xlsx/csv/txt/md/docx)</p>
+<h2 id="чат">Чат</h2>
+<p><code>POST /api/chat</code></p>
+<p>Тело запроса:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;message&quot;</span><span class="fu">:</span> <span class="st">&quot;Что клиенты говорят про счета?&quot;</span><span class="fu">,</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;history&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;role&quot;</span><span class="fu">:</span> <span class="st">&quot;user&quot;</span><span class="fu">,</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;content&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;role&quot;</span><span class="fu">:</span> <span class="st">&quot;assistant&quot;</span><span class="fu">,</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;content&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;answer&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sources&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;…как в knowledge/search&quot;</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;facts&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;signals_detailed&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;…сигналы по упомянутому семейству (или критичные): цифры, контроль, релизы с оценкой, итог расследования&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;other_signals&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;priority&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">}</span><span class="ot">]</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;mode&quot;</span><span class="fu">:</span> <span class="st">&quot;llm | search_only&quot;</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><code>facts</code> — какие данные магазина модель видела при ответе
+(можно показать в UI блоком «На чём основан ответ»).</p>
+<h2 id="поиск-в-интернете-yandex-search-api">Поиск в интернете (Yandex
+Search API)</h2>
+<p><code>GET /api/web/search?q=купить kaspersky endpoint security&amp;k=5</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">&quot;ok&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span> <span class="dt">&quot;query&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="st">&quot;Yandex Search API&quot;</span><span class="fu">,</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;results&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;domain&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;snippet&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">}</span><span class="ot">]</span><span class="fu">}</span></span></code></pre></div>
+<p>Без ключа:
+<code>{&quot;ok&quot;: false, &quot;results&quot;: [], &quot;error&quot;: &quot;Yandex Search API не настроен …&quot;}</code>.
+В <code>/api/health</code> — <code>web_search.configured</code>.
+Результаты также попадают в отчёт расследования
+(<code>evidence.web</code>) и в чат (<code>facts.web</code>, если в
+вопросе «поищи в интернете», «конкуренты», «рынок» и т.п.). Сводка
+аналитика по внешним источникам —
+<code>evidence.analyst_evidence</code>. Её точные цитаты идут первыми в
+<code>evidence.interviews</code> / <code>evidence.competitors</code>
+(тот же формат фрагмента плюс <code>curated: true</code>,
+<code>finding</code> — вывод аналитика,
+<code>supports_hypothesis</code>) и в <code>steps[n=6].quotes</code>
+отчёта.</p>
+<p>Тег задачи «изменена ИИ-помощником» ставится только при изменениях от
+агента (курьер поднял приоритет, замер закрыл задачу).
+<code>PATCH /api/backlog/tasks/{id}</code> от человека тег не ставит; в
+<code>history[].by</code> — <code>pm</code> или <code>ai</code>.</p>
+<h2 id="почта-отправка-на-тестовый-ящик">Почта (отправка на тестовый
+ящик)</h2>
+<p>При <code>POST /api/investigations/{id}/apply</code> письмо ПМу
+сохраняется в <code>outbox/*.eml</code> и, если настроен SMTP
+(<code>SMTP_USER</code>, <code>SMTP_PASSWORD</code>,
+<code>MAIL_TO</code>), отправляется. В ответе <code>email.sent</code>:
+<code>{&quot;ok&quot;: true, &quot;to&quot;: &quot;…&quot;, &quot;at&quot;: &quot;…&quot;}</code> или
+<code>{&quot;ok&quot;: false, &quot;error&quot;: &quot;…&quot;}</code>. <code>email.to</code> —
+адресат.</p>
+<ul>
+<li><code>POST /api/investigations/{id}/send-email</code> — отправить
+ещё раз;</li>
+<li><code>POST /api/sales-briefs/{id}/send</code> — разослать справку
+отделу продаж;</li>
+<li><code>GET /api/mail/log</code> — журнал отправленных писем; в
+<code>/api/health</code> — <code>mail.configured</code>,
+<code>mail.to</code>.</li>
+</ul>
+<h2 id="экспорт-бэклога-в-redmine">Экспорт бэклога в Redmine</h2>
+<ul>
+<li><code>GET /api/backlog/tasks/{id}/redmine</code> — JSON для
+<code>POST /issues.json</code> (Redmine REST API);</li>
+<li><code>GET /api/backlog/redmine.csv?ai_only=true</code> — CSV
+(<code>;</code>, UTF-8) для импорта задач в Redmine;
+<code>ai_only</code> — только задачи агента.</li>
+</ul>
+<h2 id="живая-карточка-товара-storesoftlineru">Живая карточка товара
+(store.softline.ru)</h2>
+<p><code>GET /api/storefront/card?family=KES</code> →
+<code>{&quot;ok&quot;: true, &quot;url&quot;: &quot;…&quot;, &quot;title&quot;: &quot;…&quot;, &quot;prices_rub&quot;: [23220], &quot;excerpt&quot;: &quot;текст карточки&quot;, &quot;issues&quot;: [&quot;На карточке под ценой остался текст-заглушка «Lorem ipsum» — видно покупателю&quot;], &quot;fetched_at&quot;: &quot;…&quot;}</code>.
+Публичная страница, без входа. Справка для продаж берёт из неё редакции,
+сроки и цену (<code>evidence.store_card</code>), проблемы карточки — в
+<code>internal_note</code>.</p>
+<h2 id="справка-для-отдела-продаж">Справка для отдела продаж</h2>
+<p>Бизнес-проблема задачи — ПМ тратит часы на одни и те же объяснения
+продавцам. Агент собирает шпаргалку по продукту из конкурентного
+анализа, интервью, сводки аналитика, сигналов, релизов и поиска Яндекса;
+каждый тезис со ссылкой на источник.</p>
+<p><code>POST /api/sales-briefs</code> <code>{&quot;product&quot;: &quot;KES&quot;}</code> —
+синхронно, ~30–50 с с LLM (без ключа — шаблон из цитат аналитика).
+Ответ:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;SB-1A2B3C&quot;</span><span class="fu">,</span> <span class="dt">&quot;created_at&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;mode&quot;</span><span class="fu">:</span> <span class="st">&quot;llm&quot;</span><span class="fu">,</span> <span class="dt">&quot;family&quot;</span><span class="fu">:</span> <span class="st">&quot;KES&quot;</span><span class="fu">,</span> <span class="dt">&quot;tag&quot;</span><span class="fu">:</span> <span class="st">&quot;сгенерирована ИИ-помощником&quot;</span><span class="fu">,</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;product&quot;</span><span class="fu">:</span> <span class="st">&quot;Kaspersky Endpoint Security для бизнеса&quot;</span><span class="fu">,</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;pitch&quot;</span><span class="fu">:</span> <span class="st">&quot;2–3 предложения для клиента&quot;</span><span class="fu">,</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;who_buys&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;…&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;key_points&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;text&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="st">&quot;E-01 | &lt;id фрагмента&gt; | URL&quot;</span><span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;vs_competitors&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;competitor&quot;</span><span class="fu">:</span> <span class="st">&quot;allsoft.ru&quot;</span><span class="fu">,</span> <span class="dt">&quot;point&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;faq&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;q&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;a&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;objections&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;objection&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;answer&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">,</span> <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="st">&quot;…&quot;</span><span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;dont_say&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;чего нельзя обещать — нет данных&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;internal_note&quot;</span><span class="fu">:</span> <span class="st">&quot;для ПМа: сигналы и релизы по продукту&quot;</span><span class="fu">,</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;message&quot;</span><span class="fu">:</span> <span class="st">&quot;сообщение в канал продаж (Dion)&quot;</span><span class="fu">,</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;video_script&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span><span class="dt">&quot;sec&quot;</span><span class="fu">:</span> <span class="st">&quot;0–10&quot;</span><span class="fu">,</span> <span class="dt">&quot;screen&quot;</span><span class="fu">:</span> <span class="st">&quot;что показать на карточке товара&quot;</span><span class="fu">,</span> <span class="dt">&quot;voice&quot;</span><span class="fu">:</span> <span class="st">&quot;текст для озвучки&quot;</span><span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a> <span class="dt">&quot;evidence&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;analyst_quotes&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;competitors&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;interviews&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;signals&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;releases&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span> <span class="dt">&quot;web&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">}}</span></span></code></pre></div>
+<p><code>product</code> — <code>KES</code>, <code>Astra</code> или любое
+название (поиск по базе знаний). <code>GET /api/sales-briefs</code> —
+список (без <code>evidence</code>),
+<code>GET /api/sales-briefs/{id}</code> — целиком. Чат подхватывает
+последнюю справку по упомянутому продукту
+(<code>facts.sales_brief</code>) — типовые вопросы отвечаются по ней.
+Токены — шаг <code>sales_brief</code> в
+<code>/api/usage/tokens</code>.</p>
+<h2 id="живой-счётчик-яндексметрики">Живой счётчик Яндекс.Метрики</h2>
+<p><code>GET /api/metrika/live?date1=7daysAgo&amp;date2=today</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;ok&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;error&quot;</span><span class="fu">:</span> <span class="st">&quot;METRIKA_TOKEN / METRIKA_COUNTER_ID не заданы&quot;</span><span class="fu">,</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="st">&quot;metrika&quot;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 id="токены-по-шагам-для-калькулятора">Токены по шагам (для
+калькулятора)</h2>
+<p><code>GET /api/usage/tokens</code></p>
+<p>Ответ:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;steps&quot;</span><span class="fu">:</span> <span class="fu">{},</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;records&quot;</span><span class="fu">:</span> <span class="dv">0</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+</body>
+</html>
