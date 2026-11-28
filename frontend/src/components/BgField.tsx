@@ -74,7 +74,8 @@ export default function BgField({ layer = 'back' }: { layer?: 'back' | 'front' }
     }
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
-      w = window.innerWidth; h = window.innerHeight
+      // в фоновой вкладке/превью окно бывает нулевой ширины — без этого createImageData(0, …) роняет всё приложение
+      w = Math.max(1, window.innerWidth || 1); h = Math.max(1, window.innerHeight || 1)
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       gw = Math.ceil(w / CELL); gh = Math.ceil(h / CELL)
