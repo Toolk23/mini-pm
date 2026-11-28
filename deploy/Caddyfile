@@ -1,0 +1,8 @@
+# HTTPS (Let's Encrypt) через Caddy. Своего домена нет — имя из IP через sslip.io.
+77-233-220-24.sslip.io {
+    encode gzip
+    reverse_proxy 127.0.0.1:8000
+}
+http://77.233.220.24 {
+    reverse_proxy 127.0.0.1:8000
+}

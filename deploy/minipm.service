@@ -1,0 +1,12 @@
+[Unit]
+Description=mini PM (FastAPI + собранный фронтенд)
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/mini-pm
+Environment=STATE_DIR=/opt/mini-pm-state
+ExecStart=/opt/mini-pm/.venv/bin/uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
