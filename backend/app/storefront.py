@@ -46,7 +46,7 @@ def read_card(url: str) -> dict:
     excerpt = _text(raw[h1.start():] if h1 else raw)[:1500]  # текст карточки начиная с заголовка товара
     issues = []
     if re.search(r"lorem ipsum", excerpt, re.I):
-        issues.append("На карточке под ценой остался текст-заглушка «Lorem ipsum» — видно покупателю")
+        issues.append("В HTML карточки скрытый текст-заглушка «Lorem ipsum» под ценой (покупателю не виден, остаётся в разметке)")
     if not prices:
         issues.append("На карточке не найдена цена")
     if title and "купить" not in text_lower(raw) and "корзин" not in excerpt.lower():

@@ -913,7 +913,7 @@ Search API)</h2>
 <h2 id="живая-карточка-товара-storesoftlineru">Живая карточка товара
 (store.softline.ru)</h2>
 <p><code>GET /api/storefront/card?family=KES</code> →
-<code>{&quot;ok&quot;: true, &quot;url&quot;: &quot;…&quot;, &quot;title&quot;: &quot;…&quot;, &quot;prices_rub&quot;: [23220], &quot;excerpt&quot;: &quot;текст карточки&quot;, &quot;issues&quot;: [&quot;На карточке под ценой остался текст-заглушка «Lorem ipsum» — видно покупателю&quot;], &quot;fetched_at&quot;: &quot;…&quot;}</code>.
+<code>{&quot;ok&quot;: true, &quot;url&quot;: &quot;…&quot;, &quot;title&quot;: &quot;…&quot;, &quot;prices_rub&quot;: [23220], &quot;excerpt&quot;: &quot;текст карточки&quot;, &quot;issues&quot;: [&quot;В HTML карточки скрытый текст-заглушка «Lorem ipsum» под ценой (покупателю не виден)&quot;], &quot;fetched_at&quot;: &quot;…&quot;}</code>.
 Публичная страница, без входа. Справка для продаж берёт из неё редакции,
 сроки и цену (<code>evidence.store_card</code>), проблемы карточки — в
 <code>internal_note</code>.</p>

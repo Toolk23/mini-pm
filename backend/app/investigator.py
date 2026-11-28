@@ -115,6 +115,7 @@ def collect_evidence(sig: dict) -> dict:
         "interviews": _quotes(analyst, "interview") + [h for q in interview_q for h in _search(q, 3, "interview")],
         "competitors": _quotes(analyst, "competitor") + [h for q in competitor_q for h in _search(q, 3, "competitor")],
         "analyst_evidence": analyst,
+        "store_check": store_check(fam),
         "web": _web(sig),
         "reference_case_traps": ingest.reference_case()["traps"],
     }
@@ -124,6 +125,12 @@ def _analyst_evidence(fam: str) -> dict | None:
     """Проверенная аналитиком сводка внешних источников (data/curated/evidence_<семейство>.json)."""
     p = config.DATA_DIR / "curated" / f"evidence_{ {'KES': 'kaspersky', 'Astra': 'astra'}.get(fam, fam.lower()) }.json"
     return json.loads(p.read_text("utf-8")) if p.exists() else None
+
+
+def store_check(fam: str | None) -> dict | None:
+    """Проверка пути покупки на живом магазине в тестовом ЛК (data/curated/store_check_<семейство>.json)."""
+    p = config.DATA_DIR / "curated" / f"store_check_{(fam or '').lower()}.json"
+    return json.loads(p.read_text("utf-8")) if fam and p.exists() else None
 
 
 def _quotes(analyst: dict | None, kind: str) -> list[dict]:
@@ -173,6 +180,8 @@ SYSTEM = """Ты — «мини ПМ», ИИ-помощник продакт-м�
 4. Каждое утверждение — со ссылкой на источник (лист, файл, строка, id задачи/релиза).
 5. Пиши по-русски, коротко и по делу, как опытный продакт-аналитик.
 6. Результаты поиска Яндекса (web) — внешний контекст, а не данные магазина: ссылайся на URL и не делай по ним выводов о причине падения без подтверждения в данных. Вывод аналитика (analyst_evidence) — проверенная сводка внешних источников.
+7. store_check — проверка пути покупки на живом магазине в тестовом ЛК (дата, факты S-01…): это наблюдения, а не замер.
+   Используй их в шаге про воронку и в гипотезах, ссылайся на S-id; причину по-прежнему называй «главным кандидатом».
 Верни строго JSON."""
 
 SCHEMA_HINT = """{
@@ -317,6 +326,39 @@ def investigate(sig: dict, inv_id: str) -> dict:
             rep, mode = _template_report(ev), f"template (LLM error: {e})"
     else:
         rep, mode = _template_report(ev), "template"
+    sc = ev.get("store_check")
+    sig_ev = ev.get("signal", {})
+    if sc and sig_ev.get("metric_id") == "lk_reco_click_visits":
+        s06 = next((i for i in sc["items"] if i["id"] == "S-06"), None)
+        if s06:
+            rep.setdefault("hypotheses", []).insert(0, {"text": s06["hypothesis"], "status": "подтверждено наблюдением, не замером",
+                                                        "check": "Сверить клики в ЛК (счётчик 95059120) с визитами utm_campaign=reco "
+                                                                 "в магазине (44242089) за недели с нулём [S-06]"})
+            rep["store_check"] = {"checked_at": sc["checked_at"], "verdict": s06["fact"], "risks": [s06]}
+        sc = None
+    elif sig_ev.get("kind") != "sales_drop":
+        sc = None
+    if sc and isinstance(rep.get("steps"), list):
+        # проверка на живом магазине — детерминированно, независимо от того, что написала модель
+        risks = [i for i in sc["items"] if i.get("hypothesis")]
+        note = (f" Проверка на живом магазине ({sc['checked_at']}, тестовый ЛК): {sc['verdict']}")
+        for st in rep["steps"]:
+            if isinstance(st, dict) and (st.get("n") == 4 or "воронк" in str(st.get("title", "")).lower()):
+                st["finding"] = (st.get("finding") or "") + note
+                st.setdefault("sources", []).append("Тестовый ЛК store.softline.ru")
+                break
+        hs = rep.setdefault("hypotheses", [])
+        if not any("продлени" in str(h.get("text", "")).lower() for h in hs if isinstance(h, dict)):
+            hs.insert(0, {"text": "По умолчанию на карточке KES выбрано «Продление», а на оформлении продления нужен скан "
+                                  "предыдущей лицензии — новые клиенты обрываются на последнем шаге",
+                          "status": "подтверждено наблюдением, не замером",
+                          "check": "A/B: по умолчанию «Полная версия»; сравнить долю самостоятельных заказов KES с контролем Astra "
+                                   "[S-02, S-03]"})
+        for h in hs:
+            if isinstance(h, dict) and "корзин" in str(h.get("text", "")).lower() and "слом" in str(h.get("text", "")).lower():
+                h["status"] = "проверена в тестовом ЛК: путь до корзины работает"
+        rep["store_check"] = {"checked_at": sc["checked_at"], "verdict": sc["verdict"],
+                              "risks": [{"id": i["id"], "fact": i["fact"], "hypothesis": i["hypothesis"]} for i in risks]}
     quotes = [q for q in ev["interviews"] + ev["competitors"] if q.get("curated")]
     for st in rep.get("steps", []) or []:  # цитаты аналитика — в шаг «Внешние источники» и в LLM-, и в шаблонном режиме
         if isinstance(st, dict) and (st.get("n") == 6 or "внешн" in str(st.get("title", "")).lower()):
@@ -379,7 +421,12 @@ def chat_facts(message: str) -> dict:
         detailed.append(f)
     focus_ids = {s["id"] for s in focus}
     others = [{k: s.get(k) for k in ("id", "title", "priority")} for s in sigs if s["id"] not in focus_ids]
-    return {"signals_detailed": detailed, "other_signals": others}
+    out = {"signals_detailed": detailed, "other_signals": others}
+    checks = {f: store_check(f) for f in (fams or {"KES"})}
+    checks = {f: c for f, c in checks.items() if c}
+    if checks:
+        out["store_check"] = checks  # проверка пути покупки в тестовом ЛК
+    return out
 
 
 WEB_TRIGGERS = ("интернет", "в сети", "поищи", "погугли", "загугли", "найди в", "рынок", "конкурент", "яндекс", "сейчас на сайт")

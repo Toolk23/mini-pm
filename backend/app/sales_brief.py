@@ -39,6 +39,11 @@ def analyst_faq(family: str | None = None) -> list[dict]:
     return items
 
 
+def _store_check(fam):
+    from .investigator import store_check
+    return store_check(fam)
+
+
 def collect_facts(product: str) -> dict:
     fam = _family(product)
     name = FAMILIES.get(fam, product)
@@ -73,6 +78,7 @@ def collect_facts(product: str) -> dict:
         "product": name, "family": fam,
         "store_card": storefront.card_for(fam),
         "analyst_faq": analyst_faq(fam),
+        "store_check": _store_check(fam),
         "analyst_quotes": _quotes(analyst, "competitor") + _quotes(analyst, "interview"),
         "analyst_verdict": analyst.get("verdict") if analyst else None,
         "competitors": competitors[:14], "interviews": interviews[:12],
@@ -88,6 +94,8 @@ SYSTEM = """Ты — «мини ПМ», ИИ-помощник продакт-м�
    id фрагмента базы, id релиза или URL. Без источника тезис не пиши.
 2. store_card — живая карточка (приоритет над остальными источниками по составу редакций, срокам и цене магазина);
    store_card.issues — проблемы карточки, вынеси их в internal_note для ПМа.
+   store_check — проверка пути покупки в тестовом ЛК: учти в faq (как выбрать «Полная версия», что для продления нужен скан
+   лицензии) и в internal_note (риски S-02, S-03, S-05).
    store_card — живая карточка товара на store.softline.ru сейчас: текущая цена магазина и редакции; ссылайся на её URL.
    Цены конкурентов — только сопоставимые лицензии (тот же SKU и срок); продления и несравнимые позиции не сравнивай.
 3. Если данных нет — так и пиши «нет данных», и вынеси это в dont_say (что продавцу нельзя обещать).

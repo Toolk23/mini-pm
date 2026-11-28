@@ -810,7 +810,7 @@
 
 ## Живая карточка товара (store.softline.ru)
 `GET /api/storefront/card?family=KES` → `{"ok": true, "url": "…", "title": "…", "prices_rub": [23220], "excerpt": "текст карточки",
-"issues": ["На карточке под ценой остался текст-заглушка «Lorem ipsum» — видно покупателю"], "fetched_at": "…"}`.
+"issues": ["В HTML карточки скрытый текст-заглушка «Lorem ipsum» под ценой (покупателю не виден)"], "fetched_at": "…"}`.
 Публичная страница, без входа. Справка для продаж берёт из неё редакции, сроки и цену (`evidence.store_card`),
 проблемы карточки — в `internal_note`.
 
