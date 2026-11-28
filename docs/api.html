@@ -138,6 +138,9 @@ table{border-collapse:collapse}td,th{border:1px solid #d0d7de;padding:4px 8px}
 Search API)</a></li>
 <li><a href="#почта-отправка-на-тестовый-ящик" id="toc-почта-отправка-на-тестовый-ящик">Почта (отправка на тестовый
 ящик)</a></li>
+<li><a href="#store-против-конкурентов" id="toc-store-против-конкурентов">Store против конкурентов</a></li>
+<li><a href="#приоритет-бэклога-по-пользе" id="toc-приоритет-бэклога-по-пользе">Приоритет бэклога по
+пользе</a></li>
 <li><a href="#экспорт-бэклога-в-redmine" id="toc-экспорт-бэклога-в-redmine">Экспорт бэклога в Redmine</a></li>
 <li><a href="#живая-карточка-товара-storesoftlineru" id="toc-живая-карточка-товара-storesoftlineru">Живая карточка товара
 (store.softline.ru)</a></li>
@@ -902,6 +905,20 @@ Search API)</h2>
 <code>/api/health</code> — <code>mail.configured</code>,
 <code>mail.to</code>.</li>
 </ul>
+<h2 id="store-против-конкурентов">Store против конкурентов</h2>
+<p><code>GET /api/competitors/matrix</code> →
+<code>{&quot;store_rank&quot;: 1, &quot;summary&quot;: &quot;Store — 1-е место из 11 … Отстаём: Поиск (4 против 5 у allsoft.ru), Личный кабинет (4 против 5 у komus.ru).&quot;, &quot;blocks&quot;: [{&quot;block&quot;: &quot;Поиск&quot;, &quot;weight_pct&quot;: 10, &quot;store&quot;: 4, &quot;best_rival&quot;: &quot;allsoft.ru&quot;, &quot;best_score&quot;: 5, &quot;gap&quot;: -1, &quot;verdict&quot;: &quot;отстаём&quot;, &quot;evidence&quot;: [&quot;E-03&quot;,&quot;E-04&quot;]}, …], &quot;shops&quot;: [{&quot;shop&quot;: &quot;store.softline.ru&quot;, &quot;scores&quot;: {…}, &quot;weighted_total&quot;: 4.1}, …]}</code>
+— итоговая матрица конкурентного исследования (лист «Итоги»), «-» = нет
+данных. Используется в справке для продаж и в чате (вопросы про
+конкурентов).</p>
+<h2 id="приоритет-бэклога-по-пользе">Приоритет бэклога по пользе</h2>
+<p><code>GET /api/backlog/ranking</code> →
+<code>[{&quot;task_id&quot;: &quot;T-07&quot;, &quot;title&quot;: &quot;…&quot;, &quot;status&quot;: &quot;Done&quot;, &quot;priority&quot;: &quot;High&quot;, &quot;score&quot;: 17.0, &quot;action&quot;: &quot;пересмотреть результат: задача сделана, но связана с отклонением&quot;, &quot;reasons&quot;: [&quot;+5: активный сигнал SIG-SALES-KES …&quot;, …]}]</code>,
+по убыванию <code>score</code>. Балл считает код (без LLM) из
+подтверждений разных источников: активные сигналы по метрикам задачи,
+связь с воронкой сигнала продаж, риски из проверки в тестовом ЛК (S-…),
+релиз — главный кандидат, интервью/сводка аналитика; несделанные задачи
+×1,5.</p>
 <h2 id="экспорт-бэклога-в-redmine">Экспорт бэклога в Redmine</h2>
 <ul>
 <li><code>GET /api/backlog/tasks/{id}/redmine</code> — JSON для

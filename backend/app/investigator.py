@@ -438,6 +438,9 @@ def answer(message: str, history: list[dict]) -> dict:
     from . import websearch
     if websearch.configured() and any(t in message.lower() for t in WEB_TRIGGERS):
         facts["web"] = websearch.search(message, 5)
+    if any(k in message.lower() for k in ("конкурент", "allsoft", "рынок", "положени", "сильн", "слаб")):
+        from . import competitors
+        facts["competitor_matrix"] = competitors.matrix()["summary"]  # итоговая матрица конкурентного исследования
     from . import sales_brief
     briefs = {f: sales_brief.latest_for(f) for f in _mentioned_families(message)}
     briefs = {f: {k: b.get(k) for k in ("id", "pitch", "key_points", "vs_competitors", "faq", "objections", "dont_say")}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { api } from '../api/client'
+import { api, useMocks } from '../api/client'
 import type { CuratedQuote, MailSent, SalesBrief } from '../api/types'
 import { Hl, KIcons, Kicker, Rich, SectionHead } from '../components/highlight'
 import StoreCard from '../components/StoreCard'
@@ -56,6 +56,8 @@ export default function Sales() {
         </div>
         <button className="btn btn-primary" onClick={build} disabled={building}>{building ? <><span className="spinner" /> Собираю…</> : 'Собрать справку'}</button>
       </section>
+
+      {!useMocks && <Positioning />}
 
       {building && <Building product={PRODUCTS.find((p) => p.id === product)?.label ?? product} />}
 
@@ -267,3 +269,56 @@ function SourceRef({ s, quotes }: { s?: string; quotes: Record<string, CuratedQu
 
 const clean = (t: string) => t.replace(/^\[[^\]]+\]\s*/, '')
 const clip = (t: string, n: number) => (t.length > n ? t.slice(0, n - 1) + '…' : t)
+
+
+/** Положение Store на фоне конкурентов — итоговая матрица конкурентного исследования (баллы 1–5, веса блоков). */
+function Positioning() {
+  const m = useApi(() => api.competitorMatrix())
+  const [open, setOpen] = useState(false)
+  if (m.error || !m.data) return null
+  const d = m.data
+  const tone = (v: string) => (v === 'отстаём' ? 'var(--danger)' : v === 'нет данных' ? 'var(--text-faint, #888)' : 'var(--success)')
+  return (
+    <section className="card reveal" style={{ padding: 16, margin: '12px 0 18px' }}>
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+        <div><b>Store против конкурентов</b> <span className="faint">— {d.summary}</span></div>
+        <button className="btn btn-sm btn-ghost" onClick={() => setOpen(!open)}>{open ? 'Скрыть таблицу' : 'Все магазины'}</button>
+      </div>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 10, fontSize: 14 }}>
+          <thead><tr className="faint" style={{ textAlign: 'left' }}>
+            <th style={{ padding: '4px 8px' }}>Блок</th><th>Вес</th><th>Store</th><th>Лучший конкурент</th><th>Вывод</th><th>Источники</th>
+          </tr></thead>
+          <tbody>
+            {d.blocks.map((b) => (
+              <tr key={b.block} style={{ borderTop: '1px solid var(--border)' }}>
+                <td style={{ padding: '6px 8px' }}>{b.block}</td>
+                <td className="faint">{b.weight_pct ?? '—'}%</td>
+                <td><b>{b.store ?? 'нет данных'}</b></td>
+                <td>{b.best_rival ? <>{b.best_rival} · {b.best_score}</> : 'нет данных'}{b.rivals_with_data < 6 && <span className="faint"> (данные у {b.rivals_with_data})</span>}</td>
+                <td style={{ color: tone(b.verdict) }}>{b.verdict}</td>
+                <td className="faint mono">{b.evidence.join(' · ') || '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {open && (
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 12, fontSize: 13 }}>
+            <thead><tr className="faint" style={{ textAlign: 'left' }}><th style={{ padding: '4px 8px' }}>Магазин</th>
+              {d.blocks.map((b) => <th key={b.block}>{b.block}</th>)}<th>Итог (с весом)</th></tr></thead>
+            <tbody>
+              {d.shops.map((s) => (
+                <tr key={s.shop} style={{ borderTop: '1px solid var(--border)', fontWeight: s.shop === 'store.softline.ru' ? 700 : 400 }}>
+                  <td style={{ padding: '4px 8px' }}>{s.shop}</td>
+                  {d.blocks.map((b) => <td key={b.block}>{s.scores[b.block] ?? '—'}</td>)}
+                  <td>{s.weighted_total ?? '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+      <div className="faint" style={{ fontSize: 12, marginTop: 6 }}>{d.source}. Шкала: {d.scale}; «—» — нет данных, не ноль.</div>
+    </section>
+  )
+}

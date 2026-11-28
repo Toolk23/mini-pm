@@ -804,6 +804,12 @@
 - `POST /api/sales-briefs/{id}/send` — разослать справку отделу продаж;
 - `GET /api/mail/log` — журнал отправленных писем; в `/api/health` — `mail.configured`, `mail.to`.
 
+## Store против конкурентов
+`GET /api/competitors/matrix` → `{"store_rank": 1, "summary": "Store — 1-е место из 11 … Отстаём: Поиск (4 против 5 у allsoft.ru), Личный кабинет (4 против 5 у komus.ru).",
+"blocks": [{"block": "Поиск", "weight_pct": 10, "store": 4, "best_rival": "allsoft.ru", "best_score": 5, "gap": -1, "verdict": "отстаём", "evidence": ["E-03","E-04"]}, …],
+"shops": [{"shop": "store.softline.ru", "scores": {…}, "weighted_total": 4.1}, …]}` — итоговая матрица конкурентного исследования
+(лист «Итоги»), «-» = нет данных. Используется в справке для продаж и в чате (вопросы про конкурентов).
+
 ## Приоритет бэклога по пользе
 `GET /api/backlog/ranking` → `[{"task_id": "T-07", "title": "…", "status": "Done", "priority": "High", "score": 17.0,
 "action": "пересмотреть результат: задача сделана, но связана с отклонением", "reasons": ["+5: активный сигнал SIG-SALES-KES …", …]}]`,

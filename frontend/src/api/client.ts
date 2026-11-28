@@ -68,6 +68,15 @@ export interface RankedTask {
   score: number; action: string; reasons: string[]; tags: string[]
 }
 
+export interface CompetitorBlock {
+  block: string; weight_pct: number | null; store: number | null; best_rival: string | null; best_score: number | null
+  gap: number | null; verdict: string; rivals_with_data: number; evidence: string[]
+}
+export interface CompetitorMatrix {
+  source: string; scale: string; store_rank: number; summary: string; blocks: CompetitorBlock[]
+  shops: { shop: string; scores: Record<string, number | null>; total: number; weighted_total: number | null }[]
+}
+
 export const api = {
   health: () => request<Health>('GET', '/health'),
   metrics: () => request<MetricInfo[]>('GET', '/metrics'),
@@ -90,6 +99,7 @@ export const api = {
     request<Task>('PATCH', `/backlog/tasks/${id}`, patch),
   redmine: (id: string) => request<unknown>('GET', `/backlog/tasks/${id}/redmine`),
   backlogRanking: () => request<RankedTask[]>('GET', '/backlog/ranking'),
+  competitorMatrix: () => request<CompetitorMatrix>('GET', '/competitors/matrix'),
 
   hypotheses: () => request<HypothesisRecord[]>('GET', '/hypotheses'),
   measure: (id: string, scenario: 'recovered' | 'not_recovered') =>

@@ -39,6 +39,12 @@ def analyst_faq(family: str | None = None) -> list[dict]:
     return items
 
 
+def _matrix_summary():
+    from . import competitors
+    m = competitors.matrix()
+    return {"summary": m["summary"], "blocks": m["blocks"]}
+
+
 def _store_check(fam):
     from .investigator import store_check
     return store_check(fam)
@@ -79,6 +85,7 @@ def collect_facts(product: str) -> dict:
         "store_card": storefront.card_for(fam),
         "analyst_faq": analyst_faq(fam),
         "store_check": _store_check(fam),
+        "competitor_matrix": _matrix_summary(),
         "analyst_quotes": _quotes(analyst, "competitor") + _quotes(analyst, "interview"),
         "analyst_verdict": analyst.get("verdict") if analyst else None,
         "competitors": competitors[:14], "interviews": interviews[:12],

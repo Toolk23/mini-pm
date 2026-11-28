@@ -375,6 +375,13 @@ def get_sales_brief(brief_id: str):
     return b
 
 
+@app.get("/api/competitors/matrix")
+def competitors_matrix():
+    """Положение Store на фоне конкурентов: баллы по блокам, лучший конкурент, разрыв."""
+    from . import competitors
+    return competitors.matrix()
+
+
 @app.get("/api/storefront/card")
 def storefront_card(family: str = "KES"):
     """Живая карточка товара store.softline.ru: название, цены, текст."""

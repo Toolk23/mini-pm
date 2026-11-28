@@ -72,3 +72,12 @@ def test_backlog_ranking_puts_kes_tasks_first():
     assert {"T-07", "T-08"} <= set(top)
     t08 = next(r for r in prioritizer.rank() if r["task_id"] == "T-08")
     assert t08["action"] == "взять в работу первой" and t08["reasons"]
+
+
+
+def test_competitor_matrix_store_position():
+    from backend.app import competitors
+    m = competitors.matrix()
+    assert m["store_rank"] == 1
+    lag = {b["block"] for b in m["blocks"] if b["verdict"] == "отстаём"}
+    assert lag == {"Поиск", "Личный кабинет"}
