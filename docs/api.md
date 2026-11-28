@@ -804,6 +804,13 @@
 - `POST /api/sales-briefs/{id}/send` — разослать справку отделу продаж;
 - `GET /api/mail/log` — журнал отправленных писем; в `/api/health` — `mail.configured`, `mail.to`.
 
+## Приоритет бэклога по пользе
+`GET /api/backlog/ranking` → `[{"task_id": "T-07", "title": "…", "status": "Done", "priority": "High", "score": 17.0,
+"action": "пересмотреть результат: задача сделана, но связана с отклонением", "reasons": ["+5: активный сигнал SIG-SALES-KES …", …]}]`,
+по убыванию `score`. Балл считает код (без LLM) из подтверждений разных источников: активные сигналы по метрикам задачи,
+связь с воронкой сигнала продаж, риски из проверки в тестовом ЛК (S-…), релиз — главный кандидат, интервью/сводка аналитика;
+несделанные задачи ×1,5.
+
 ## Экспорт бэклога в Redmine
 - `GET /api/backlog/tasks/{id}/redmine` — JSON для `POST /issues.json` (Redmine REST API);
 - `GET /api/backlog/redmine.csv?ai_only=true` — CSV (`;`, UTF-8) для импорта задач в Redmine; `ai_only` — только задачи агента.

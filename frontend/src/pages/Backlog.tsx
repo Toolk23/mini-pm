@@ -73,6 +73,8 @@ export default function Backlog() {
       {tasks.loading && !tasks.data && <Loading />}
       {tasks.error && <ErrorBox error={tasks.error} onRetry={tasks.reload} />}
 
+      {!useMocks && <Ranking key={tasks.data?.length ?? 0} />}
+
       {tasks.data && (
         <div className="board">
           {COLUMNS.filter((c) => c.id !== 'Reopened' || list.some((t) => t.status === 'Reopened') || drag).map((col, ci) => {
@@ -206,5 +208,39 @@ function TaskDrawer({ task, onClose, onPatch }: { task: Task; onClose: () => voi
         </div>
       </aside>
     </div>
+  )
+}
+
+
+/** Приоритет по пользе: балл считает сервер из подтверждений разных источников (сигналы, воронка, проверка в ЛК, интервью). */
+function Ranking() {
+  const r = useApi(() => api.backlogRanking())
+  const [all, setAll] = useState(false)
+  if (r.error || !r.data) return null
+  const rows = r.data.filter((x) => x.score > 0)
+  const shown = all ? rows : rows.slice(0, 3)
+  if (!rows.length) return null
+  return (
+    <section className="card reveal" style={{ padding: 16, margin: '12px 0 18px' }}>
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+        <div><b>Приоритет по пользе</b> <span className="faint">— какие задачи бэклога сильнее всего подтверждены данными</span></div>
+        {rows.length > 3 && <button className="btn btn-sm btn-ghost" onClick={() => setAll(!all)}>{all ? 'Свернуть' : `Все ${rows.length}`}</button>}
+      </div>
+      <ol style={{ margin: '10px 0 0', paddingLeft: 20, display: 'grid', gap: 10 }}>
+        {shown.map((x) => (
+          <li key={x.task_id}>
+            <div className="row" style={{ gap: 8, flexWrap: 'wrap', alignItems: 'baseline' }}>
+              <code className="task-id">{x.task_id}</code>
+              <span>{x.title}</span>
+              <span className="tok-id">{x.score} балл.</span>
+              <span className="faint">· {x.status} · {x.action}</span>
+            </div>
+            <ul className="faint" style={{ margin: '4px 0 0', paddingLeft: 18, fontSize: 13 }}>
+              {x.reasons.map((why) => <li key={why}>{why}</li>)}
+            </ul>
+          </li>
+        ))}
+      </ol>
+    </section>
   )
 }

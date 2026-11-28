@@ -63,6 +63,11 @@ const qs = (p: Record<string, string | number | undefined>) => {
   return str ? `?${str}` : ''
 }
 
+export interface RankedTask {
+  task_id: string; title: string; status: string; priority: string
+  score: number; action: string; reasons: string[]; tags: string[]
+}
+
 export const api = {
   health: () => request<Health>('GET', '/health'),
   metrics: () => request<MetricInfo[]>('GET', '/metrics'),
@@ -84,6 +89,7 @@ export const api = {
   patchTask: (id: string, patch: { status?: string; priority?: string }) =>
     request<Task>('PATCH', `/backlog/tasks/${id}`, patch),
   redmine: (id: string) => request<unknown>('GET', `/backlog/tasks/${id}/redmine`),
+  backlogRanking: () => request<RankedTask[]>('GET', '/backlog/ranking'),
 
   hypotheses: () => request<HypothesisRecord[]>('GET', '/hypotheses'),
   measure: (id: string, scenario: 'recovered' | 'not_recovered') =>

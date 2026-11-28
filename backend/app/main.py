@@ -209,6 +209,13 @@ def patch_task(task_id: str, body: TaskPatch):
         raise HTTPException(404) from None
 
 
+@app.get("/api/backlog/ranking")
+def backlog_ranking():
+    """Задачи бэклога по пользе: балл из подтверждений разных источников, с причинами."""
+    from . import prioritizer
+    return prioritizer.rank()
+
+
 @app.get("/api/backlog/redmine.csv")
 def backlog_redmine_csv(ai_only: bool = False):
     """CSV для импорта в Redmine; ai_only=true — только задачи с тегом «сгенерирована ИИ-помощником»."""

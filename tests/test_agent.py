@@ -64,3 +64,11 @@ def test_storefront_falls_back_to_snapshot():
     card = storefront.card_for("KES")
     assert card["live"] is False and 23220 in card["prices_rub"]
     assert "не виден" in card["issues"][0]
+
+
+def test_backlog_ranking_puts_kes_tasks_first():
+    from backend.app import prioritizer
+    top = [r["task_id"] for r in prioritizer.rank()[:2]]
+    assert set(top) == {"T-07", "T-08"}
+    t08 = next(r for r in prioritizer.rank() if r["task_id"] == "T-08")
+    assert t08["action"] == "взять в работу первой" and t08["reasons"]
